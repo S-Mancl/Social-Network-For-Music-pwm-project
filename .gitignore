@@ -1,0 +1,12 @@
+# LaTeX files
+*.out
+*.bbl
+*.blg
+*.aux
+*.run.xml
+*.gz
+*.toc
+*.bib
+# .env
+*.env
+*x.bib
