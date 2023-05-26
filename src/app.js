@@ -22,6 +22,10 @@ app.get('/coffee', (req, res) => {
     res.status(418).json({"answer":"I'm not a teapot, but I cannot brew coffee..."})
 })
 
+app.get('/genres',(req,res)=>{
+    
+})
+
 
 app.listen(process.env.PORT, () => {
     console.log(`Server started. Port ${process.env.PORT}. http://localhost:${process.env.PORT}/index.html`)

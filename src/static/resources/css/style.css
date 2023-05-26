@@ -33,10 +33,14 @@ span{
     font-weight: bold;
     color:#98B9F2;
 }
+
 div.progress-bar{
     background-color: #306BAC;
 }
 .row .col-md-2{
+    text-align: center;
+}
+.row{
     text-align: center;
 }
 
