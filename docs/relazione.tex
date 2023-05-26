@@ -1,0 +1,57 @@
+\documentclass{article}
+\usepackage{package}
+\graphicspath{ {./images/} }
+
+\title{
+    {\LARGE Relazione del Progetto di Programmazione Web e Mobile}\\
+    (PWM)\\
+    %\vskip 0.8 cm{\Large Facolt\`a di Scienze e Tecnologie}\\
+    \vskip 0.4cm{\large Dipartimento di Informatica Giovanni Degli Antoni}
+}
+\author{
+    \Large Samuele Manclossi\\
+    \large 09882A
+}
+\date{
+    {\large\today}
+}
+
+
+\begin{document}
+\pagenumbering{gobble}
+
+\begin{titlepage}
+    \pagestyle{empty}
+    \selectlanguage{italian}
+    \maketitle
+    \selectlanguage{italian}
+    \vspace{1em}
+    \epigraph{\say{Non quia difficilia sunt non audemos, sed quia non audemos difficilia sunt}}{--- \textup{Seneca}}
+    \selectlanguage{english}
+    \vspace{2em}
+    \begin{abstract}
+        \textit{\input{./src/abstract}}
+        %\textit{\kant[1]}% TODO 
+    \end{abstract}
+    \vskip 4cm\centerline{\includegraphics[height=50mm]{./src/unimi}}
+    \newpage
+    \pagenumbering{Roman}
+    \tableofcontents
+    \selectlanguage{italian}
+    \vspace{\fill}
+\end{titlepage}
+
+\pagenumbering{arabic}
+\lhead{Programmazione Web e Mobile}
+\rhead{Samuele Manclossi}
+
+\selectlanguage{italian}
+\section{Analisi delle specifiche}
+\input{./src/analisi_specifiche}
+\section{Tecnologie utilizzate e interazioni tra esse}
+\input{./src/tecnologie}
+\section{Interfaccia utente e front-end}
+\input{./src/frontend}
+\section{Appendice A: brani di codice}
+\section{Appendice B: response status}
+\end{document}

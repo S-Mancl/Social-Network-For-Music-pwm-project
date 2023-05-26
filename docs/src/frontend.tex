@@ -1,0 +1,43 @@
+\subsection{Pagine e relative funzioni e visibilità}
+\subsubsection{Welcome page - \textit{index.html}}
+La pagina di accoglienza sarà una pagina con pochissime funzionalità, destinata prevalentemente a fare da \say{vetrina} del servizio offerto.
+
+Vi saranno due pulsanti: \verb|login| e \verb|register|, e la navbar per navigare invece la parte pubblica. Se si è già loggati, nel load si verrà reindirizzati alla pagina dove sono mostrate le playlist pubbliche o a quella dove è possibile effettuare ricerche.
+
+\subsubsection{Registrazione - \textit{register.html}}
+La pagina di registrazione sarà costituita da un form. Se si è loggati, si verrà reindirizzati automaticamente alla pagina di login. Altrimenti, ci si potrà registrare. Se la registrazione va a buon fine si viene reindirizzati alla pagina di login, altrimenti viene mostrato il messaggio d'errore restituito dal backend.
+
+\subsubsection{Login - \textit{login.html}}
+La pagina di login sarà costituita da un form. Se si è già loggati si viene reindirizzati alla pagina di visualizzazione dati pubblici, altrimenti ci si può loggare. In ogni caso saranno emessi appositi messaggi per segnalare lo stato.
+
+\subsubsection{Ricerca - \textit{search.html}}
+La pagina di ricerca consentirà di effettuare una ricerca per vari campi. Il meccanismo è ancora da studiare nei dettagli.
+
+\subsubsection{Playlist - \textit{playlists.html}}
+In questa pagina si potranno vedere le playlist pubbliche.
+
+\subsubsection{MyPlaylists - \textit{myplaylists.html}}
+In questa pagina si potranno vedere le proprie playlist, divise tra private, pubbliche e quelle altrui che vengono seguite.
+
+\subsection{Navbar condivisa tra tutte le pagine}
+Tutte le pagine avranno accesso a una navbar condivisa, costituita dai seguenti elementi.
+\subsubsection{Pulsante \textit{SNM}}
+Consente di tornare alla pagina delle playlist pubbliche.
+\subsubsection{Pulsante \textit{Search}}
+Consente di tornare alla pagina di ricerca.
+\subsubsection{Pulsante \textit{Groups}}
+Consente di tornare alla pagina dove sono mostrati i gruppi, ed eventualmente visualizzare le informazioni su di essi.
+\subsubsection{Dropdown \textit{User}}
+Esso conterrà diverse operazioni sul profilo, tra cui le seguenti:
+\begin{center}
+    \begin{tabular}[h]{ c || c | c }
+        \textbf{Nome}&\textbf{Cosa fa}&\textbf{Condizioni di visualizzazione}\\
+        \hline
+        \textit{login}&Redirige alla pagina di login&Non essere loggati\\
+        \textit{register}&Redirige alla pagina di registrazione&Sempre visibile\\
+        \textit{profile}&Redirige alla pagina del profilo&Essere loggati\\
+        \textit{logout}&Effettua il logout e redirige alla \say{vetrina}&Essere loggati\\
+        \textit{my playlists}&Redirige alla pagina privata delle playlist personali&Essere loggati\\
+    \end{tabular}
+\end{center}
+\newpage

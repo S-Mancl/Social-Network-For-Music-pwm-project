@@ -1,0 +1,48 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Social Network for Music: Backend",
+    "description": "The backend for SNM project",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "GET",
+      "description": "All GET requests"
+    },
+    {
+      "name": "PUT",
+      "description": "All PUT requests"
+    },
+    {
+      "name": "DELETE",
+      "description": "All DELETE requests"
+    },
+    {
+      "name": "General",
+      "description": "Returns basic informations"
+    },
+    {
+      "name": "Data",
+      "description": "Can be used to interact with data"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/coffee": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "418": {
+            "description": "I'm a teapot"
+          }
+        }
+      }
+    }
+  }
+}

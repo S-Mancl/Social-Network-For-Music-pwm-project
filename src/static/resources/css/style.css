@@ -1,0 +1,128 @@
+body{
+    background-color: #141B41;
+}
+nav{
+    background-color: #141B41;
+}
+a.nav-link, a.navbar-brand, a.nav-link.dropdown-toggle{
+    color: #98B9F2;
+    text-align: center;
+}
+a.nav-link:hover,a.navbar-brand:hover, a.nav-link.dropdown-toggle.show{
+    color: #98B9F2;
+    text-decoration: underline;
+}
+nav li{
+    border: 1px solid #141B41;
+    border-radius: 40%;
+    margin: 5px;
+}
+nav li:hover{
+    border-radius: 30%;
+    border: 1px solid #918EF4;
+    transition: 0.3s;
+}
+div.col-md-4{
+    text-align: center;
+}
+#carousel .carousel-item{
+    padding: 3%;
+}
+span{
+    font-size:xx-large;
+    font-weight: bold;
+    color:#98B9F2;
+}
+div.progress-bar{
+    background-color: #306BAC;
+}
+.row .col-md-2{
+    text-align: center;
+}
+
+#main-container{
+    padding-top: 3%;
+}
+#main-container>.row{
+    margin-top: 10px;
+}
+.btn-lg{
+    margin: 5% 0% 5% 10%;
+    border-radius: 10%;
+    width:80%;
+    background-color: rgba(0,0,0,0);
+    border:3px solid #918EF4;
+    transition: 0.6s ease;
+}
+.btn-lg.register{
+    background-color:#918EF4;
+    color:#141B41;
+}
+.btn-lg:hover{
+    background-color:#918EF4;
+    border-color: #918EF4;
+    color:#141B41;
+    border-radius: 30%;
+    transition: 0.6s ease;
+}
+.row.titlerow{
+    margin-bottom:10px;
+}
+.buttons{
+    margin-top: 20%;
+}
+#accordionExample,#carousel{
+    padding:10%;
+}
+.accordion-button.collapsed,.accordion-button,.accordion-collapse{
+    background-color: #141B41;
+    color:#98B9F2;
+    border:#918EF4;
+}
+.accordion-item{
+    border:2px solid #918EF4;
+}
+ul.dropdown-menu{
+    background-color: #141B41;
+    border: 2px solid #918EF4;
+}
+ul.dropdown-menu li a{
+    border: 1px solid #918EF4;
+    color:#918EF4;
+    transition: 0.6s ease;
+    border-radius: 10%;
+}
+ul.dropdown-menu li a:active{
+    border: 1px solid #918EF4;
+    color:#918EF4;
+    border-radius: 30%;
+    transition: 0.6s ease;
+}
+.navbar-toggler,.navbar-toggler-icon{
+    background-color:#918EF4;
+}
+.nav-image{
+    width: 5%;
+    height: 5%;
+    margin-right:5%;
+    -webkit-filter: invert(100%); /* Safari/Chrome */
+    filter: invert(100%);
+}
+.nav-brand-image{
+    width: 30%;
+    height: 30%;
+}
+.carousel-inner img{
+    border-radius: 20%;
+    padding:10%;
+    border:3px solid #918EF4;
+    transition: 0.6s ease;
+}
+.carousel-inner img:hover{
+    border-radius: 5%;
+    transition: 0.6s ease;
+}
+/*debug purposes only
+#main-container div{
+    border:1px solid magenta;
+}*/

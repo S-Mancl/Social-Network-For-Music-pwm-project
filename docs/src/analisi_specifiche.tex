@@ -1,0 +1,45 @@
+\subsection{Funzionalità da implementare}
+\uppercase{Social Network for Music} (di seguito \verb|SNM|) deve essere in grado di svolgere diverse funzioni, tra cui le seguenti.
+\subsubsection{Gestione degli utenti}
+La gestione degli utenti è necessaria, e deve essere affrontata attraverso diverse fasi:
+\paragraph{Registrazione} La registrazione degli utenti avviene attraverso una pagina apposita, a cui può accedere qualsiasi utente. Questa pagina consente (dopo appositi controlli) di effettuare una richiesta POST al backend, che si occuperà di registrare i dati dopo averli nuovamente verificati.
+
+I campi che saranno richiesti in fase di registrazione dovranno essere:
+\begin{itemize}
+    \item \textbf{Email}, campo unico che verrà usato per autenticarsi.
+    \item \textbf{Password}
+    \item \textbf{Conferma password}
+    \item \textbf{Nome utente}, che sarà il nome mostrato agli altri quando una playlist viene condivisa
+    \item \textbf{Preferenze musicali} (genere preferito, da una lista restituita dal backend)
+    \item \textbf{Gruppi musicali preferiti}
+\end{itemize}
+\paragraph{Login} Mediante il login un utente entra nel proprio profilo, diventando in grado di vedere le proprie playlist e il proprio profilo.
+
+Questo avverrà attraverso la richiesta di due campi:
+\begin{itemize}
+    \item Email
+    \item Password
+\end{itemize}
+
+Nonostante sia stato suggerito di salvarsi le informazioni in locale sarebbe più opportuno usare i token JWT. A questo sarà dedicata una apposita sezione.
+\paragraph{Logout} Questa funzione si spiega da sola, senza bisogno di tanti commenti.
+\paragraph{Cambiare i propri dati} Ogni dato deve essere modificabile tramite apposite richieste al backend.
+\paragraph{Eliminare l'account} Deve essere possibile eliminare l'account, cancellando tutte le informazioni che lo riguardano. Se l'account viene eliminato, vengono rimosse tutte le playlist create da quell'utente. Sarebbe pertanto consigliabile la realizzazione di un sistema che consenta, all'eliminazione dell'account, di stabilire a chi passa la proprietà di quelle playlist, oppure scegliere di eliminarle.
+\subsubsection{Ricerca e visualizzazione dei dati}
+Questo deve essere fatto attraverso due pagine apposite, una che si occupi della ricerca e ne mostri i risultati e una che mostri le informazioni sul singolo brano, permettendo l'inserimento di questo nelle playlist (eventualmente la creazione di una nuova playlist in caso non dovesse già esistere).
+\subsubsection{Preferiti e Playlist}
+\paragraph{Preferiti} Un utente può decidere di selezionare un numero imprecisato di brani come suoi brani preferiti. Questo li aggiunge alle informazioni (private) del suo account.
+\paragraph{Playlist} Una playlist è una collezione di brani denotata da alcune informazioni:
+\begin{itemize}
+    \item \textbf{Proprietario}
+    \item \textbf{Nome}
+    \item \textbf{Descrizione}
+    \item \textbf{Canzoni contenute} (si ipotizza di porre gli indici in un array)
+    \item \textbf{Stato di condivisione}
+\end{itemize}
+Una playlist privata può essere vista solamente dal creatore, una playlist pubblica può essere vista liberamente da chiunque mediante una apposita pagina.
+\subsubsection{Opzionale: creazione di gruppi}
+Si potranno creare delle comunità di utenti, di qui in avanti \verb|gruppi|, a cui gli utenti potranno iscriversi / disiscriversi. Quando un utente è iscritto, esso è in grado di vedere tutte le playlist condivise con quella comunità specifica, e risulta anche in grado di parteciparvi condividendo altre playlist.
+
+Il creatore del gruppo può essere in grado di escludere qualcuno dal gruppo (forse).
+\newpage

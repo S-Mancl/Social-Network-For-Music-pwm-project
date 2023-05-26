@@ -6,7 +6,10 @@
 *.run.xml
 *.gz
 *.toc
-*.bib
-# .env
-*.env
 *x.bib
+
+# .env
+.env
+
+# node modules
+*/node_modules/*

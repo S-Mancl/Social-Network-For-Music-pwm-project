@@ -1,0 +1,208 @@
+\ProvidesPackage{package}
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[italian,english]{babel}
+\RequirePackage[a4paper, portrait, margin=2cm]{geometry}
+\RequirePackage{dirtytalk}
+
+%drawings
+\RequirePackage{tikz}
+\usetikzlibrary{positioning,calc,matrix}
+
+% HEADER
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\pagenumbering{arabic}
+
+\RequirePackage{url}
+\RequirePackage{hyperref}
+
+% TABELLE
+\RequirePackage{array}
+\RequirePackage{longtable}
+\RequirePackage{multirow}
+
+% FIGURE
+\RequirePackage{graphicx}
+\RequirePackage{wrapfig}
+\RequirePackage{subcaption}
+
+%simboli
+\RequirePackage{fontawesome}
+
+%comandi
+
+\newcommand{\Vero}{\textit{Vero} (1)}
+\newcommand{\Falso}{\textit{Falso} (0)}
+
+% colori
+\RequirePackage{xcolor}
+
+%Teoremi etc
+\RequirePackage{amsthm}
+
+\theoremstyle{definition} %stile con testo normale
+\newtheorem*{oss}{Osservazione}
+\newtheorem*{definition}{DEF}
+
+\theoremstyle{plain}
+\newtheorem*{theorem}{Teorema}
+\newtheorem*{law}{Legge}
+\newtheorem*{esempio*}{Esempio}
+\newtheorem*{lemma}{Lemma}
+\newtheorem*{corollary*}{Corollario}
+
+\newtheorem{esempio}{\color{teal}Esempio}[section]
+\newtheorem{exc}{Esercizio}[subsubsection]
+\newtheorem{axiom}{Assioma}
+\newtheorem{corollary}{Corollario}
+
+%bibliography
+\RequirePackage{csquotes}
+\RequirePackage[backend=bibtex,style=numeric]{biblatex}
+\addbibresource{bibliography.bib}
+\RequirePackage{etoolbox}
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+\BiblatexSplitbibDefernumbersWarningOff
+
+%quotes
+\RequirePackage{epigraph}
+\setlength\epigraphwidth{8cm}
+\setlength\epigraphrule{0pt}
+\makeatletter
+\patchcmd{\epigraph}{\@epitext{#1}}{\itshape\@epitext{#1}}{}{}
+\makeatother
+
+
+%meme
+\RequirePackage{kantlipsum}
+
+%timeline
+\RequirePackage{environ}
+\RequirePackage{charter}
+
+\makeatletter
+    \let\matamp=&
+    \catcode`\&=13
+    \def&{%
+        \iftikz@is@matrix%
+            \pgfmatrixnextcell%
+        \else%
+            \matamp%
+        \fi%
+    }
+\makeatother
+
+\newcounter{lines}
+\def\endlr{\stepcounter{lines}\\}
+
+\newcounter{vtml}
+\setcounter{vtml}{0}
+
+\newif\ifvtimelinetitle
+\newif\ifvtimebottomline
+
+\tikzset{
+    description/.style={column 2/.append style={#1}},
+    timeline color/.store in=\vtmlcolor,
+    timeline color=red!80!black,
+    timeline color st/.style={fill=\vtmlcolor,draw=\vtmlcolor},
+    use timeline header/.is if=vtimelinetitle,
+    use timeline header=false,
+    add bottom line/.is if=vtimebottomline,
+    add bottom line=false,
+    timeline title/.store in=\vtimelinetitle,
+    timeline title={},
+    line offset/.store in=\lineoffset,
+    line offset=4pt,
+}
+
+\NewEnviron{vtimeline}[1][]{%
+    \setcounter{lines}{1}%
+    \stepcounter{vtml}%
+    \begin{tikzpicture}[column 1/.style={anchor=east},
+        column 2/.style={anchor=west},
+        text depth=0pt,text height=1ex,
+        row sep=1ex,
+        column sep=1em,
+        #1
+    ]
+        \matrix(vtimeline\thevtml)[matrix of nodes]{\BODY};
+        \pgfmathtruncatemacro\endmtx{\thelines-1}
+
+        \path[timeline color st]
+            ($(vtimeline\thevtml-1-1.north east)!0.5!(vtimeline\thevtml-1-2.north west)$)--
+            ($(vtimeline\thevtml-\endmtx-1.south east)!0.5!(vtimeline\thevtml-\endmtx-2.south west)$);
+
+        \foreach \x in {1,...,\endmtx}{
+            \node[circle,timeline color st, inner sep=0.15pt, draw=white, thick]
+            (vtimeline\thevtml-c-\x) at
+            ($(vtimeline\thevtml-\x-1.east)!0.5!(vtimeline\thevtml-\x-2.west)$){};
+                \draw[timeline color st](vtimeline\thevtml-c-\x.west)--++(-3pt,0);
+        }
+
+        \ifvtimelinetitle%
+            \draw[timeline color st]([yshift=\lineoffset]vtimeline\thevtml.north west)--
+                ([yshift=\lineoffset]vtimeline\thevtml.north east);
+
+            \node[anchor=west,yshift=16pt,font=\large]
+                at (vtimeline\thevtml-1-1.north west)
+                {\textsc{Timeline \thevtml}: \textit{\vtimelinetitle}};
+        \else%
+            \relax%
+        \fi%
+
+        \ifvtimebottomline%
+            \draw[timeline color st]([yshift=-\lineoffset]vtimeline\thevtml.south west)--
+            ([yshift=-\lineoffset]vtimeline\thevtml.south east);
+        \else%
+            \relax%
+        \fi%
+    \end{tikzpicture}
+}
+
+%chess pieces
+\RequirePackage{utfsym}
+
+%pdfs
+\RequirePackage{pdfpages}
+
+%for code
+\RequirePackage{listings}
+\RequirePackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tlrb,
+  %language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+%funny quotes
+\newcommand{\funnyquote}[2]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textit{\say{#1}}\\\vspace{-5mm}\begin{flushright}#2\end{flushright}
+    \hrule
+    \vspace{5mm}
+}
+
+%centered images with no overflow
+\newcommand{\includecenter}[1]{
+    \begin{center}\includegraphics[scale=0.5]{#1}\end{center}
+}

@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongodb": "^5.4.0",
+    "nodemon": "^2.0.22",
+    "swagger-ui-express": "^4.6.2"
+  },
+  "devDependencies": {
+    "swagger-autogen": "^2.23.1"
+  }
+}
