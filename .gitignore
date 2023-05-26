@@ -7,6 +7,7 @@
 *.gz
 *.toc
 *x.bib
+*.log
 
 # .env
 .env
