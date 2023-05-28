@@ -23,6 +23,10 @@ app.get('/coffee', (req, res) => {
 })
 
 app.get('/genres',(req,res)=>{
+    //TODO
+})
+
+app.post("/register", function (req, res) {
     
 })
 
