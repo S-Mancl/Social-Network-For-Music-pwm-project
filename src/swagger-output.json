@@ -33,15 +33,40 @@
     "http"
   ],
   "paths": {
-    "/coffee": {
+    "/genres": {
       "get": {
         "description": "",
         "parameters": [],
         "responses": {
-          "418": {
-            "description": "I'm a teapot"
+          "200": {
+            "description": "OK"
           }
         }
+      }
+    },
+    "/types": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/search": {
+      "post": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     }
   }
