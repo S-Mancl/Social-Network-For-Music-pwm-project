@@ -108,6 +108,20 @@ function askSpotify(res,question){
     )
 }
 
+function register(res,user){
+    /*
+        Format of user
+        user = {
+            name: String,
+            surname: String,
+            userName: String
+            favoriteGenres: Array(genres) <- tra /genres
+            password: String
+
+        }
+    */
+}
+
 app.use('/',express.static(__dirname + '/static'))
 app.use('/images',express.static(__dirname+'/static/resources/imgs'))
 app.use('/scripts',express.static(__dirname+'/static/resources/srcs'))
@@ -127,7 +141,7 @@ app.get('/types',(req,res)=>{
 })
 
 app.post("/register", (req, res)=>{
-    
+    register(res,req.body)
 })
 
 app.post("/search",(req,res)=>{
