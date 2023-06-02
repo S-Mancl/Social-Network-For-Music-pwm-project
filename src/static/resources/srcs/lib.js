@@ -10,6 +10,55 @@ function getOptions(){
             });
         })
 }
+function getGenres(){
+    var toFill = document.getElementById("genres")
+    toFill.style+="border-radius:5%;border:3px solid #918EF4;margin-top:30px"
+    fetch('/genres')
+        .then((a) => a.json())
+        .then((response) => {
+            response.results.forEach(element => {
+                //console.log(element)
+                toFill.innerHTML+=`<div class="form-check"><input class="form-check-input" type="checkbox" value="${element}" id="${element}"> <label class="form-check-label normal-text" for="${element}">${element}</label></div>`
+            });
+        })
+}
+function register(){
+    var user = {
+        name: document.getElementById("name").value,
+        surname: document.getElementById("surname").value,
+        userName: document.getElementById("userName").value,
+        email: document.getElementById(`email`).value,
+        birthDate: document.getElementById(`birthDate`).value,
+        favoriteGenres: [],
+        password: document.getElementById(`pass1`).value
+    }
+    if(document.getElementById(`pass1`).value==document.getElementById(`pass2`).value){
+        var inputElements = document.getElementsByClassName('form-check-input');
+        for(var i=0; inputElements[i]; ++i){
+            if(inputElements[i].checked){
+                user.favoriteGenres.push(inputElements[i].value);
+            }
+        }
+        //console.log(JSON.stringify(user))
+        fetch("/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(user)
+        })
+        .then(a => a.json())
+        .then(response => {
+            console.log(response)
+            //############ HERE
+        })
+    }
+    else{
+        console.log(`passwords do not match`)
+        //############ HERE
+    }
+        
+}
 function askAndRedirect(){
     question = {
         string: document.getElementById("search").value,

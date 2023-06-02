@@ -52,6 +52,12 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
+function hash(input) {
+    return crypto.createHash('md5')
+        .update(input)
+        .digest('hex')
+}
+
 function perform(questo,paramA,paramB){
     if(token.hasExpired()) token.regenAndThen(questo,paramA,paramB)
     else questo(paramA,paramB)
@@ -130,26 +136,53 @@ function getInfo(details,res){
     )
 }
 
-function register(res,user){
+async function register(res,user){
     /*
         Format of user
         user = {
             name: String,
             surname: String,
-            userName: String
+            userName: String,
+            email: String
+            birthDate: Date
             favoriteGenres: Array(genres) <- tra /genres
             password: String
-
         }
     */
-    user.name = validator.escape(user.name)
-    user.surname = validator.escape(user.surname)
-    user.userName = validator.escape(user.userName)
-    user.password = validator.escape(user.password)
-    if(!validator.isStrongPassword(user.password)) res.status(400).json({reason:`${user.password} is not strong enough as a password`})
-    else if(!validator.isEmail(user.email)) res.status(400).json({reason:`Are you sure ${user.email} is an email?`})
 
-    res.status(200).json({})
+    if(user.name==undefined || user.password==undefined || user.surname == undefined || user.userName == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({reason: `You are missing some fields...`})
+    else{
+        [`name`,`surname`,`userName`,`birthDate`,`password`,`email`].forEach(key => {
+            //console.log(user[key])
+            user[key] = validator.escape(validator.trim(user[key]))
+        })
+        for (let i = 0; i < user.favoriteGenres.length; i++){
+            user.favoriteGenres[i] = validator.escape(validator.trim(user.favoriteGenres[i]))
+        }
+        if(!validator.isEmail(user.email)) res.status(400).json({reason:`Are you sure ${user.email} is an email?`})
+        else if(!validator.isStrongPassword(user.password)) res.status(400).json({reason:`${user.password} is not strong enough as a password`})
+        else if(!validator.isDate(user.birthDate)) res.status(400).json({reason:`${user.birthDate} is not an accepted birth date`})
+        else if(!validator.isAlpha(user.name)||!validator.isAlpha(user.surname)) res.status(400).json({reason:`${user.name} ${user.surname} is not an accepted name... It contains numbers!`})
+        else{
+            user.email = validator.normalizeEmail(user.email)
+            user.password = hash(user.password)
+            var pwmClient = await new mongoClient(mongoUrl).connect()
+            try {
+                var items = await pwmClient.db("pwm_project").collection('users').insertOne(user)
+                delete items.insertedId
+                res.status(200).json(items)
+            }
+            catch (e) {
+                console.log('catch in test');
+                if (e.code == 11000) {
+                    res.status(400).json({reason:"Already present user: please choose a different username or email"})
+                    return
+                }
+                res.status(500).json({reason:`Generic error: ${e}`})
+        
+            };
+        }
+    }
 }
 
 app.use('/',express.static(__dirname + '/static'))
@@ -166,11 +199,21 @@ app.get('/genres',(req,res)=>{
     perform(getGenres,req,res);
 })
 app.get('/types',(req,res)=>{
-    res.status(200).json(["album","playlist","episode","track","audiobook","artist","show"].sort())
+    res.status(200).json(
+        [
+            "album",
+            "playlist",
+            "episode",
+            "track",
+            "audiobook",
+            "artist",
+            "show"
+        ]
+            .sort())
 })
 
 app.post("/register", (req, res)=>{
-    register(res,req.body)
+    perform(register,res,req.body)
 })
 
 app.post("/search",(req,res)=>{
