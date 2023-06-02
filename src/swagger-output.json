@@ -33,6 +33,17 @@
     "http"
   ],
   "paths": {
+    "/coffee": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "418": {
+            "description": "I'm a teapot"
+          }
+        }
+      }
+    },
     "/genres": {
       "get": {
         "description": "",
@@ -67,6 +78,29 @@
         "description": "",
         "parameters": [],
         "responses": {}
+      }
+    },
+    "/requireInfo/{kind}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     }
   }

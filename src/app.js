@@ -5,6 +5,7 @@ const crypto = require('crypto')
 const cors = require('cors')
 const mongoClient = require('mongodb').MongoClient;
 const mongoUrl = "mongodb+srv://"+process.env.MONGONAME+":"+process.env.MONGOPASSWORD+"@pwm.hwxyajg.mongodb.net/?retryWrites=true&w=majority"
+const path = require('path')
 
 const app = express()
 app.use(express.json())
@@ -14,7 +15,6 @@ var token = {
     value: "none",
     expiration: 42,
     regenAndThen : function(func_to_apply,paramA,paramB){
-        this.expiration = new Date().getTime(); //ms since doesn't matter
         fetch(baseUrls.token, {
             method: "POST",
             headers: {
@@ -25,6 +25,7 @@ var token = {
         })
         .then((response) => response.json())
         .then((tokenResponse) => {
+            this.expiration = new Date().getTime(); //ms since doesn't matter
             //console.log(tokenResponse.access_token)
             this.value=tokenResponse.access_token
             //console.log(this.value)
@@ -43,12 +44,18 @@ var token = {
 const baseUrls = {
     search: "https://api.spotify.com/v1/search?",
     token: "https://accounts.spotify.com/api/token",
-    genres: "https://api.spotify.com/v1/recommendations/available-genre-seeds"
+    genres: "https://api.spotify.com/v1/recommendations/available-genre-seeds",
+    basic: "https://api.spotify.com/v1/"
 }
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+
+function perform(questo,paramA,paramB){
+    if(token.hasExpired()) token.regenAndThen(questo,paramA,paramB)
+    else questo(paramA,paramB)
+}
 
 function getGenres(req,res){
     //console.log(token.value)
@@ -71,7 +78,7 @@ function getGenres(req,res){
 }
 
 function createUrlForSearch(question){
-    url = baseUrls.search+"q="+question.string+"&type="
+    var url = baseUrls.search+"q="+question.string+"&type="
     question.type.forEach(element => {
         url += element
         url += ","
@@ -108,6 +115,21 @@ function askSpotify(res,question){
     )
 }
 
+function getInfo(details,res){
+    var url = baseUrls.basic+details.kind+"/"+details.id
+    fetch(url,{
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token.value,
+        },
+    })
+    .then((response) => response.json())
+    .then((searchResults) => {
+        res.json(searchResults)
+    }
+    )
+}
+
 function register(res,user){
     /*
         Format of user
@@ -120,6 +142,14 @@ function register(res,user){
 
         }
     */
+    user.name = validator.escape(user.name)
+    user.surname = validator.escape(user.surname)
+    user.userName = validator.escape(user.userName)
+    user.password = validator.escape(user.password)
+    if(!validator.isStrongPassword(user.password)) res.status(400).json({reason:`${user.password} is not strong enough as a password`})
+    else if(!validator.isEmail(user.email)) res.status(400).json({reason:`Are you sure ${user.email} is an email?`})
+
+    res.status(200).json({})
 }
 
 app.use('/',express.static(__dirname + '/static'))
@@ -133,8 +163,7 @@ app.get('/coffee', (req, res) => {
 
 app.get('/genres',(req,res)=>{
     //console.log(token.hasExpired())
-    if(token.hasExpired()) token.regenAndThen(getGenres,req,res);
-    else getGenres(req,res)
+    perform(getGenres,req,res);
 })
 app.get('/types',(req,res)=>{
     res.status(200).json(["album","playlist","episode","track","audiobook","artist","show"].sort())
@@ -145,10 +174,22 @@ app.post("/register", (req, res)=>{
 })
 
 app.post("/search",(req,res)=>{
-    if(token.hasExpired()) token.regenAndThen(askSpotify,res,req.body);
-    else askSpotify(res,req.body)
+    perform(askSpotify,res,req.body);
 })
 
-app.listen(process.env.PORT, () => {
+app.get('/requireInfo/:kind',(req,res)=>{
+    const details = {
+        kind: req.params.kind,
+        id : req.query.id
+    }
+    perform(getInfo,details,res)
+})
+
+app.get("*", (req, res) => {
+    //console.log(path.join(__dirname,'/static/not_found.html'))
+    res.status(404).sendFile(path.join(__dirname, '/static/not_found.html'));
+})
+
+app.listen(process.env.PORT, "0.0.0.0", () => {
     console.log(`Server started. Port ${process.env.PORT}. http://localhost:${process.env.PORT}/index.html`)
 })

@@ -28,12 +28,30 @@ div.col-md-4{
 #carousel .carousel-item{
     padding: 3%;
 }
+.normal-text{
+    font-size: medium;
+    color:#98B9F2;
+}
+.normal-text-list{
+    color:#141B41;
+    text-align: center;
+}
+.space-above{
+    padding-top:3%;
+}
 span{
     font-size:xx-large;
     font-weight: bold;
     color:#98B9F2;
 }
-
+@media screen and (min-width:2000px) {
+    .normal-text{
+        font-size:1.5vw;
+    }
+    span{
+        font-size: 3vw;
+    }
+}
 div.progress-bar{
     background-color: #306BAC;
 }
@@ -116,6 +134,22 @@ ul.dropdown-menu li a:active{
     width: 30%;
     height: 30%;
 }
+.small-image{
+    width:10%;
+    height:10%
+}
+@media screen and (min-width:2000px){
+    .nav-image{
+        display: none;
+    }
+    nav .normal-text{
+        margin-right:3vw;
+    }
+    .nav-link.dropdown-toggle.normal-text{
+        margin-right: 4vw;
+        padding-left:4vw;
+    }
+}
 .carousel-inner img{
     border-radius: 20%;
     padding:10%;
@@ -125,6 +159,46 @@ ul.dropdown-menu li a:active{
 .carousel-inner img:hover{
     border-radius: 5%;
     transition: 0.6s ease;
+}
+.adapt-size{
+    width:10vw;
+}
+@media screen and (max-width:576px) {
+    .adapt-size{
+        width:70vw;
+    }
+}
+@media screen and (min-width:576px) and (max-width:768px) {
+    .adapt-size{
+        width:55vw;
+    }
+}
+@media screen and (min-width:768px) and (max-width:992px) {
+    .adapt-size{
+        width:30vw;
+    }
+}
+@media screen and (min-width:992px) and (max-width:1400px) {
+    .adapt-size{
+        width:20vw;
+    }
+}
+.common-border{
+    border-radius: 20%;
+    border: 2px solid #918EF4;
+    transition: 0.6s ease;
+    padding:5%
+    /*TODO*/
+}
+.common-border:hover{
+    border-radius: 5%;
+    transition: 0.6s ease;
+}
+.un-common-border{
+    padding:1%;
+}
+.un-common-border:hover{
+    padding:0%;
 }
 /*debug purposes only
 #main-container div{

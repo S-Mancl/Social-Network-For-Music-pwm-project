@@ -18,7 +18,7 @@ var menuHTML = "";
 var dropdownHTML = "";
 var dropdownHTML = `
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle normal-text" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <img class="nav-image" src="/images/user-solid.svg">
                     User
                 </a>
@@ -27,12 +27,12 @@ var dropdownHTML = `
 
 for (let i = 0; i < menuItems.length; i++) {
     let item = menuItems[i];
-    menuHTML += `<li class="nav-item"><a class="nav-link" href="${item.link}"><img class="nav-image" src="/images/${item.image}.svg">${item.label}</a></li>`;
+    menuHTML += `<li class="nav-item"><a class="nav-link normal-text" href="${item.link}"><img class="nav-image" src="/images/${item.image}.svg">${item.label}</a></li>`;
 }
 
 for (let i = 0; i < dropdownItems.length; i++) {
     let item = dropdownItems[i];
-    dropdownHTML += `<li><a class="dropdown-item" href="${item.link}"><img class="nav-image" src="/images/${item.image}.svg">${item.label}</a></li>`;
+    dropdownHTML += `<li><a class="dropdown-item normal-text" href="${item.link}"><img class="nav-image" src="/images/${item.image}.svg">${item.label}</a></li>`;
 }
 dropdownHTML += `
 </ul>
@@ -42,7 +42,7 @@ dropdownHTML += `
 console.log(document.getElementsByClassName("navbar")[0].innerHTML)
 document.getElementsByClassName("navbar")[0].innerHTML=`
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="./index.html"><img class="nav-image nav-brand-image" src="https://img.icons8.com/wired/64/tesseract.png" alt="tesseract"/>SNM</a>
+            <a class="navbar-brand fw-bold normal-text" href="./index.html"><img class="nav-image nav-brand-image" src="https://img.icons8.com/wired/64/tesseract.png" alt="tesseract"/>SNM</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
