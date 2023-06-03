@@ -200,6 +200,14 @@ ul.dropdown-menu li a:active{
 .un-common-border:hover{
     padding:0%;
 }
+.gif-404{
+    width: 40vw;
+}
+@media screen and (max-width:768px) {
+    .gif-404{
+        width: 80vw;
+    }
+}
 /*debug purposes only
 #main-container div{
     border:1px solid magenta;

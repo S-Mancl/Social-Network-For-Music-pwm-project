@@ -49,15 +49,231 @@ function register(){
         })
         .then(a => a.json())
         .then(response => {
-            console.log(response)
-            //############ HERE
+            if(response.code==0) {
+                setTimeout(()=>{
+                    window.location.href=`/login.html`
+                },2000)
+                document.getElementById('toFill').innerHTML=`
+                    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                            <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+                            <strong class="me-auto text-primary">Success</strong>
+                            <small class="text-primary">Success</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                            You successfully registered. Please wait to be redirected to the login page.
+                            </div>
+                        </div>
+                    </div>
+                `
+                var a = new bootstrap.Toast(document.querySelector('.toast'))
+                a.show()
+                //CORRECT
+            }
+            else{
+                document.getElementById('toFill').innerHTML=`
+                    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                            <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+                            <strong class="me-auto text-danger">Failure</strong>
+                            <small class="text-danger">Don't panic</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                            We received an error: code: <code>${response.code}</code>, and a message, that is: <code>${response.reason}</code>.
+                            </div>
+                        </div>
+                    </div>
+                `
+                var a = new bootstrap.Toast(document.querySelector('.toast'))
+                a.show()
+                a = [`email`,`pass1`,`pass2`,`birthDate`,`name`,`surname`,`userName`]
+                a.forEach(questo => {
+                    //console.log(questo);
+                    document.getElementById(questo).style.border = "0px solid red"
+                })
+                switch(response.code){
+                    case 1:
+                        document.getElementById(`email`).style.border = "5px solid red"
+                        break;
+                    case 2:
+                        document.getElementById(`pass1`).style.border = "5px solid red"
+                        document.getElementById(`pass2`).style.border = "5px solid red"
+                        break;
+                    case 3:
+                        document.getElementById(`birthDate`).style.border = "5px solid red"
+                        break;
+                    case 4:
+                        document.getElementById(`name`).style.border = "5px solid red"
+                        document.getElementById(`surname`).style.border = "5px solid red"
+                        break;
+                    case 5:
+                        document.getElementById(`email`).style.border = "5px solid red"
+                        document.getElementById(`userName`).style.border = "5px solid red"
+                        break;
+                    case 7:
+                        document.getElementById(`userName`).style.border = "5px solid red"
+                        break;
+                    default:
+                        console.log(`${response.code}, ${response.reason}`)
+                }
+            }
         })
     }
     else{
-        console.log(`passwords do not match`)
-        //############ HERE
+        //console.log(`passwords do not match`)
+        a = [`email`,`pass1`,`pass2`,`birthDate`,`name`,`surname`,`userName`]
+        a.forEach(questo => {
+            //console.log(questo);
+            document.getElementById(questo).style.border = "0px solid red"
+        })
+        document.getElementById(`pass1`).style.border = "5px solid red"
+        document.getElementById(`pass2`).style.border = "5px solid red"
+    }       
+}
+function login(){
+    var user = {
+        email: document.getElementById(`email`).value,
+        password: document.getElementById(`pass1`).value
     }
-        
+    fetch("/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(user)
+    })
+    .then(a => a.json())
+    .then(response => {
+        if(response.code==4) {
+            document.getElementById('toFill').innerHTML=`
+                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                        <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+                        <strong class="me-auto text-primary">Success</strong>
+                        <small class="text-primary">Success</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                        You successfully logged in.
+                        </div>
+                    </div>
+                </div>
+            `
+            var a = new bootstrap.Toast(document.querySelector('.toast'))
+            a.show()
+            setTimeout(()=>{
+                checkLoginAndRedirect()
+            },1500)
+
+        }
+        else{
+            document.getElementById('toFill').innerHTML=`
+                <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                        <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+                        <strong class="me-auto text-danger">Failure</strong>
+                        <small class="text-danger">Don't panic</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                        We received an error: code: <code>${response.code}</code>, and a message, that is: <code>${response.reason}</code>.
+                        </div>
+                    </div>
+                </div>
+            `
+            var a = new bootstrap.Toast(document.querySelector('.toast'))
+            a.show()
+            document.getElementById(`email`).style.border = "0px solid red"
+            document.getElementById(`pass1`).style.border = "0px solid red"
+            switch(response.code){
+                case 1:
+                    document.getElementById(`email`).style.border = "5px solid red"
+                    document.getElementById(`pass1`).style.border = "5px solid red"
+                    break;
+                case 2:
+                    document.getElementById(`email`).style.border = "5px solid red"
+                    break;
+                case 3:
+                    document.getElementById(`email`).style.border = "5px solid red"
+                    document.getElementById(`pass1`).style.border = "5px solid red"
+                    break;
+                default:
+                    console.log(`${response.code}, ${response.reason}`)
+            }
+        }
+    })
+
+}
+function checkLoginAndRedirect(){
+    const params = new URLSearchParams(window.location.search)
+    fetch(`/checkLogin`)
+        .then(response =>{
+            //console.log(response.ok)
+            if(response.ok)
+                if(params.get('redirect')!=undefined)
+                    setTimeout(()=>{
+                        window.location.href=`/${params.get('redirect')}`
+                    },1000)
+                else setTimeout(()=>{
+                    window.location.href=`/index.html`
+                },1000)
+
+        })
+}
+function fillProfile(){
+    fetch(`/checkLogin`)
+        .then(a =>{
+            if(!a.ok) window.location.href=`/login.html`
+            else{
+                a.json().then(
+                    async (userData) => {
+                        var fill = "";
+                        //console.log(userData)
+                        [`name`,`surname`,`userName`,`birthDate`,`email`].forEach(element =>{
+                            //console.log(userData[element])
+                            fill+=`
+                                <div class="row d-flex justify-content-center">
+                                    <strong class="col-5 col-md-3 normal-text m-2">${element}: </strong>
+                                    <div class="col-5 col-md-3 normal-text m-2">${userData[element]} </div>
+                                </div>
+                            `
+                        })
+                        fill+=`
+                                <div class="row d-flex justify-content-center">
+                                    <strong class="col-5 col-md-3 normal-text m-2">Favorite Genres: </strong>
+                                    <div class="col-5 col-md-3 normal-text m-2">
+                                `
+                        var colors = ['success','primary','danger','warning','info']
+                        userData.favoriteGenres.forEach(element =>{
+                            //console.log(element)
+                            var color = colors[Math.floor(Math.random()*colors.length)]
+                            fill+=`
+                                <span class="badge rounded-pill text-bg-${color}">${element}</span>
+                            `
+                        })
+                        document.getElementById("toFill").innerHTML+=fill+`
+                                    </div>
+                                </div>
+                                `
+                        fill = "";
+                        //still to do draw favorites
+                    })
+            }
+        })
+}
+
+function logout(){
+    fetch(`/logout`).then(res =>{
+        setTimeout(()=>{
+            window.location.href=`/index.html`
+        },1000)
+    })
 }
 function askAndRedirect(){
     question = {
@@ -151,6 +367,54 @@ function askAndRedirect(){
         
 }
 
+function starUnstar(type,id){
+    console.log({type:type,id:id})
+    fetch('/addOrRemoveFavorite', {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({category:type,id:id})
+    }).then(a => {
+        if(a.ok) {console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+            <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+            <strong class="me-auto text-primary">Added</strong>
+            <small class="text-primary">Success</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+            You added this to your favorites.
+            </div>
+            </div>
+            </div>
+            `
+        }
+        else{console.log(a.ok)
+            document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+            <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+            <strong class="me-auto text-danger">Removed</strong>
+            <small class="text-danger">Success</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+            You removed this from your favorites.
+            </div>
+            </div>
+            </div>
+            `
+        }
+        var a = new bootstrap.Toast(document.querySelector('.toast'))
+        a.show()
+        setTimeout(()=>{
+            window.location.reload()
+        },3000)
+})
+}
+
 function fillData(){
     const params = new URLSearchParams(window.location.search)
     const question = {
@@ -207,6 +471,10 @@ function fillData(){
                             <div class="normal-text"><strong>Release date: </strong>${response.release_date}</div>
                         </div>`
             }
+            fill+=` <div class="row">
+                        <div class="btn btn-lg normal-text" id="star" onclick="starUnstar('${response.type}','${response.id}')">Add or remove from favorites</div>
+                    </div>
+                `
             //
             fill+=`</div>`
             if(response.available_markets!=undefined){

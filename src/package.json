@@ -3,9 +3,11 @@
     "start": "nodemon app.js"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.4.0",
     "nodemon": "^2.0.22",
     "swagger-ui-express": "^4.6.2",

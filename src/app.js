@@ -6,10 +6,13 @@ const cors = require('cors')
 const mongoClient = require('mongodb').MongoClient;
 const mongoUrl = "mongodb+srv://"+process.env.MONGONAME+":"+process.env.MONGOPASSWORD+"@pwm.hwxyajg.mongodb.net/?retryWrites=true&w=majority"
 const path = require('path')
+const jwt = require('jsonwebtoken');
+const cookieParser = require("cookie-parser");
 
 const app = express()
 app.use(express.json())
 app.use(cors())//per i cors
+app.use(cookieParser());
 
 var token = {
     value: "none",
@@ -135,6 +138,51 @@ function getInfo(details,res){
     }
     )
 }
+async function login(res,user){
+    /*
+        Format of user
+        user = {
+            email: email,
+            password: password,
+        }
+    */
+    if((typeof user.email !== 'string' &&!( user.email instanceof String)) || (typeof user.password !== 'string' &&!( user.password instanceof String))) res.status(400).json({code:1,reason: `Don't try to mess with me...`})
+    else if(user.email == undefined || user.password == undefined) res.status(400).json({code:1,reason: `You are missing some fields or they are not strings...`})
+    else{
+        user.email = validator.escape(validator.trim(user.email))
+        user.email = user.email.toLowerCase()
+        user.password = validator.escape(validator.trim(user.password))
+        if(!validator.isEmail(user.email)) res.status(400).json({code:2,reason:`This isn't really an email, is it?`})
+        else{
+            user.password = hash(user.password)
+            var pwmClient = await new mongoClient(mongoUrl).connect()
+            var filter = {
+                $and : [
+                    {"email": user.email},
+                    {"password": user.password}
+                ]
+            }
+            var loggedUser = await pwmClient.db("pwm_project")
+                .collection('users')
+                .findOne(filter);
+            //console.log(loggedUser)
+            if(loggedUser == null) res.status(401).json({code:3,reason:`This user does not exist or its password is not the one you inserted.`})
+            else{
+                //JWT and cookie
+                var token = jwt.sign(
+                    {
+                        username:user.userName,
+                        email:user.email,
+                        exp: Math.floor(Date.now() / 1000) + (60 * 60),
+                    },
+                    process.env.SECRET)
+                res.cookie(`token`,token,{maxAge:60*1000*1000,httpOnly:true})
+                res.status(200).json({code:4,reason:`Logged successfully!`})
+            }
+        }
+    }
+}
+
 
 async function register(res,user){
     /*
@@ -147,10 +195,11 @@ async function register(res,user){
             birthDate: Date
             favoriteGenres: Array(genres) <- tra /genres
             password: String
+            favorites: object of arrays of types
         }
     */
 
-    if(user.name==undefined || user.password==undefined || user.surname == undefined || user.userName == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({reason: `You are missing some fields...`})
+    if(user.name==undefined || user.password==undefined || user.surname == undefined || user.userName == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({code:-1,reason: `You are missing some fields...`})
     else{
         [`name`,`surname`,`userName`,`birthDate`,`password`,`email`].forEach(key => {
             //console.log(user[key])
@@ -159,30 +208,74 @@ async function register(res,user){
         for (let i = 0; i < user.favoriteGenres.length; i++){
             user.favoriteGenres[i] = validator.escape(validator.trim(user.favoriteGenres[i]))
         }
-        if(!validator.isEmail(user.email)) res.status(400).json({reason:`Are you sure ${user.email} is an email?`})
-        else if(!validator.isStrongPassword(user.password)) res.status(400).json({reason:`${user.password} is not strong enough as a password`})
-        else if(!validator.isDate(user.birthDate)) res.status(400).json({reason:`${user.birthDate} is not an accepted birth date`})
-        else if(!validator.isAlpha(user.name)||!validator.isAlpha(user.surname)) res.status(400).json({reason:`${user.name} ${user.surname} is not an accepted name... It contains numbers!`})
+        if(!validator.isEmail(user.email)) res.status(400).json({code:1,reason:`Are you sure ${user.email} is an email?`})
+        else if(!validator.isStrongPassword(user.password)) res.status(400).json({code:2,reason:`${user.password} is not strong enough as a password`})
+        else if(!validator.isDate(user.birthDate)) res.status(400).json({code:3,reason:`${user.birthDate} is not an accepted birth date`})
+        else if(!validator.isAlpha(user.name)||!validator.isAlpha(user.surname)) res.status(400).json({code:4,reason:`${user.name} ${user.surname} is not an accepted name... It contains numbers or it's empty!`})
+        else if(user.userName=="") res.status(400).json({code:7,reason:`You have selected an invalid username. Please try again`})
         else{
-            user.email = validator.normalizeEmail(user.email)
+            //user.email = validator.normalizeEmail(user.email)
+            user.email = user.email.toLowerCase()
             user.password = hash(user.password)
+            user.favorites = {
+                album: [],
+                artist: [],
+                audiobook: [],
+                episode: [],
+                playlist: [],
+                show: [],
+                track: []
+            }
             var pwmClient = await new mongoClient(mongoUrl).connect()
             try {
                 var items = await pwmClient.db("pwm_project").collection('users').insertOne(user)
                 delete items.insertedId
-                res.status(200).json(items)
+                res.status(200).json({code:0,items:items})
             }
             catch (e) {
-                console.log('catch in test');
+                //console.log('catch in test');
                 if (e.code == 11000) {
-                    res.status(400).json({reason:"Already present user: please choose a different username or email"})
+                    res.status(400).json({code:5,reason:"Already present user: please choose a different username or email"})
                     return
                 }
-                res.status(500).json({reason:`Generic error: ${e}`})
+                res.status(500).json({code:6,reason:`Generic error: ${e}`})
         
             };
         }
     }
+}
+
+function checkLogin(req,res){
+    if(req.cookies.token == undefined) res.status(400).json({})
+    else{
+        var token = req.cookies.token
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(400).json(err)
+            }
+            else{
+                //console.log(decoded)
+                var pwmClient = await new mongoClient(mongoUrl).connect()
+            var filter = {"email": decoded.email}
+            var loggedUser = await pwmClient.db("pwm_project")
+                .collection('users')
+                .findOne(filter);
+            if(loggedUser == null) res.status(401).clearCookie(`token`).json({code:3,reason:`Somehow you are logged as a user that does not exist... are you trying to mess with me?`})
+            else{
+                delete loggedUser._id
+                delete loggedUser.password
+                console.log(loggedUser)
+                res.status(200).json(loggedUser)
+            }
+            }
+        })
+    }
+}
+
+async function addOrRemoveFavorite(item,res){
+    console.log(item.id,item.category)
+    //connect to DB, evaluate if present, else... etc
+    res.status(200).json({})
 }
 
 app.use('/',express.static(__dirname + '/static'))
@@ -215,6 +308,9 @@ app.get('/types',(req,res)=>{
 app.post("/register", (req, res)=>{
     perform(register,res,req.body)
 })
+app.post("/login", (req, res)=>{
+    perform(login,res,req.body)
+})
 
 app.post("/search",(req,res)=>{
     perform(askSpotify,res,req.body);
@@ -226,6 +322,19 @@ app.get('/requireInfo/:kind',(req,res)=>{
         id : req.query.id
     }
     perform(getInfo,details,res)
+})
+
+app.get(`/logout`,(req,res)=>{
+    try{res.status(200).clearCookie(`token`).json({success:true})}
+    catch(e){res.status(400).json({success:false})}
+})
+
+app.get(`/checkLogin`,(req,res)=>{
+    perform(checkLogin,req,res)
+})
+
+app.post('/addOrRemoveFavorite',(req,res)=>{
+    perform(addOrRemoveFavorite,req.body,res)
 })
 
 app.get("*", (req, res) => {
