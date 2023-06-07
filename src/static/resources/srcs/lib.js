@@ -367,14 +367,14 @@ function askAndRedirect(){
         
 }
 
-function starUnstar(type,id){
-    console.log({type:type,id:id})
+function starUnstar(type,id,name){
+    console.log({type:type,id:id,name:name})
     fetch('/addOrRemoveFavorite', {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({category:type,id:id})
+        body: JSON.stringify({"category":type,"id":id,"name":name})
     }).then(a => {
         if(a.ok) {console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -472,7 +472,7 @@ function fillData(){
                         </div>`
             }
             fill+=` <div class="row">
-                        <div class="btn btn-lg normal-text" id="star" onclick="starUnstar('${response.type}','${response.id}')">Add or remove from favorites</div>
+                        <div class="btn btn-lg normal-text" id="star" onclick="starUnstar('${response.type}','${response.id}','${response.name}')">Add or remove from favorites</div>
                     </div>
                 `
             //

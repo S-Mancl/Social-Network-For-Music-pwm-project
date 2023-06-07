@@ -8,6 +8,7 @@ const mongoUrl = "mongodb+srv://"+process.env.MONGONAME+":"+process.env.MONGOPAS
 const path = require('path')
 const jwt = require('jsonwebtoken');
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require('express-mongo-sanitize')({allowDots: true,replaceWith: ''});
 
 const app = express()
 app.use(express.json())
@@ -272,10 +273,36 @@ function checkLogin(req,res){
     }
 }
 
-async function addOrRemoveFavorite(item,res){
-    console.log(item.id,item.category)
+async function addOrRemoveFavorite(req,res){
+    console.log(req.body.id,req.body.name,req.body.category)
     //connect to DB, evaluate if present, else... etc
-    res.status(200).json({})
+    var pwmClient = await new mongoClient(mongoUrl).connect()
+    const token = req.cookies.token
+    if(token == undefined) res.status(400).json({reason: `Invalid login`})
+    else{
+        const user = jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(400).json(err)
+            }
+            else{
+                var filter = {"email":decoded.email}
+                var loggedUser = await pwmClient.db("pwm_project")
+                            .collection('users')
+                            .findOne(filter);
+                //così ho trovato l'utente loggato
+                //ora devo ricavarne i campi da modificare (qui aggiungo spudoratamente, da modificare)
+                loggedUser.favorites[req.body.category].push({"name":req.body.name,"id":req.body.id})
+                pwmClient
+                    .db("pwm_project")
+                    .collection("users")
+                    .replaceOne(
+                        filter,
+                        loggedUser
+                    )
+                res.status(200).json({})
+            }
+        })
+    }
 }
 
 app.use('/',express.static(__dirname + '/static'))
@@ -305,10 +332,10 @@ app.get('/types',(req,res)=>{
             .sort())
 })
 
-app.post("/register", (req, res)=>{
+app.post("/register",mongoSanitize,(req, res)=>{
     perform(register,res,req.body)
 })
-app.post("/login", (req, res)=>{
+app.post("/login",mongoSanitize, (req, res)=>{
     perform(login,res,req.body)
 })
 
@@ -324,17 +351,17 @@ app.get('/requireInfo/:kind',(req,res)=>{
     perform(getInfo,details,res)
 })
 
-app.get(`/logout`,(req,res)=>{
+app.get(`/logout`,mongoSanitize,(req,res)=>{
     try{res.status(200).clearCookie(`token`).json({success:true})}
     catch(e){res.status(400).json({success:false})}
 })
 
-app.get(`/checkLogin`,(req,res)=>{
+app.get(`/checkLogin`,mongoSanitize,(req,res)=>{
     perform(checkLogin,req,res)
 })
 
-app.post('/addOrRemoveFavorite',(req,res)=>{
-    perform(addOrRemoveFavorite,req.body,res)
+app.post('/addOrRemoveFavorite',mongoSanitize,(req,res)=>{
+    perform(addOrRemoveFavorite,req,res)
 })
 
 app.get("*", (req, res) => {
