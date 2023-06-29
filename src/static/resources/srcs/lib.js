@@ -229,7 +229,7 @@ function checkLoginAndRedirect(){
 function fillProfile(){
     fetch(`/checkLogin`)
         .then(a =>{
-            if(!a.ok) window.location.href=`/login.html`
+            if(!a.ok) window.location.href=`/login.html?redirect=profile.html`
             else{
                 a.json().then(
                     async (userData) => {
@@ -262,7 +262,42 @@ function fillProfile(){
                                 </div>
                                 `
                         fill = "";
-                        //still to do draw favorites
+
+                        for (const key in userData.favorites) {
+                            document.getElementById('favoritesToFill').innerHTML+=`<div class="row" id="${key}"><div class="normal-text text-start-${key}">We found the following <strong>${key}</strong></div></div><div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante">View more</a></div></div></div></div>`
+                            var card = document.getElementById("card-"+key)
+                            var clone = card.cloneNode(true)
+                            clone.id = "card-"+key+"-nope"
+                            clone.getElementsByClassName('card-title')[0].innerHTML = "Sorry, we found nothing!"
+                            clone.getElementsByClassName('card-text')[0].innerHTML = "Search and find new favorites!"
+                            clone.getElementsByClassName('btn')[0].href = "/search.html"
+                            clone.getElementsByClassName('testo-pulsante')[0].innerHTML = "Search!"
+                            clone.classList.remove('d-block')
+                            clone.classList.add('d-none')
+                            card.after(clone)
+                            if(userData.favorites[key].length==0){
+                                document.getElementById(key).classList.add('d-none')
+                                document.getElementById("anche-questo-"+key).classList.add('d-none')
+                            }
+                            for(let i = 0;i<userData.favorites[key].length;i++){
+                                try{
+                                    var card = document.getElementById("card-"+key)
+                                    var clone = card.cloneNode(true)
+                                    clone.id = "card-"+key+"-"+i
+                                    clone.getElementsByClassName('card-title')[0].innerHTML = userData.favorites[key][i].name
+                                    clone.getElementsByClassName('btn')[0].href = "/describe.html?kind="+key+"s&value=" + userData.favorites[key][i].id
+                                    clone.classList.remove('d-none')
+                                    clone.classList.add('d-block')
+                                    card.after(clone)
+                                }
+                                catch(e){
+                                    console.log(e)
+                                };
+                            }
+                        }
+
+
+                        //still to do draw playlists
                     })
             }
         })
@@ -332,11 +367,17 @@ function askAndRedirect(){
                 clone.getElementsByClassName('card-text')[0].innerHTML = "You'll find more of this category!"
                 //clone.getElementsByClassName('text-body-secondary')[0].innerHTML = popolari.results[i].release_date
                 clone.getElementsByClassName('card-img-top')[0].src = '/images/black.png'
-                clone.getElementsByClassName('btn')[0].href = "/showMore.html?kind="+key+"&value=" + question.string
+                clone.getElementsByClassName('btn')[0].href = "/showMore.html?kind="+key+"&value=" + question.string +"&page=1"
                 clone.classList.remove('d-none')
                 clone.classList.add('d-block')
                 //clone.getElementsByClassName('btn')[0].classList.add('disabled')
                 card.after(clone)
+                //console.log("trying "+key)
+                if(response[key].items.length==0){
+                    document.getElementById("card-"+key+"-more").getElementsByClassName('btn')[0].classList.add('disabled')
+                    document.getElementById("card-"+key+"-more").getElementsByClassName('card-title')[0].innerHTML = "Sorry, we found nothing!"
+                    document.getElementById("card-"+key+"-more").getElementsByClassName('card-text')[0].innerHTML = "Please try with other params!"
+                }
                 for(let i = 0;i<response[key].items.length;i++){
                     try{
                         var card = document.getElementById("card-"+key)
@@ -355,6 +396,7 @@ function askAndRedirect(){
                     }
                     catch(e){
                         //console.log(e)
+                        //console.log(key)
                         document.getElementById("card-"+key+"-more").getElementsByClassName('btn')[0].classList.add('disabled')
                         document.getElementById("card-"+key+"-more").getElementsByClassName('card-title')[0].innerHTML = "Sorry, we found nothing!"
                         document.getElementById("card-"+key+"-more").getElementsByClassName('card-text')[0].innerHTML = "Please try with other params!"
@@ -367,7 +409,124 @@ function askAndRedirect(){
         
 }
 
-function starUnstar(type,id,name){
+function showMore(){
+    const params = new URLSearchParams(window.location.search)
+    question = {
+        string: params.get('value'),//
+        type: [],//
+        limit: 16,//il limite è sempre di 16 risultati
+        offset: (-1+parseInt(params.get('page')))*20,//offset parte da 0
+    }
+    //console.log(question)
+    question.type.push(params.get('kind').slice(0,-1))
+    //console.log(question)
+    fetch("/search", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(question)
+    })
+    .then(a => a.json())
+    .then(response => {
+        //console.log(response)
+        try{
+            if(response.error.status==400){
+                document.getElementById('toFill').innerHTML=`
+                    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                            <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+                            <strong class="me-auto text-danger">Attention please</strong>
+                            <small class="text-danger">Error detected</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                            Hey there! Are you sure some results existed? Because I received this error: <code>${response.error.message}</code>. Try reloading and searching again, maybe...
+                            </div>
+                        </div>
+                    </div>
+                `
+                var a = new bootstrap.Toast(document.querySelector('.toast'))
+                a.show()
+            }
+        }
+        catch(e){
+            //console.log(`here`)
+            document.getElementById('title').innerHTML=`Your results: page ${params.get('page')}`
+            key = params.get('kind')
+            document.getElementById('toFill').innerHTML+=`<div class="row" id="${key}"><div class="normal-text">We found the following <strong>${key}</strong></div></div>
+            
+            <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
+                <div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none">
+                <div  class="card h-100 normal-text adapt-size m-1">
+                <img  class="card-img-top" alt="...">
+                <div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div>
+                <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary text-btn-this">View more</a></div></div></div></div>`
+            
+            var card = document.getElementById("card-"+key)
+            var clone = card.cloneNode(true)
+            clone.id = "card-"+key+"-more"
+            clone.getElementsByClassName('card-title')[0].innerHTML = "Discover more!"
+            clone.getElementsByClassName('card-text')[0].innerHTML = "You'll find more of this category!"
+            //clone.getElementsByClassName('text-body-secondary')[0].innerHTML = popolari.results[i].release_date
+            clone.getElementsByClassName('card-img-top')[0].src = '/images/black.png'
+            clone.getElementsByClassName('btn')[0].href = "/showMore.html?kind="+key+"&value=" + question.string +"&page="+(parseInt(params.get('page'))+1)
+            clone.classList.remove('d-none')
+            clone.classList.add('d-block')
+            //clone.getElementsByClassName('btn')[0].classList.add('disabled')
+            card.after(clone)
+            //console.log("trying "+key)
+            if(response[key].items.length==0){
+                document.getElementById("card-"+key+"-more").getElementsByClassName('btn')[0].classList.add('disabled')
+                document.getElementById("card-"+key+"-more").getElementsByClassName('card-title')[0].innerHTML = "Sorry, we found nothing else!"
+                document.getElementById("card-"+key+"-more").getElementsByClassName('card-text')[0].innerHTML = "Please try searching again with other params!"
+            }
+            for(let i = 0;i<response[key].items.length;i++){
+                try{
+                    var card = document.getElementById("card-"+key)
+                    var clone = card.cloneNode(true)
+                    clone.id = "card-"+key+"-"+i
+                    clone.getElementsByClassName('card-title')[0].innerHTML = response[key].items[i].name
+                    //clone.getElementsByClassName('card-text')[0].innerHTML = popolari.results[i].overview
+                    //clone.getElementsByClassName('text-body-secondary')[0].innerHTML = popolari.results[i].release_date
+                    try{clone.getElementsByClassName('card-img-top')[0].src = response[key].items[i].images[1].url}catch(e){clone.getElementsByClassName('card-img-top')[0].src = '/images/black.png'}
+                    clone.getElementsByClassName('btn')[0].href = "/describe.html?kind="+key+"&value=" + response[key].items[i].id
+                    document.getElementById("card-"+key+"-more").classList.remove('disabled')
+                    clone.classList.remove('d-none')
+                    clone.classList.add('d-block')
+                    card.after(clone)
+                    //console.log("done correctly "+key)
+                }
+                catch(e){
+                    //console.log(e)
+                    //console.log(key)
+                    document.getElementById("card-"+key+"-more").getElementsByClassName('btn')[0].classList.add('disabled')
+                    document.getElementById("card-"+key+"-more").getElementsByClassName('card-title')[0].innerHTML = "Sorry, we found nothing else!"
+                    document.getElementById("card-"+key+"-more").getElementsByClassName('card-text')[0].innerHTML = "Please try searching again with other params!"
+                    //console.log('here')
+                };
+            }
+            var card = document.getElementById("card-"+key)
+            var clone = card.cloneNode(true)
+            clone.id = "card-"+key+"-back"
+            clone.getElementsByClassName('card-title')[0].innerHTML = `Go back!`
+            //clone.getElementsByClassName('card-text')[0].innerHTML = popolari.results[i].overview
+            //clone.getElementsByClassName('text-body-secondary')[0].innerHTML = popolari.results[i].release_date
+            clone.getElementsByClassName('card-img-top')[0].src = '/images/black.png'
+            clone.getElementsByClassName('card-text')[0].innerHTML = "Take another look at the ones you saw before!"
+            clone.getElementsByClassName('btn')[0].href = "/showMore.html?kind="+key+"&value=" + question.string +"&page="+(parseInt(params.get('page'))-1)
+            clone.getElementsByClassName('text-btn-this')[0].innerHTML=`Go back!`
+            document.getElementById("card-"+key+"-more").classList.remove('disabled')
+            clone.classList.remove('d-none')
+            clone.classList.add('d-block')
+            if(parseInt(params.get('page'))-1>0)card.after(clone)
+        }
+    })
+        
+}
+
+async function starUnstar(type,id,name){
     console.log({type:type,id:id,name:name})
     fetch('/addOrRemoveFavorite', {
         method: "POST",
@@ -375,24 +534,13 @@ function starUnstar(type,id,name){
             "Content-Type": "application/json"
         },
         body: JSON.stringify({"category":type,"id":id,"name":name})
-    }).then(a => {
-        if(a.ok) {console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-            <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
-            <strong class="me-auto text-primary">Added</strong>
-            <small class="text-primary">Success</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-            You added this to your favorites.
-            </div>
-            </div>
-            </div>
-            `
-        }
-        else{console.log(a.ok)
-            document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    }).then(async a => {
+        response =  await a.json();
+        if(a.ok){
+            //console.log(response)
+            if(response.removed){
+                console.log(a.ok)
+                document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
             <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
@@ -406,13 +554,46 @@ function starUnstar(type,id,name){
             </div>
             </div>
             `
-        }
+            }
+            else{
+                console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+                <strong class="me-auto text-primary">Added</strong>
+                <small class="text-primary">Success</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                You added this to your favorites.
+                </div>
+                </div>
+                </div>
+                `
+            }
+            }
+        else{
+            console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+            <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+            <strong class="me-auto text-danger">Something happened</strong>
+            <small class="text-danger">Oh no!</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+            ${response.reason}
+            </div>
+            </div>
+            </div>
+            `   
+            }
         var a = new bootstrap.Toast(document.querySelector('.toast'))
         a.show()
         setTimeout(()=>{
             window.location.reload()
         },3000)
-})
+    })
 }
 
 function fillData(){
@@ -472,7 +653,10 @@ function fillData(){
                         </div>`
             }
             fill+=` <div class="row">
-                        <div class="btn btn-lg normal-text" id="star" onclick="starUnstar('${response.type}','${response.id}','${response.name}')">Add or remove from favorites</div>
+                        <div class="col-2" id="isStarred"></div>
+                        <div class="col-10 ms-0">
+                            <div class="btn btn-lg normal-text near" id="star" onclick="starUnstar('${response.type}','${response.id}','${response.name}')">Add or remove from favorites</div>
+                        </div>
                     </div>
                 `
             //
@@ -554,5 +738,44 @@ function fillData(){
             `
             }
             toFill.innerHTML=fill;
+            checkIfStarred();
         })
+}
+function checkIfStarred(){
+    const params = new URLSearchParams(window.location.search)
+    //console.log(question)
+    fetch('/isStarred', {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({"category":params.get('kind').slice(0,-1),"id":params.get('value')})
+    }).then(async a => {
+        if(a.ok){
+            response =  await a.json();
+            //console.log(JSON.stringify(response))
+            if(response.favorite) {
+                document.getElementById('isStarred').innerHTML=`<img class="rounded ps-2 ps-m-0 mx-auto d-block img-fluid" src="/images/starred.png">`
+            }
+            else{
+                document.getElementById('isStarred').innerHTML=`<img class="rounded ps-2 ps-m-0 mx-auto d-block img-fluid reverse" src="/images/not_starred.png">`
+            }
+        }
+        else{
+            console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
+                <strong class="me-auto text-danger">Something happened</strong>
+                <small class="text-danger">Oh no!</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                ${response.reason}
+                </div>
+                </div>
+                </div>
+                `   
+        }
+    })
 }

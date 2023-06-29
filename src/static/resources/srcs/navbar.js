@@ -9,7 +9,7 @@ const dropdownItems = [
     { label: "register", link: "register.html", image:"door-open-solid", needsLogged:false },
     { label: "login", link: "login.html", image:"arrow-right-to-bracket-solid", needsLogged:false },
     { label: "logout", link: "logout.html", image:"arrow-right-from-bracket-solid",needsLogged:true },
-    { label: "my favorites", link: "favorites.html", image:"heart-solid",needsLogged:true},
+    { label: "my favorites", link: "profile.html#favorites", image:"heart-solid",needsLogged:true},
     { label: "my playlists", link: "myplaylists.html", image:"compact-disc-solid",needsLogged:true },
     { label: "my profile", link: "profile.html", image:"address-card-solid",needsLogged:true },
 ]

@@ -180,6 +180,7 @@ async function login(res,user){
                 res.cookie(`token`,token,{maxAge:60*1000*1000,httpOnly:true})
                 res.status(200).json({code:4,reason:`Logged successfully!`})
             }
+            pwmClient.close()
         }
     }
 }
@@ -232,6 +233,7 @@ async function register(res,user){
                 var items = await pwmClient.db("pwm_project").collection('users').insertOne(user)
                 delete items.insertedId
                 res.status(200).json({code:0,items:items})
+                pwmClient.close()
             }
             catch (e) {
                 //console.log('catch in test');
@@ -267,22 +269,24 @@ function checkLogin(req,res){
                 delete loggedUser.password
                 console.log(loggedUser)
                 res.status(200).json(loggedUser)
-            }
+            }        
+            pwmClient.close()
             }
         })
     }
 }
 
 async function addOrRemoveFavorite(req,res){
-    console.log(req.body.id,req.body.name,req.body.category)
+    //console.log(req.body.id,req.body.name,req.body.category)
     //connect to DB, evaluate if present, else... etc
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
-    if(token == undefined) res.status(400).json({reason: `Invalid login`})
+    if(token == undefined) res.status(400).json({"reason": `Invalid login`})
     else{
         const user = jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
             if(err){
-                res.status(400).json(err)
+                res.status(400).json(err)                
+                pwmClient.close()
             }
             else{
                 var filter = {"email":decoded.email}
@@ -290,16 +294,177 @@ async function addOrRemoveFavorite(req,res){
                             .collection('users')
                             .findOne(filter);
                 //così ho trovato l'utente loggato
-                //ora devo ricavarne i campi da modificare (qui aggiungo spudoratamente, da modificare)
-                loggedUser.favorites[req.body.category].push({"name":req.body.name,"id":req.body.id})
-                pwmClient
+                //ora devo ricavarne i campi da modificare
+                //console.log(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id))
+                if(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id)){
+                    loggedUser.favorites[req.body.category].splice(loggedUser.favorites[req.body.category].indexOf({"name":req.body.name,"id":req.body.id}),1)
+                    res.status(200).json({"removed":true})
+                    //console.log(JSON.stringify(loggedUser.favorites[req.body.category]))
+                }//se non è già presente allora lo devo invece aggiungere
+                else {
+                    loggedUser.favorites[req.body.category].push({"name":req.body.name,"id":req.body.id})
+                    res.status(200).json({"removed":false})
+                }
+                await pwmClient//e infine aggiorno il db
                     .db("pwm_project")
                     .collection("users")
                     .replaceOne(
                         filter,
                         loggedUser
                     )
-                res.status(200).json({})
+                pwmClient.close()
+            }
+        })
+    }
+}
+
+async function isStarred(req,res){
+    //console.log(req.body.category)
+    //connect to DB, evaluate if present, else... etc
+    var pwmClient = await new mongoClient(mongoUrl).connect()
+    const token = req.cookies.token
+    if(token == undefined) res.status(400).json({"reason": `Invalid login`})
+    else{
+        const user = jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(400).json(err)
+                pwmClient.close()
+            }
+            else{
+                var filter = {"email":decoded.email}
+                var loggedUser = await pwmClient.db("pwm_project")
+                            .collection('users')
+                            .findOne(filter);
+                //console.log(loggedUser.favorites[req.body.category])                            
+                if(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id)){
+                    res.status(200).json({"favorite":true})
+                    //console.log(JSON.stringify(loggedUser.favorites[req.body.category]))
+                }//se non è già presente allora lo devo invece aggiungere
+                else res.status(200).json({"favorite":false})
+                pwmClient.close()
+            }
+        })
+    }
+}
+
+function newPlaylist(req,email){
+    a = {
+        "name":"",
+        "songs":[],
+        "description":"",
+        "tags":[],
+        "public":false, //default privata
+        "groups":[],
+        "owner":email
+    }
+    if (
+        req.body.newPlaylist.nome!=undefined&&req.body.newPlaylist.nome!=null&&
+        req.body.newPlaylist.descrizione!=undefined&&req.body.newPlaylist.descrizione!=null
+        )
+        {
+            a.nome=req.body.newPlaylist.nome+"_"+email
+            a.descrizione=req.body.newPlaylist.descrizione
+            return a
+        }
+    return null;
+}
+
+async function playlistOperations(req,res){
+    var pwmClient = await new mongoClient(mongoUrl).connect()
+    const token = req.cookies.token
+    if(token == undefined) res.status(400).json({"reason": `Invalid login`})
+    else{
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(400).json(err)
+                pwmClient.close()
+            }
+            else{
+                /*
+                    Struttura di una playlist:
+                        {
+                            "nome":Stringa,
+                            "canzoni":[
+                                {
+                                    "titolo":Stringa,
+                                    "durata":numero (ms),
+                                    "cantante":Stringa,
+                                    "genere":Stringa,
+                                    "anno_di_pubblicazione":Stringa,
+                                },
+                                ...
+                            ],
+                            "descrizione":Testo,
+                            "tag":[
+                                Stringa,
+                                ...
+                            ],
+                            "public":Boolean //pubblica=>false,privata=>true,se privata => gruppi?
+                            "gruppi_concessi":[
+                                Stringa,
+                                ...
+                            ],
+                            "owner":email
+                        }
+                */
+                //mi assicuro che ci sia l'utente
+                var filter = {"email":decoded.email}
+                var loggedUser = await pwmClient.db("pwm_project")
+                            .collection('users')
+                            .findOne(filter);
+                //ora faccio uno switch in base alle operazioni:
+                switch (req.body.operation) {
+                    case "new":
+                        //creo una nuova playlist
+                        if(newPlaylist(req,filter.email)!=null)
+                            try{
+                                await pwmClient.db("pwm_project").collection('playlists').insertOne(newPlaylist(req,filter.email))
+                            }
+                            catch(e){
+                                //l'inserimento non è andato a buon fine?
+                                res.status(400).json(e)
+                            }
+                        break;
+                    case "delete":
+                        //elimino una playlist
+                        break;
+                    
+                    case "follow":
+                        //aggiungo al profilo la playlist seguita (essa deve essere pubblica o visibile per me)
+                        break;
+                    case "unfollow":
+                        //rimuovo dal profilo la playlist seguita
+                        break;
+                    case "add song":
+                        //aggiungo una canzone con tutti i dettagli alla playlist
+                        break;
+                    case "remove song":
+                        //rimuovo una canzone con tutti i dettagli dalla playlist
+                        break;
+                    case "transfer ownership":
+                        //trasferisco la proprietà della playlist a un altro user
+                        break;
+                    case "share":
+                        //condivido la playlist con un gruppo
+                        break;
+                    case "publish":
+                        //rendo la playlist visibile world-wide
+                        break;
+                    case "get info":
+                        //ottengo le informazioni sulla playlist
+                        break;
+                    default:
+                        //non ho capito che operazione si voglia fare, nel dubbio:
+                        res.status(400).json({"reason":"Are you trying to hack me?"})
+                        break;
+                }
+                //console.log(loggedUser.favorites[req.body.category])                            
+                if(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id)){
+                    res.status(200).json({"favorite":true})
+                    //console.log(JSON.stringify(loggedUser.favorites[req.body.category]))
+                }//se non è già presente allora lo devo invece aggiungere
+                else res.status(200).json({"favorite":false})
+                pwmClient.close()
             }
         })
     }
@@ -322,7 +487,6 @@ app.get('/types',(req,res)=>{
     res.status(200).json(
         [
             "album",
-            "playlist",
             "episode",
             "track",
             "audiobook",
@@ -362,6 +526,14 @@ app.get(`/checkLogin`,mongoSanitize,(req,res)=>{
 
 app.post('/addOrRemoveFavorite',mongoSanitize,(req,res)=>{
     perform(addOrRemoveFavorite,req,res)
+})
+
+app.post('/isStarred',mongoSanitize,(req,res) =>{
+    perform(isStarred,req,res)
+})
+
+app.post('/playlistOperations',mongoSanitize,(req,res)=>{
+    perform(playlistOperations,req,res)
 })
 
 app.get("*", (req, res) => {
