@@ -450,6 +450,9 @@ async function playlistOperations(req,res){
                     case "publish":
                         //rendo la playlist visibile world-wide
                         break;
+                    case "make private":
+                        //rendo la playlist privata
+                        break;
                     case "get info":
                         //ottengo le informazioni sulla playlist
                         break;
