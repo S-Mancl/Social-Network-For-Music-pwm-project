@@ -8,6 +8,7 @@
 *.toc
 *x.bib
 *.log
+*.synctex(busy)
 
 # .env
 .env
