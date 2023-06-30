@@ -218,7 +218,6 @@ async function register(res,user){
                 artist: [],
                 audiobook: [],
                 episode: [],
-                playlist: [],
                 show: [],
                 track: []
             }
@@ -631,6 +630,18 @@ async function playlistOperations(req,res){
             }
         })
     }
+}
+
+/*
+    FUNZIONI ASSORTITE per lavorare con i gruppi
+*/
+
+/*
+    FINE FUNZIONI ASSORTITE per lavorare con i gruppi
+*/
+
+async function groupsOperations(req,res){
+    //TODO
 }
 
 app.use('/',express.static(__dirname + '/static'))
