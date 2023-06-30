@@ -581,6 +581,15 @@ async function playlistOperations(req,res){
                         //rimuovo una canzone con tutti i dettagli dalla playlist
                         break;
                     case "transfer ownership":
+                        try{
+                            let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                            let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": req.body.name})
+                            if(isOwner(playlist,user.email) & validator.isEmail(req.body.new_owner) && await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})!=null && await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})!=undefined){
+                                changeOwner(playlist,req.body.new_owner)
+                                res.status(200).json({"reason":"ok"})
+                            }
+                            else res.status(400).json({"reason":"you do not own this playlist, or some other data you inserted is not valid. Stop trying to hack me, please"})
+                        }catch(e){res.status(400).json(e)}
                         //trasferisco la proprietà della playlist a un altro user
                         break;
                     case "share":
