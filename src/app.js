@@ -44,7 +44,6 @@ var token = {
         else return false;
     }
 }
-
 const baseUrls = {
     search: "https://api.spotify.com/v1/search?",
     token: "https://accounts.spotify.com/api/token",
@@ -61,12 +60,10 @@ function hash(input) {
         .update(input)
         .digest('hex')
 }
-
 function perform(questo,paramA,paramB){
     if(token.hasExpired()) token.regenAndThen(questo,paramA,paramB)
     else questo(paramA,paramB)
 }
-
 function getGenres(req,res){
     //console.log(token.value)
     fetch(baseUrls.genres,{
@@ -86,7 +83,6 @@ function getGenres(req,res){
     }
     )    
 }
-
 function createUrlForSearch(question){
     var url = baseUrls.search+"q="+question.string+"&type="
     question.type.forEach(element => {
@@ -99,7 +95,6 @@ function createUrlForSearch(question){
     //console.log(url)
     return url
 }
-
 function askSpotify(res,question){
     /*
         Format of question
@@ -124,7 +119,6 @@ function askSpotify(res,question){
     }
     )
 }
-
 function getInfo(details,res){
     var url = baseUrls.basic+details.kind+"/"+details.id
     fetch(url,{
@@ -184,8 +178,6 @@ async function login(res,user){
         }
     }
 }
-
-
 async function register(res,user){
     /*
         Format of user
@@ -198,6 +190,8 @@ async function register(res,user){
             favoriteGenres: Array(genres) <- tra /genres
             password: String
             favorites: object of arrays of types
+            playlistsFollowed: array of strings (names)
+            playlistsOwned: array of strings (names)
         }
     */
 
@@ -228,6 +222,8 @@ async function register(res,user){
                 show: [],
                 track: []
             }
+            user.playlistsFollowed=[]
+            user.playlistsOwned=[]
             var pwmClient = await new mongoClient(mongoUrl).connect()
             try {
                 var items = await pwmClient.db("pwm_project").collection('users').insertOne(user)
@@ -247,7 +243,6 @@ async function register(res,user){
         }
     }
 }
-
 function checkLogin(req,res){
     if(req.cookies.token == undefined) res.status(400).json({})
     else{
@@ -275,7 +270,6 @@ function checkLogin(req,res){
         })
     }
 }
-
 async function addOrRemoveFavorite(req,res){
     //console.log(req.body.id,req.body.name,req.body.category)
     //connect to DB, evaluate if present, else... etc
@@ -317,7 +311,6 @@ async function addOrRemoveFavorite(req,res){
         })
     }
 }
-
 async function isStarred(req,res){
     //console.log(req.body.category)
     //connect to DB, evaluate if present, else... etc
@@ -370,41 +363,33 @@ function newPlaylist(req,email){
         }
     return null;
 }
-
 function isOwner(playlist,email){
     return playlist.owner==email
 }
-
 function addSong(playlist,song){
     playlist.songs.push(song)
     return playlist
 }
-
 async function removeSong(playlist,song){
     var elementToRemove = await playlist.songs.find(element => element.id == song.id)
     playlist.songs.splice(indexOf(elementToRemove),1)
     return playlist
 }
-
 function publish(playlist){
     playlist.visibility=true;
     return playlist;
 }
-
 function makePrivate(playlist){
     playlist.visibility=false;
     return playlist;
 }
-
 function changeOwner(playlist,newOwner){
     playlist.owner=newOwner;
     return playlist;
 }
-
 function canSee(playlist, groupList, user){
     return playlist.visibility || /*await groupList.playlists.some(group => await group.some(element => element == playlist.name)) || STILL TO DO*/ playlist.owner == user.email
 }
-
 
 /*
     FINE FUNZIONI ASSORTITE per lavorare con le playlists
