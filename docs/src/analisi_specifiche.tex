@@ -27,6 +27,8 @@ Nonostante sia stato suggerito di salvarsi le informazioni in locale sarebbe pi�
 \paragraph{Eliminare l'account} Deve essere possibile eliminare l'account, cancellando tutte le informazioni che lo riguardano. Se l'account viene eliminato, vengono rimosse tutte le playlist create da quell'utente. Sarebbe pertanto consigliabile la realizzazione di un sistema che consenta, all'eliminazione dell'account, di stabilire a chi passa la proprietà di quelle playlist, oppure scegliere di eliminarle.
 \subsubsection{Ricerca e visualizzazione dei dati}
 Questo deve essere fatto attraverso due pagine apposite, una che si occupi della ricerca e ne mostri i risultati e una che mostri le informazioni sul singolo brano, permettendo l'inserimento di questo nelle playlist (eventualmente la creazione di una nuova playlist in caso non dovesse già esistere).
+
+Vista l'ampia varietà di campi per cui è possibile cercare, una soluzione sarebbe prima mostrare alcuni risultati per ogni campo e poi restringere la ricerca su un campo specifico.
 \subsubsection{Preferiti e Playlist}
 \paragraph{Preferiti} Un utente può decidere di selezionare un numero imprecisato di brani come suoi brani preferiti. Questo li aggiunge alle informazioni (private) del suo account.
 \paragraph{Playlist} Una playlist è una collezione di brani denotata da alcune informazioni:
@@ -34,10 +36,23 @@ Questo deve essere fatto attraverso due pagine apposite, una che si occupi della
     \item \textbf{Proprietario}
     \item \textbf{Nome}
     \item \textbf{Descrizione}
-    \item \textbf{Canzoni contenute} (si ipotizza di porre gli indici in un array)
-    \item \textbf{Stato di condivisione}
+    \item \textbf{Canzoni contenute} (si ipotizza di porre gli oggetti che descrivono la canzone in un array)
+    \item \textbf{Stato di condivisione} (public/private)
+    \item \textbf{Gruppi consentiti} (Array di nomi (che godono della proprietà di essere \verb|unique|), dei gruppi)
 \end{itemize}
 Una playlist privata può essere vista solamente dal creatore, una playlist pubblica può essere vista liberamente da chiunque mediante una apposita pagina.
+
+Si noti che le playlist devono implementare le seguenti azioni:\begin{itemize}
+    \item \textbf{Cancellazione}
+    \item \textbf{Rendere privata}
+    \item \textbf{Rendere pubblica}
+    \item \textbf{Condividere con un gruppo}
+    \item \textbf{Rimuovere condivisione con un gruppo}
+    \item \textbf{Follow/Unfollow}
+    \item \textbf{Trasferimento della proprietà ad un nuovo owner}
+    \item \textbf{Aggiunta o Rimozione di canzoni}
+    \item \textbf{Recuperare le informazioni}
+\end{itemize}
 \subsubsection{Opzionale: creazione di gruppi}
 Si potranno creare delle comunità di utenti, di qui in avanti \verb|gruppi|, a cui gli utenti potranno iscriversi / disiscriversi. Quando un utente è iscritto, esso è in grado di vedere tutte le playlist condivise con quella comunità specifica, e risulta anche in grado di parteciparvi condividendo altre playlist.
 

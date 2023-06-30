@@ -447,6 +447,9 @@ async function playlistOperations(req,res){
                     case "share":
                         //condivido la playlist con un gruppo
                         break;
+                    case "do not share":
+                        //rimuovo la condivisione con un gruppo
+                        break;
                     case "publish":
                         //rendo la playlist visibile world-wide
                         break;

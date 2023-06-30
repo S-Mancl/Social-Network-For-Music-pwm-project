@@ -28,7 +28,7 @@
 \RequirePackage{subcaption}
 
 %simboli
-\RequirePackage{fontawesome}
+\RequirePackage{fontawesome5}
 
 %comandi
 
@@ -40,6 +40,15 @@
 
 %Teoremi etc
 \RequirePackage{amsthm}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+
+%joins
+\def\ojoin{\setbox0=\hbox{$\Join$}%
+\rule[-.02ex]{.25em}{.4pt}\llap{\rule[1.10ex]{.25em}{.4pt}}}
+\def\leftouterjoin{\mathbin{\ojoin\mkern-8.5mu\Join}}
+\def\rightouterjoin{\mathbin{\Join\mkern-8.5mu\ojoin}}
+\def\fullouterjoin{\mathbin{\ojoin\mkern-8.5mu\Join\mkern-8.5mu\ojoin}}
 
 \theoremstyle{definition} %stile con testo normale
 \newtheorem*{oss}{Osservazione}
@@ -79,7 +88,7 @@
 
 %timeline
 \RequirePackage{environ}
-\RequirePackage{charter}
+%\RequirePackage{charter}
 
 \makeatletter
     \let\matamp=&
@@ -202,7 +211,37 @@
     \vspace{5mm}
 }
 
+%idea
+\newcommand{\idea}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\faLightbulb[regular] Idea: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
+\newcommand{\alert}[1]{
+    \vspace{5mm}
+    \hrule
+    \vspace{2mm}
+    \textbf{\faExclamationTriangle: }#1
+    \vspace{1mm}
+    \hrule
+    \vspace{5mm}
+}
+
 %centered images with no overflow
 \newcommand{\includecenter}[1]{
     \begin{center}\includegraphics[scale=0.5]{#1}\end{center}
 }
+\newcommand{\includescale}[2]{
+    \begin{center}\includegraphics[scale=#2]{#1}\end{center}
+}
+
+% choice
+\RequirePackage{enumitem}
+\newlist{choices}{enumerate}{1}
+\setlist[choices]{label*=(\Alph*)}
+\newcommand{\choice}{\item}
