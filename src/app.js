@@ -347,7 +347,7 @@ function newPlaylist(req,email){
         "songs":[],
         "description":"",
         "tags":[],
-        "public":false, //default privata
+        "visibility":false, //default privata
         "groups":[],
         "owner":email
     }
@@ -580,6 +580,10 @@ async function playlistOperations(req,res){
                         break;
                     case "do not share":
                         //rimuovo la condivisione con un gruppo TODO
+                        break;
+                    case "add tag"://TODO
+                        break;
+                    case "remove tag"://TODO
                         break;
                     case "publish":
                         //rendo la playlist visibile world-wide
