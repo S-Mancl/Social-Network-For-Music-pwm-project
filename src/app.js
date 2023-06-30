@@ -504,7 +504,6 @@ async function playlistOperations(req,res){
                             res.status(400).json(e)
                         }
                         break;
-                    
                     case "follow":
                         //aggiungo al profilo la playlist seguita (essa deve essere pubblica o visibile per me)
                         try{
@@ -625,6 +624,17 @@ async function playlistOperations(req,res){
                         }catch(e){res.status(400).json(e)}
                         break;
                     case "get info":
+                        try{
+                            let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                            let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": req.body.name})
+                            //TODO groups      vvvvvvvvv
+                            if(canSee(playlist,undefined,user)){
+                                res.json(200).json(playlist)
+                            }
+                            else{
+                                res.json(401).json({"reason":"you cannot access this"})
+                            }
+                        }catch(e){res.status(400).json(e)}
                         //ottengo le informazioni sulla playlist
                         break;
                     default:
@@ -632,12 +642,6 @@ async function playlistOperations(req,res){
                         res.status(400).json({"reason":"Are you trying to hack me?"})
                         break;
                 }
-                //console.log(loggedUser.favorites[req.body.category])                            
-                if(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id)){
-                    res.status(200).json({"favorite":true})
-                    //console.log(JSON.stringify(loggedUser.favorites[req.body.category]))
-                }//se non è già presente allora lo devo invece aggiungere
-                else res.status(200).json({"favorite":false})
                 pwmClient.close()
             }
         })
