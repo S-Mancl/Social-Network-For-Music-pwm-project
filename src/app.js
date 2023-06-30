@@ -593,16 +593,36 @@ async function playlistOperations(req,res){
                         //trasferisco la proprietà della playlist a un altro user
                         break;
                     case "share":
-                        //condivido la playlist con un gruppo
+                        //condivido la playlist con un gruppo TODO
                         break;
                     case "do not share":
-                        //rimuovo la condivisione con un gruppo
+                        //rimuovo la condivisione con un gruppo TODO
                         break;
                     case "publish":
                         //rendo la playlist visibile world-wide
+                        try{
+                            let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                            let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": req.body.name})
+                            if(isOwner(playlist,user.email)){
+                                playlist = publish(playlist)
+                                await pwmClient.db("pwm_project").collection('playlists').updateOne({"name": req.body.name},playlist)
+                                res.status(200).json({"reason":"ok"})
+                            }
+                            else res.status(400).json({"reason":"not owner"})
+                        }catch(e){res.status(400).json(e)}
                         break;
                     case "make private":
                         //rendo la playlist privata
+                        try{
+                            let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                            let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": req.body.name})
+                            if(isOwner(playlist,user.email)){
+                                playlist = makePrivate(playlist)
+                                await pwmClient.db("pwm_project").collection('playlists').updateOne({"name": req.body.name},playlist)
+                                res.status(200).json({"reason":"ok"})
+                            }
+                            else res.status(400).json({"reason":"not owner"})
+                        }catch(e){res.status(400).json(e)}
                         break;
                     case "get info":
                         //ottengo le informazioni sulla playlist
