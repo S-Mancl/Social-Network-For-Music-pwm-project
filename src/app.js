@@ -380,8 +380,8 @@ function addSong(playlist,song){
     return playlist
 }
 
-async function removeSong(playlist,songId){
-    var elementToRemove = await playlist.songs.find(element => element.id ==songId)
+async function removeSong(playlist,song){
+    var elementToRemove = await playlist.songs.find(element => element.id == song.id)
     playlist.songs.splice(indexOf(elementToRemove),1)
     return playlist
 }
@@ -464,15 +464,15 @@ async function playlistOperations(req,res){
                                 let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$not: decoded.email}})
                                 for(let user in allUsers){
                                     if(await user.playlistsFollowed.some(element => element == a.name)){
-                                        user.playlistsFollowed = user.playlistsFollowed.splice(await user.playlistsFollowed.indexOf(a.name),1)
+                                        user.playlistsFollowed.splice(await user.playlistsFollowed.indexOf(a.name),1)
                                         await pwmClient.db("pwm_project").collection('users').updateOne({"email":user.email},user)
                                     }
                                 }
                                 //STILL TO DO CON I GRUPPI
                                 //-2. elimino, dall'utente che la possedeva, la playlist, sia da quelle seguite che da quelle totali (aka assicuro integrità referenziale)
                                 let userToUpdate = await pwmClient.db("pwm_project").collection('users').findOne({"email":decoded.email});
-                                userToUpdate.playlistsOwned = userToUpdate.playlistsOwned.splice(await userToUpdate.indexOf(a.name),1)
-                                userToUpdate.playlistsFollowed =  userToUpdate.playlistsFollowed.splice(await userToUpdate.indexOf(a.name),1)
+                                userToUpdate.playlistsOwned.splice(await userToUpdate.indexOf(a.name),1)
+                                userToUpdate.playlistsFollowed.splice(await userToUpdate.indexOf(a.name),1)
                                 await pwmClient.db("pwm_project").collection('users').updateOne({"email":decoded.email},userToUpdate);
                                 //-1. elimino la playlist
                                 await pwmClient.db("pwm_project").collection('playlists').deleteOne(a)
@@ -492,8 +492,8 @@ async function playlistOperations(req,res){
                                 let playlistToAdd = newPlaylist(req,filter.email)
                                 await pwmClient.db("pwm_project").collection('playlists').insertOne(playlistToAdd)
                                 let userToUpdate = await pwmClient.db("pwm_project").collection('users').findOne({"email":decoded.email});
-                                userToUpdate.playlistsOwned = userToUpdate.playlistsOwned.push(playlistToAdd.name)
-                                userToUpdate.playlistsFollowed = userToUpdate.playlistsFollowed.push(playlistToAdd.name)
+                                userToUpdate.playlistsOwned.push(playlistToAdd.name)
+                                userToUpdate.playlistsFollowed.push(playlistToAdd.name)
                                 await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},userToUpdate)
                                 res.status(200).json({"reason":"inserted correctly"})
                             }
@@ -512,7 +512,7 @@ async function playlistOperations(req,res){
                             let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                             //TO DO ottenere i gruppi di cui fa parte
                             if(canSee(a,undefined,user)){
-                                user.playlistsFollowed = user.playlistsFollowed.push(a.name)
+                                user.playlistsFollowed.push(a.name)
                                 await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},user)
                                 res.status(200).json({"reason":"ok"})
                             }
@@ -526,7 +526,7 @@ async function playlistOperations(req,res){
                             let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                             let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": req.body.name})
                             if(await user.playlistsFollowed.some(name => name == playlist.name)){
-                                user.playlistsFollowed = user.playlistsFollowed.splice(indexOf(playlist.name),1)
+                                user.playlistsFollowed.splice(indexOf(playlist.name),1)
                                 await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},user)
                                 res.status(200).json({"reason":"ok"})
                             }
@@ -537,14 +537,47 @@ async function playlistOperations(req,res){
                             let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                             let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": req.body.name})
                             if(isOwner(playlist,user.email)){
-                                //TODO verificare che la canzone sia nel formato corretto
-                                //TO DO aggiungere la canzone con l'apposita funzione
+                                let details = await fetch(`/requireInfo/tracks/${req.body.song_id}`)
+                                details = await details.json()
+                                let song = {
+                                    titolo : details.name,
+                                    durata : details.duration_ms,
+                                    cantante: details.artists[0].name,
+                                    //genere: TODO: non c'è nei dati restituiti
+                                    anno_di_pubblicazione: details.album.releaseDate.split("-")[0]
+                                }
+                                if(! await playlist.songs.some(element => element.id == song_id)){
+                                    playlist = addSong(playlist,song)
+                                    await pwmClient.db("pwm_project").collection('playlists').updateOne({"name":playlist.name},playlist)
+                                }
+                                res.status(200).json({"reason":"done"})
                             }
                             else res.status(400).json({"reason":"you are not the owner of this playlist"})
                         }catch(e){res.status(400).json({"reason":e})}
                         //aggiungo una canzone con tutti i dettagli alla playlist
                         break;
                     case "remove song":
+                        try{
+                            let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                            let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": req.body.name})
+                            if(isOwner(playlist,user.email)){
+                                let details = await fetch(`/requireInfo/tracks/${req.body.song_id}`)
+                                details = await details.json()
+                                let song = {
+                                    titolo : details.name,
+                                    durata : details.duration_ms,
+                                    cantante: details.artists[0].name,
+                                    //genere: TODO: non c'è nei dati restituiti
+                                    anno_di_pubblicazione: details.album.releaseDate.split("-")[0]
+                                }
+                                if(await playlist.songs.some(element => element.id == song_id)) {
+                                    playlist = await removeSong(playlist,song)
+                                    await pwmClient.db("pwm_project").collection('playlists').updateOne({"name":playlist.name},playlist)
+                                }
+                                res.status(200).json({"reason":"done"})
+                            }
+                            else res.status(400).json({"reason":"you are not the owner of this playlist"})
+                        }catch(e){res.status(400).json({"reason":e})}
                         //rimuovo una canzone con tutti i dettagli dalla playlist
                         break;
                     case "transfer ownership":
