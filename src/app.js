@@ -346,9 +346,11 @@ async function isStarred(req,res){
         })
     }
 }
-
+/*
+    FUNZIONI ASSORTITE per lavorare con le playlists
+*/
 function newPlaylist(req,email){
-    a = {
+    var a = {
         "name":"",
         "songs":[],
         "description":"",
@@ -362,12 +364,48 @@ function newPlaylist(req,email){
         req.body.newPlaylist.descrizione!=undefined&&req.body.newPlaylist.descrizione!=null
         )
         {
-            a.nome=req.body.newPlaylist.nome+"_"+email
-            a.descrizione=req.body.newPlaylist.descrizione
+            a.name=req.body.newPlaylist.nome+"_"+email
+            a.description=req.body.newPlaylist.descrizione
             return a
         }
     return null;
 }
+
+function isOwner(playlist,email){
+    return playlist.owner==email
+}
+
+function addSong(playlist,song){
+    playlist.songs.push(song)
+    return playlist
+}
+
+async function removeSong(playlist,songId){
+    var elementToRemove = await playlist.songs.find(element => element.id ==songId)
+    playlist.songs.splice(indexOf(elementToRemove),1)
+    return playlist
+}
+
+function publish(playlist){
+    playlist.visibility=true;
+    return playlist;
+}
+
+function makePrivate(playlist){
+    playlist.visibility=false;
+    return playlist;
+}
+
+function changeOwner(playlist,newOwner){
+    playlist.owner=newOwner;
+    return playlist;
+}
+
+
+
+/*
+    FINE FUNZIONI ASSORTITE per lavorare con le playlists
+*/
 
 async function playlistOperations(req,res){
     var pwmClient = await new mongoClient(mongoUrl).connect()
