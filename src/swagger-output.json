@@ -17,16 +17,36 @@
       "description": "All PUT requests"
     },
     {
+      "name": "POST",
+      "description": "All POST requests"
+    },
+    {
       "name": "DELETE",
       "description": "All DELETE requests"
     },
     {
       "name": "General",
-      "description": "Returns basic informations"
+      "description": "Basic"
+    },
+    {
+      "name": "User",
+      "description": "Everything related to users"
     },
     {
       "name": "Data",
       "description": "Can be used to interact with data"
+    },
+    {
+      "name": "Favorites",
+      "description": "Can be used to interact with Favorites"
+    },
+    {
+      "name": "Playlists",
+      "description": "Can be used to interact with playlists"
+    },
+    {
+      "name": "Groups",
+      "description": "Can be used to interact with groups"
     }
   ],
   "schemes": [
@@ -35,6 +55,11 @@
   "paths": {
     "/coffee": {
       "get": {
+        "tags": [
+          "EasterEgg",
+          "Meme"
+        ],
+        "summary": "I had to...",
         "description": "",
         "parameters": [],
         "responses": {
@@ -46,6 +71,11 @@
     },
     "/genres": {
       "get": {
+        "tags": [
+          "General",
+          "GET"
+        ],
+        "summary": "Gets a list of genres",
         "description": "",
         "parameters": [],
         "responses": {}
@@ -53,6 +83,11 @@
     },
     "/types": {
       "get": {
+        "tags": [
+          "General",
+          "GET"
+        ],
+        "summary": "Gets a list of types",
         "description": "",
         "parameters": [],
         "responses": {
@@ -64,6 +99,11 @@
     },
     "/register": {
       "post": {
+        "tags": [
+          "User",
+          "POST"
+        ],
+        "summary": "Creates a new user",
         "description": "",
         "parameters": [],
         "responses": {}
@@ -71,6 +111,11 @@
     },
     "/login": {
       "post": {
+        "tags": [
+          "User",
+          "POST"
+        ],
+        "summary": "Logs in",
         "description": "",
         "parameters": [],
         "responses": {}
@@ -78,13 +123,23 @@
     },
     "/search": {
       "post": {
+        "tags": [
+          "Data",
+          "POST"
+        ],
+        "summary": "Performs a search on Spotify",
         "description": "",
         "parameters": [],
         "responses": {}
       }
     },
-    "/requireInfo/{kind}": {
+    "/requireInfo/{kind}/{id}": {
       "get": {
+        "tags": [
+          "Data",
+          "GET"
+        ],
+        "summary": "Gets infos about a specific item",
         "description": "",
         "parameters": [
           {
@@ -95,7 +150,8 @@
           },
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
@@ -104,6 +160,11 @@
     },
     "/logout": {
       "get": {
+        "tags": [
+          "User",
+          "GET"
+        ],
+        "summary": "Performs logout",
         "description": "",
         "parameters": [],
         "responses": {
@@ -118,6 +179,11 @@
     },
     "/checkLogin": {
       "get": {
+        "tags": [
+          "User",
+          "GET"
+        ],
+        "summary": "Checks if the user is logged in",
         "description": "",
         "parameters": [],
         "responses": {}
@@ -125,6 +191,47 @@
     },
     "/addOrRemoveFavorite": {
       "post": {
+        "tags": [
+          "Favorites",
+          "POST"
+        ],
+        "summary": "Adds or removes favorites",
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/isStarred": {
+      "post": {
+        "tags": [
+          "Favorites",
+          "POST"
+        ],
+        "summary": "Checks if something is in the favorites",
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/playlistOperations": {
+      "post": {
+        "tags": [
+          "Playlists",
+          "POST"
+        ],
+        "summary": "Perform operations on the playlists",
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/groupsOperations": {
+      "post": {
+        "tags": [
+          "Groups",
+          "POST"
+        ],
+        "summary": "Perform operations on the groups",
         "description": "",
         "parameters": [],
         "responses": {}

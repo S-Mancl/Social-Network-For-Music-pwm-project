@@ -243,12 +243,12 @@ async function register(res,user){
     }
 }
 function checkLogin(req,res){
-    if(req.cookies.token == undefined) res.status(400).json({})
+    if(req.cookies.token == undefined) res.status(401).json({})
     else{
         var token = req.cookies.token
         jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
             if(err){
-                res.status(400).json(err)
+                res.status(401).json(err)
             }
             else{
                 //console.log(decoded)
@@ -278,7 +278,7 @@ async function addOrRemoveFavorite(req,res){
     else{
         const user = jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
             if(err){
-                res.status(400).json(err)                
+                res.status(401).json(err)                
                 pwmClient.close()
             }
             else{
@@ -319,7 +319,7 @@ async function isStarred(req,res){
     else{
         const user = jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
             if(err){
-                res.status(400).json(err)
+                res.status(401).json(err)
                 pwmClient.close()
             }
             else{
@@ -409,7 +409,7 @@ async function playlistOperations(req,res){
     else{
         jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
             if(err){
-                res.status(400).json(err)
+                res.status(401).json(err)
                 pwmClient.close()
             }
             else{
@@ -456,7 +456,7 @@ async function playlistOperations(req,res){
                                 //-3. per ogni utente, diverso dall'owner, elimino la playlist da quelle seguite, laddove presente.
                                 let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$not: decoded.email}})
                                 for(let user in allUsers){
-                                    if(user.playlistsFollowed.some(element => element == a.name)){
+                                    if(user.playlistsFollowed.some(a.name)){
                                         user.playlistsFollowed.splice(user.playlistsFollowed.indexOf(a.name),1)
                                         await pwmClient.db("pwm_project").collection('users').updateOne({"email":user.email},user)
                                     }
@@ -464,15 +464,14 @@ async function playlistOperations(req,res){
                                 //-2.5. per ogni gruppo elimino la playlist da quelle seguite, laddove presente
                                 let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
                                 for(let group in allGroups){
-                                    if(group.playlistsFollowed.some(element => element == a.name)){
-                                        group.playlistsFollowed.splice(group.playlistsFollowed.indexOf(a.name),1)
+                                    if(group.playlistsShared.some(a.name)){
+                                        group.playlistsShared.splice(group.playlistsShared.indexOf(a.name),1)
                                         await pwmClient.db("pwm_project").collection('groups').updateOne({"name":group.name},group)
                                     }
                                 }
-                                //STILL TO DO CON I GRUPPI
                                 //-2. elimino, dall'utente che la possedeva, la playlist, sia da quelle seguite che da quelle totali (aka assicuro integrità referenziale)
-                                userToUpdate.playlistsOwned.splice(await userToUpdate.indexOf(a.name),1)
-                                userToUpdate.playlistsFollowed.splice(await userToUpdate.indexOf(a.name),1)
+                                userToUpdate.playlistsOwned.splice(await userToUpdate.playlistsOwned.indexOf(a.name),1)
+                                userToUpdate.playlistsFollowed.splice(await userToUpdate.playlistsFollowed.indexOf(a.name),1)
                                 await pwmClient.db("pwm_project").collection('users').updateOne({"email":decoded.email},userToUpdate);
                                 //-1. elimino la playlist
                                 await pwmClient.db("pwm_project").collection('playlists').deleteOne(a)
@@ -696,9 +695,6 @@ function newGroup(req,userName){
 function isGroupOwner(group, username){
     return group.owner==username
 }
-function addPlaylist(group, playlistName){
-    if(!group.playlistsShared.some(playlistName)) group.playlistsShared.push(playlistName)   
-}
 function canRemove(group, playlist, userName){
     return playlist.owner==userName && group.members.some(userName) && group.playlistsShared.some(playlist.name)
 }
@@ -729,7 +725,7 @@ async function groupsOperations(req,res){
     else{
         jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
             if(err){
-                res.status(400).json(err)
+                res.status(401).json(err)
                 pwmClient.close()
             }
             else{
@@ -777,7 +773,24 @@ async function groupsOperations(req,res){
                         }catch(e){res.status(400).json(e)}
                     break;
                     case "delete":
-                        //elimino un gruppo TO DO
+                        //elimino un gruppo
+                        let a = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.body.name)})
+                        //-3. elimino dagli utenti non owner ogni riferimento a quel gruppo
+                        let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$not: decoded.email}})
+                        for(let user in allUsers){
+                            if(user.groupsFollowed.some(a.name)){
+                                user.groupsFollowed.splice(user.groupsFollowed.indexOf(a.name),1)
+                                await pwmClient.db("pwm_project").collection('users').updateOne({"email":user.email},user)
+                            }
+                        }
+                        //-2. elimino dall'owner il gruppo, sia owned che followed
+                        userToUpdate.groupsFollowed.splice(await userToUpdate.groupsFollowed.indexOf(a.name),1)
+                        userToUpdate.groupsOwned.splice(await userToUpdate.groupsOwned.indexOf(a.name),1)
+                        await pwmClient.db("pwm_project").collection('users').updateOne({"email":decoded.email},userToUpdate);
+                        //-1 elimino il gruppo
+                        await pwmClient.db("pwm_project").collection('groups').deleteOne(a)
+                        //0. forse è andato tutto liscio
+                        res.status(200).json({"reason":"ok"})
                     break;
                     case "transfer ownership":
                         //trasferisco la proprietà del gruppo
@@ -786,23 +799,41 @@ async function groupsOperations(req,res){
                             let group = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.body.name)})
                             let new_owner = await pwmClient.db("pwm_project").collection('users').findOne({"email": validator.escape(req.body.new_owner)})
                             if(isGroupOwner(group,user.userName) && new_owner!=null && new_owner!=undefined){
-                                changeOwner(group,new_owner)
+                                changeGroupOwner(group,new_owner)
                                 res.status(200).json({"reason":"ok"})
                             }
                             else res.status(400).json({"reason":"you do not own this group, or some other data you inserted is not valid. Stop trying to hack me, please"})
                         }catch(e){res.status(400).json(e)}
                     break;
                     case "add playlist":
-                        //aggiungo una playlist TODO
+                        //aggiungo una playlist
+                        try{
+                            let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                            let group = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.body.group_name)})
+                            let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name":validator.escape(req.body.playlist_name)})
+                            if(canAdd(group,playlist,user.userName)){
+                                addPlaylist(group,playlist)
+                            }
+                            else res.status(400).json({"reason":"invalid data or wrong permissions"})
+                        }catch(e){res.status(400).json(e)}
                     break;
                     case "remove playlist":
-                        //rimuovo una playlist TODO
+                        //rimuovo una playlist
+                        try{
+                            let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                            let group = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.body.group_name)})
+                            let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name":validator.escape(req.body.playlist_name)})
+                            if(canRemove(group,playlist,user.userName)){
+                                removePlaylist(group,playlist)
+                            }
+                            else res.status(400).json({"reason":"invalid data or wrong permissions"})
+                        }catch(e){res.status(400).json(e)}
                     break;
                     case "join":
                         //mi unisco a un gruppo
                         try{
                             let user = await pwmClient.db("pwm_project").collection('users').findOne(filter)
-                            let group = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.body.name)})
+                            let group = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.body.name)})
                             if(user!=null && group!=null && ! group.users.some(user.userName)){
                                 // devo modificare lo user in modo che contenga il nome del gruppo
                                 user.groupsFollowed.push(group.name)
@@ -819,7 +850,7 @@ async function groupsOperations(req,res){
                         //Esco da un gruppo
                         try{
                             let user = await pwmClient.db("pwm_project").collection('users').findOne(filter)
-                            let group = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.body.name)})
+                            let group = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.body.name)})
                             if(user!=null && group!=null && group.users.some(user.userName)){
                                 // devo modificare lo user in modo che non contenga il nome del gruppo
                                 user.groupsFollowed.splice(user.groupsFollowed.indexOf(group.name),1)
@@ -844,14 +875,19 @@ app.use('/scripts',express.static(__dirname+'/static/resources/srcs'))
 app.use('/styles',express.static(__dirname+'/static/resources/css'))
 
 app.get('/coffee', (req, res) => {
+    // #swagger.tags = ['EasterEgg','Meme']
+    // #swagger.summary = 'I had to...'
     res.status(418).json({"answer":"I'm not a teapot, but I cannot brew coffee..."})
 })
 
 app.get('/genres',(req,res)=>{
-    //console.log(token.hasExpired())
+    // #swagger.tags = ['General','GET']
+    // #swagger.summary = 'Gets a list of genres'
     perform(getGenres,req,res);
 })
 app.get('/types',(req,res)=>{
+    // #swagger.tags = ['General','GET']
+    // #swagger.summary = 'Gets a list of types'
     res.status(200).json(
         [
             "album",
@@ -865,17 +901,25 @@ app.get('/types',(req,res)=>{
 })
 
 app.post("/register",mongoSanitize,(req, res)=>{
+    // #swagger.tags = ['User','POST']
+    // #swagger.summary = 'Creates a new user'
     perform(register,res,req.body)
 })
 app.post("/login",mongoSanitize, (req, res)=>{
+    // #swagger.tags = ['User','POST']
+    // #swagger.summary = 'Logs in'
     perform(login,res,req.body)
 })
 
 app.post("/search",(req,res)=>{
+    // #swagger.tags = ['Data','POST']
+    // #swagger.summary = 'Performs a search on Spotify'
     perform(askSpotify,res,req.body);
 })
 
 app.get('/requireInfo/:kind/:id',(req,res)=>{
+    // #swagger.tags = ['Data','GET']
+    // #swagger.summary = 'Gets infos about a specific item'
     const details = {
         kind: req.params.kind,
         id : req.params.id
@@ -884,35 +928,47 @@ app.get('/requireInfo/:kind/:id',(req,res)=>{
 })
 
 app.get(`/logout`,mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['User','GET']
+    // #swagger.summary = 'Performs logout'
     try{res.status(200).clearCookie(`token`).json({success:true})}
     catch(e){res.status(400).json({success:false})}
 })
 
 app.get(`/checkLogin`,mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['User','GET']
+    // #swagger.summary = 'Checks if the user is logged in'
     perform(checkLogin,req,res)
 })
 
 app.post('/addOrRemoveFavorite',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Favorites','POST']
+    // #swagger.summary = 'Adds or removes favorites'
     perform(addOrRemoveFavorite,req,res)
 })
 
 app.post('/isStarred',mongoSanitize,(req,res) =>{
+    // #swagger.tags = ['Favorites','POST']
+    // #swagger.summary = 'Checks if something is in the favorites'
     perform(isStarred,req,res)
 })
 
 app.post('/playlistOperations',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Playlists','POST']
+    // #swagger.summary = 'Perform operations on the playlists'
     perform(playlistOperations,req,res)
 })
 
 app.post('/groupsOperations',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Groups','POST']
+    // #swagger.summary = 'Perform operations on the groups'
     perform(groupsOperations,req,res)
 })
 
 app.get("*", (req, res) => {
-    //console.log(path.join(__dirname,'/static/not_found.html'))
+    // #swagger.tags = ['Everything else','GET']
     res.status(404).sendFile(path.join(__dirname, '/static/not_found.html'));
 })
 
 app.listen(process.env.PORT, "0.0.0.0", () => {
-    console.log(`Server started. Port ${process.env.PORT}. http://0.0.0.0:${process.env.PORT}/index.html`)
+    console.log(`Server started. Port ${process.env.PORT}. http://localhost:${process.env.PORT}/index.html`)
 })

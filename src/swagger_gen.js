@@ -18,17 +18,37 @@ const doc = {
       description: 'All PUT requests',
     },
     {
+      name: 'POST',
+      description: 'All POST requests',
+    },
+    {
       name: 'DELETE',
       description: 'All DELETE requests',
     },
     {
       name: 'General',
-      description: 'Returns basic informations',
+      description: 'Basic',
+    },
+    {
+      name: 'User',
+      description: 'Everything related to users',
     },
     {
       name: 'Data',
       description: 'Can be used to interact with data',
     },
+    {
+      name: 'Favorites',
+      description: 'Can be used to interact with Favorites',
+    },
+    {
+      name: 'Playlists',
+      description: 'Can be used to interact with playlists',
+    },
+    {
+      name: 'Groups',
+      description: 'Can be used to interact with groups',
+    }
   ],
 };
 //il file di output
