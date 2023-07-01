@@ -527,7 +527,7 @@ function showMore(){
 }
 
 async function starUnstar(type,id,name){
-    console.log({type:type,id:id,name:name})
+    //console.log({type:type,id:id,name:name})
     fetch('/addOrRemoveFavorite', {
         method: "POST",
         headers: {
@@ -539,7 +539,7 @@ async function starUnstar(type,id,name){
         if(a.ok){
             //console.log(response)
             if(response.removed){
-                console.log(a.ok)
+                //console.log(a.ok)
                 document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -557,7 +557,8 @@ async function starUnstar(type,id,name){
             unstar()
         }
             else{
-                console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                //console.log(a.ok);
+                document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
             <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                 <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
@@ -575,7 +576,8 @@ async function starUnstar(type,id,name){
             }
             }
         else{
-            console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            //console.log(a.ok);
+            document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
             <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
@@ -605,11 +607,11 @@ function fillData(){
         value : params.get('value')
     }
     //console.log(question)
-    console.log(`/requireInfo/${question.kind}?id=${question.value}`)
-    fetch(`/requireInfo/${question.kind}?id=${question.value}`)
+    //console.log(`/requireInfo/${question.kind}/${question.value}`)
+    fetch(`/requireInfo/${question.kind}/${question.value}`)
         .then((a) => a.json())
         .then((response) => {
-            console.log(response)
+            //console.log(response)
             var toFill = document.getElementById('toFill')
             //console.log(toFill)
             var fill=`
@@ -752,8 +754,8 @@ function checkIfStarred(){
         },
         body: JSON.stringify({"category":params.get('kind').slice(0,-1),"id":params.get('value')})
     }).then(async a => {
+        response =  await a.json();
         if(a.ok){
-            response =  await a.json();
             //console.log(JSON.stringify(response))
             if(response.favorite) {
                 star()
@@ -763,7 +765,8 @@ function checkIfStarred(){
             }
         }
         else{
-            console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            //console.log(a.ok);
+            document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
             <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                 <img src="/images/alert.png" class="rounded me-2 small-image" alt="...">
