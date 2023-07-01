@@ -213,27 +213,493 @@
         "responses": {}
       }
     },
-    "/playlistOperations": {
-      "post": {
+    "/group/{name}": {
+      "get": {
         "tags": [
-          "Playlists",
-          "POST"
+          "Groups",
+          "GET"
         ],
-        "summary": "Perform operations on the playlists",
+        "summary": "Gets infos about a group",
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "delete": {
+        "tags": [
+          "Groups",
+          "DELETE"
+        ],
+        "summary": "Delete a group",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {}
       }
     },
-    "/groupsOperations": {
+    "/group": {
       "post": {
         "tags": [
           "Groups",
           "POST"
         ],
-        "summary": "Perform operations on the groups",
+        "summary": "Creates a group",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Group data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nome": {
+                  "type": "string",
+                  "example": "The name of your new group"
+                },
+                "descrizione": {
+                  "type": "string",
+                  "example": "The description of your new group"
+                }
+              },
+              "required": [
+                "nome",
+                "descrizione"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/group/owner": {
+      "put": {
+        "tags": [
+          "Groups",
+          "PUT"
+        ],
+        "summary": "Updates a group status: changes the owner",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Group data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "The name of the group"
+                },
+                "new_owner": {
+                  "type": "string",
+                  "example": "The username of the new owner"
+                }
+              },
+              "required": [
+                "name",
+                "new_owner"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/group/playlists/add": {
+      "put": {
+        "tags": [
+          "Groups",
+          "PUT"
+        ],
+        "summary": "Updates a group status: adds a playlist",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Group data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "group_name": {
+                  "type": "string",
+                  "example": "The name of the group"
+                },
+                "playlist_name": {
+                  "type": "string",
+                  "example": "The name of the playlist to add"
+                }
+              },
+              "required": [
+                "group_name",
+                "playlist_name"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/group/playlists/remove": {
+      "put": {
+        "tags": [
+          "Groups",
+          "PUT"
+        ],
+        "summary": "Updates a group status: removes a playlist",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Group data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "group_name": {
+                  "type": "string",
+                  "example": "The name of the group"
+                },
+                "playlist_name": {
+                  "type": "string",
+                  "example": "The name of the playlist to remove"
+                }
+              },
+              "required": [
+                "group_name",
+                "playlist_name"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/group/join/{name}": {
+      "put": {
+        "tags": [
+          "Groups",
+          "PUT"
+        ],
+        "summary": "Updates a group status: joins a group",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/group/leave/{name}": {
+      "put": {
+        "tags": [
+          "Groups",
+          "PUT"
+        ],
+        "summary": "Updates a group status: leaves a group",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/{name}": {
+      "get": {
+        "tags": [
+          "Playlists",
+          "GET"
+        ],
+        "summary": "Gets infos about a playlist",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      },
+      "delete": {
+        "tags": [
+          "Playlists",
+          "DELETE"
+        ],
+        "summary": "Delete a playlist",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist": {
+      "post": {
+        "tags": [
+          "Playlists",
+          "POST"
+        ],
+        "summary": "Creates a group",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Playlist data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "nome": {
+                  "type": "string",
+                  "example": "The name of your new playlist"
+                },
+                "descrizione": {
+                  "type": "string",
+                  "example": "The description of your new playlist"
+                }
+              },
+              "required": [
+                "nome",
+                "descrizione"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/songs/add": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: adds a song",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Playlist data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "The name of the playlist"
+                },
+                "song_id": {
+                  "type": "string",
+                  "example": "The id of the song to add"
+                }
+              },
+              "required": [
+                "name",
+                "song_id"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/songs/remove": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: removes a song",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Playlist data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "The name of the playlist"
+                },
+                "song_id": {
+                  "type": "string",
+                  "example": "The id of the song to add"
+                }
+              },
+              "required": [
+                "name",
+                "song_id"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/owner": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: changes the owner",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Playlist data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "The name of the group"
+                },
+                "new_owner": {
+                  "type": "string",
+                  "example": "The username of the new owner"
+                }
+              },
+              "required": [
+                "name",
+                "new_owner"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/follow/{name}": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: start following",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/unfollow/{name}": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: stop following",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/tags/add": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: adds a tag",
         "description": "",
         "parameters": [],
+        "responses": {}
+      }
+    },
+    "/playlist/tags/remove": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: removes a tag",
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/playlist/publish/{name}": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: publishes it",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/private/{name}": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: makes it private",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {}
       }
     }
