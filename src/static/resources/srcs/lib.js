@@ -554,7 +554,8 @@ async function starUnstar(type,id,name){
             </div>
             </div>
             `
-            }
+            unstar()
+        }
             else{
                 console.log(a.ok);document.getElementById('alerts').innerHTML=`<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
             <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -570,6 +571,7 @@ async function starUnstar(type,id,name){
                 </div>
                 </div>
                 `
+                star()
             }
             }
         else{
@@ -590,9 +592,9 @@ async function starUnstar(type,id,name){
             }
         var a = new bootstrap.Toast(document.querySelector('.toast'))
         a.show()
-        setTimeout(()=>{
+        /*setTimeout(()=>{
             window.location.reload()
-        },3000)
+        },3000)*/
     })
 }
 
@@ -652,11 +654,10 @@ function fillData(){
                             <div class="normal-text"><strong>Release date: </strong>${response.release_date}</div>
                         </div>`
             }
-            fill+=` <div class="row">
-                        <div class="col-2" id="isStarred"></div>
-                        <div class="col-10 ms-0">
-                            <div class="btn btn-lg normal-text near" id="star" onclick="starUnstar('${response.type}','${response.id}','${response.name}')">Add or remove from favorites</div>
-                        </div>
+            fill+=` <div class="row" onclick="starUnstar('${response.type}','${response.id}','${response.name}')">
+                        <div class="col-sm-5 col-4"></div>
+                        <div class="col-sm-2 col-4" id="isStarred"></div>
+                        <div class="col-sm-5 col-4"></div>
                     </div>
                 `
             //
@@ -755,10 +756,10 @@ function checkIfStarred(){
             response =  await a.json();
             //console.log(JSON.stringify(response))
             if(response.favorite) {
-                document.getElementById('isStarred').innerHTML=`<img class="rounded ps-2 ps-m-0 mx-auto d-block img-fluid" src="/images/starred.png">`
+                star()
             }
             else{
-                document.getElementById('isStarred').innerHTML=`<img class="rounded ps-2 ps-m-0 mx-auto d-block img-fluid reverse" src="/images/not_starred.png">`
+                unstar()
             }
         }
         else{
@@ -779,3 +780,6 @@ function checkIfStarred(){
         }
     })
 }
+
+function star(){document.getElementById('isStarred').innerHTML=`<img class="rounded ps-2 ps-m-0 mx-auto d-block img-fluid reverse mt-4 mb-3" src="/images/heart-solid.svg">`}
+function unstar(){document.getElementById('isStarred').innerHTML=`<img class="rounded ps-2 ps-m-0 mx-auto d-block img-fluid reverse mt-4 mb-3" src="/images/heart-regular.svg">`}
