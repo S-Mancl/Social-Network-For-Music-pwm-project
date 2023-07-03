@@ -1,5 +1,7 @@
 \subsection{Funzionalità da implementare}
 \uppercase{Social Network for Music} (di seguito \verb|SNM|) deve essere in grado di svolgere diverse funzioni, tra cui le seguenti.
+
+Si noti, non saranno riportati i campi dei singoli oggetti, in quanto essi sono già presenti nella apposita sezione riguardante la struttura dati, all'interno delle scelte implementative.
 \subsubsection{Gestione degli utenti}
 La gestione degli utenti è necessaria, e deve essere affrontata attraverso diverse fasi:
 \paragraph{Registrazione} La registrazione degli utenti avviene attraverso una pagina apposita, a cui può accedere qualsiasi utente. Questa pagina consente (dopo appositi controlli) di effettuare una richiesta POST al backend, che si occuperà di registrare i dati dopo averli nuovamente verificati.
@@ -9,10 +11,11 @@ I campi che saranno richiesti in fase di registrazione dovranno essere:
     \item \textbf{Email}, campo unico che verrà usato per autenticarsi.
     \item \textbf{Password}
     \item \textbf{Conferma password}
-    \item \textbf{Nome utente}, che sarà il nome mostrato agli altri quando una playlist viene condivisa
+    \item \textbf{Nome utente}, che sarà il nome mostrato agli altri quando una playlist viene condivisa e per simili funzionalità
     \item \textbf{Preferenze musicali} (genere preferito, da una lista restituita dal backend)
     \item \textbf{Gruppi musicali preferiti}
 \end{itemize}
+\idea{Per ragioni implementative, i gruppi musicali preferiti di default saranno vuoti, come ogni altro preferito. Questi potranno essere infatti aggiunti in maniera più corretta e coerente con il resto dell'applicazione navigando e cercando i gruppi, in modo da salvarne gli ID coerentemente con quelli forniti da Spotify}
 \paragraph{Login} Mediante il login un utente entra nel proprio profilo, diventando in grado di vedere le proprie playlist e il proprio profilo.
 
 Questo avverrà attraverso la richiesta di due campi:
@@ -20,6 +23,7 @@ Questo avverrà attraverso la richiesta di due campi:
     \item Email
     \item Password
 \end{itemize}
+Entrambi i campi saranno modificabili da un apposito sistema.
 
 Nonostante sia stato suggerito di salvarsi le informazioni in locale sarebbe più opportuno usare i token JWT. A questo sarà dedicata una apposita sezione.
 \paragraph{Logout} Questa funzione si spiega da sola, senza bisogno di tanti commenti.
@@ -30,17 +34,10 @@ Questo deve essere fatto attraverso due pagine apposite, una che si occupi della
 
 Vista l'ampia varietà di campi per cui è possibile cercare, una soluzione sarebbe prima mostrare alcuni risultati per ogni campo e poi restringere la ricerca su un campo specifico.
 \subsubsection{Preferiti e Playlist}
-\paragraph{Preferiti} Un utente può decidere di selezionare un numero imprecisato di brani come suoi brani preferiti. Questo li aggiunge alle informazioni (private) del suo account.
-\paragraph{Playlist} Una playlist è una collezione di brani denotata da alcune informazioni:
-\begin{itemize}
-    \item \textbf{Proprietario}
-    \item \textbf{Nome}
-    \item \textbf{Descrizione}
-    \item \textbf{Canzoni contenute} (si ipotizza di porre gli oggetti che descrivono la canzone in un array)
-    \item \textbf{Stato di condivisione} (public/private)
-    \item \textbf{Gruppi consentiti} (Array di nomi (che godono della proprietà di essere \verb|unique|), dei gruppi)
-\end{itemize}
-Una playlist privata può essere vista solamente dal creatore, una playlist pubblica può essere vista liberamente da chiunque mediante una apposita pagina.
+\paragraph{Preferiti} Un utente può decidere di selezionare un numero imprecisato di brani come suoi brani preferiti. Questo li aggiunge alle informazioni (private) del suo account. Non solo, egli potrà inserire potenzialmente ogni categoria di dati restituiti da Spotify.
+\paragraph{Playlist} Una playlist è una collezione di brani denotata da alcune informazioni, ritrovabili nella sezione apposita.
+
+Una playlist privata può essere vista solamente dal creatore, una playlist pubblica può essere vista liberamente da chiunque mediante una apposita pagina, mentre una playlist condivisa con un gruppo può essere visibile a chiunque sia all'interno di quella 
 
 Si noti che le playlist devono implementare le seguenti azioni:\begin{itemize}
     \item \textbf{Cancellazione}
@@ -54,7 +51,7 @@ Si noti che le playlist devono implementare le seguenti azioni:\begin{itemize}
     \item \textbf{Recuperare le informazioni}
 \end{itemize}
 \subsubsection{Opzionale: creazione di gruppi}
-Si potranno creare delle comunità di utenti, di qui in avanti \verb|gruppi|, a cui gli utenti potranno iscriversi / disiscriversi. Quando un utente è iscritto, esso è in grado di vedere tutte le playlist condivise con quella comunità specifica, e risulta anche in grado di parteciparvi condividendo altre playlist.
+Si potranno creare delle comunità di utenti, di qui in avanti \verb|gruppi|, a cui gli utenti potranno iscriversi e disiscriversi. Quando un utente è iscritto, esso è in grado di vedere tutte le playlist condivise con quella comunità specifica, e risulta anche in grado di parteciparvi condividendo altre playlist.
 
-Il creatore del gruppo può essere in grado di escludere qualcuno dal gruppo (forse).
+Il creatore del gruppo non può essere in grado di escludere qualcuno dal gruppo. Questo perché i gruppi nascono come comunità aperte. Il creatore del gruppo, però, ipoteticamente, potrebbe essere in grado di annullare le condivisioni di playlist verso quel gruppo da parte di altri, cosa che agli utenti normali non è consentita.
 \newpage

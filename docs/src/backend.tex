@@ -6,15 +6,15 @@ Al backend vengono delegate funzionalità relative fondamentalmente a quattro gr
     \item Gestione dei gruppi
 \end{itemize}
 Queste funzionalità saranno spiegate meglio nelle seguenti sezioni.
-\subsubsection{Richieste a Spotify e ottenimento dei dati}
+\subsection{Richieste a Spotify e ottenimento dei dati}
 \idea{Ho deciso di delegare la funzionalità di ricerca su Spotify al backend per una ragione di sicurezza: non è desiderabile che le chiavi di accesso a Spotify vengano condivise con gli utenti, anche solo inserendole nel frontend. Più avanti sarà spiegata la modalità di accesso a queste informazioni da parte del backend}
 \paragraph{Ottenere informazioni}
 Per effettuare una ricerca o comunque ottenere informazioni si deve effettuare una richiesta a Spotify specificando il proprio token. Per l'utilizzo del token, si confronti la sezione \verb|Token Object| nelle scelte implementative.
 
 Esistono due percorsi appositi per fare una ricerca o per ottenere informazioni riguardo a un oggetto specifico. Per queste si consulti l'allegato B, ossia lo swagger.
-\subsubsection{Gestione degli utenti}
+\subsection{Gestione degli utenti}
 Per ogni utente sono possibili diverse operazioni. In particolare, le principali sono \verb|register|, \verb|login|, \verb|checkLogin| (verificare se l'utente è loggato), \verb|delete|.
-\subsubsection{Gestione delle playlist e dei gruppi di utenti}
+\subsection{Gestione delle playlist e dei gruppi di utenti}
 Le playlist devono prevedere le diverse funzioni trovate nell'analisi delle specifiche, così come i gruppi.
 
 \idea{Per le singole funzionalità si prega di guardare lo swagger all'Appendice B}
