@@ -103,7 +103,46 @@
         ],
         "summary": "Performs a search on Spotify",
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "User data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "string": {
+                  "type": "string",
+                  "example": "the string to search for"
+                },
+                "type": {
+                  "type": "array",
+                  "example": [
+                    "album",
+                    "track"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "limit": {
+                  "type": "number",
+                  "example": 0
+                },
+                "offset": {
+                  "type": "number",
+                  "example": 18
+                }
+              },
+              "required": [
+                "string",
+                "type",
+                "limit",
+                "offset"
+              ]
+            }
+          }
+        ],
         "responses": {}
       }
     },
@@ -140,7 +179,35 @@
         ],
         "summary": "Adds or removes favorites",
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "User data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "example": "album"
+                },
+                "id": {
+                  "type": "string",
+                  "example": "1kCHru7uhxBUdzkm4gzRQc"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Hamilton (Original Broadway Cast Recording)"
+                }
+              },
+              "required": [
+                "category",
+                "id",
+                "name"
+              ]
+            }
+          }
+        ],
         "responses": {}
       }
     },
@@ -152,7 +219,30 @@
         ],
         "summary": "Checks if something is in the favorites",
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "User data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "example": "album"
+                },
+                "id": {
+                  "type": "string",
+                  "example": "1kCHru7uhxBUdzkm4gzRQc"
+                }
+              },
+              "required": [
+                "category",
+                "id"
+              ]
+            }
+          }
+        ],
         "responses": {}
       }
     },
@@ -465,6 +555,41 @@
         "responses": {}
       }
     },
+    "/group/description": {
+      "put": {
+        "tags": [
+          "Groups",
+          "PUT"
+        ],
+        "summary": "Updates a group status: changes the description",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Group data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "The name of the group"
+                },
+                "new_description": {
+                  "type": "string",
+                  "example": "The new description"
+                }
+              },
+              "required": [
+                "name",
+                "new_description"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
     "/group/playlists/add": {
       "put": {
         "tags": [
@@ -753,7 +878,7 @@
               "properties": {
                 "name": {
                   "type": "string",
-                  "example": "The name of the group"
+                  "example": "The name of the playlist"
                 },
                 "new_owner": {
                   "type": "string",
@@ -763,6 +888,41 @@
               "required": [
                 "name",
                 "new_owner"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/description": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: changes the description",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Playlist data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "The name of the playlist"
+                },
+                "new_description": {
+                  "type": "string",
+                  "example": "The new description"
+                }
+              },
+              "required": [
+                "name",
+                "new_description"
               ]
             }
           }

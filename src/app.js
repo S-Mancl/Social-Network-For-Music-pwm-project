@@ -54,6 +54,7 @@ const baseUrls = {
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
 const { create } = require('domain');
+const { group } = require('console');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 function hash(input) {
@@ -365,7 +366,6 @@ function checkLogin(req,res){
 }
 async function addOrRemoveFavorite(req,res){
     //console.log(req.body.id,req.body.name,req.body.category)
-    //connect to DB, evaluate if present, else... etc
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
     if(token == undefined) res.status(400).json({"reason": `Invalid login`})
@@ -772,11 +772,38 @@ async function transferPlaylistOwnership(req,res){
                     let new_owner = await pwmClient.db("pwm_project").collection('users').findOne({"email": validator.escape(req.body.new_owner)})
                     if(isOwner(playlist,user.userName) && new_owner!=null && new_owner!=undefined){
                         changeOwner(playlist,new_owner.userName)
+                        await pwmClient.db('pwm_project').collection('playlists').updateOne({"name":playlist.name},playlist)
                         res.status(200).json({"reason":"ok"})
                     }
                     else res.status(400).json({"reason":"you do not own this playlist, or some other data you inserted is not valid. Stop trying to hack me, please"})
                 }catch(e){res.status(400).json(e)}
                 //trasferisco la proprietà della playlist a un altro user
+                pwmClient.close()
+            }
+        })
+    }
+}
+async function changePlaylistDescription(req,res){
+    var pwmClient = await new mongoClient(mongoUrl).connect()
+    const token = req.cookies.token
+    if(token == undefined) res.status(400).json({"reason": `Invalid login`})
+    else{
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(401).json(err)
+                pwmClient.close()
+            }
+            else{
+                try{
+                    let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                    let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.body.name)})
+                    if(isOwner(playlist,user.userName)){
+                        playlist.description=validator.escape(req.body.new_description)
+                        await pwmClient.db('pwm_project').collection('playlists').updateOne({"name":playlist.name},playlist)
+                        res.status(200).json({"reason":"ok"})
+                    }
+                    else res.status(400).json({"reason":"you do not own this playlist, or some other data you inserted is not valid. Stop trying to hack me, please"})
+                }catch(e){res.status(400).json(e)}
                 pwmClient.close()
             }
         })
@@ -1174,7 +1201,32 @@ async function getGroupInfo(req,res){
         })
     }
 }
-
+async function changeGroupDescription(req,res){
+    var pwmClient = await new mongoClient(mongoUrl).connect()
+    const token = req.cookies.token
+    if(token == undefined) res.status(400).json({"reason": `Invalid login`})
+    else{
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(401).json(err)
+                pwmClient.close()
+            }
+            else{
+                try{
+                    let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                    let group = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.body.name)})
+                    if(isGroupOwner(group,user.userName)){
+                        group.description=validator.escape(req.body.new_description)
+                        await pwmClient.db('pwm_project').collection('groups').updateOne({"name":playlist.name},playlist)
+                        res.status(200).json({"reason":"ok"})
+                    }
+                    else res.status(400).json({"reason":"you do not own this group, or some other data you inserted is not valid. Stop trying to hack me, please"})
+                }catch(e){res.status(400).json(e)}
+                pwmClient.close()
+            }
+        })
+    }
+}
 async function searchPlaylistsByName(req,res){
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
@@ -1283,12 +1335,29 @@ app.get('/requireInfo/:kind/:id',(req,res)=>{
 app.post('/addOrRemoveFavorite',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Favorites','POST']
     // #swagger.summary = 'Adds or removes favorites'
+    /* #swagger.parameters['obj'] = { 
+         in: 'body', 
+         description: 'User data.', 
+         schema: { 
+             $category: 'album', 
+             $id: '1kCHru7uhxBUdzkm4gzRQc', 
+             $name: 'Hamilton (Original Broadway Cast Recording)',
+         } 
+     }*/
     perform(addOrRemoveFavorite,req,res)
 })
 
 app.post('/isStarred',mongoSanitize,(req,res) =>{
     // #swagger.tags = ['Favorites','POST']
     // #swagger.summary = 'Checks if something is in the favorites'
+    /* #swagger.parameters['obj'] = { 
+         in: 'body', 
+         description: 'User data.', 
+         schema: { 
+             $category: 'album', 
+             $id: '1kCHru7uhxBUdzkm4gzRQc',
+         } 
+     }*/
     perform(isStarred,req,res)
 })
 
@@ -1409,7 +1478,19 @@ app.put('/group/owner',mongoSanitize,(req,res)=>{
     perform(transferGroupOwnership,req,res)
 })
 
-//TODO TO DO app.put group description
+app.put('/group/description',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Groups','PUT']
+    // #swagger.summary = 'Updates a group status: changes the description'
+    /* #swagger.parameters['obj'] = {
+        in: 'body',
+        description: 'Group data.',
+        schema: {
+            $name: 'The name of the group',
+            $new_description: 'The new description',
+        }
+    }*/
+    perform(changeGroupDescription,req,res)
+})
 
 app.put('/group/playlists/add',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Groups','PUT']
@@ -1527,11 +1608,25 @@ app.put('/playlist/owner',mongoSanitize,(req,res)=>{
         in: 'body',
         description: 'Playlist data.',
         schema: {
-            $name: 'The name of the group',
+            $name: 'The name of the playlist',
             $new_owner: 'The username of the new owner',
         }
     }*/
     perform(transferPlaylistOwnership,req,res)
+})
+
+app.put('/playlist/description',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Playlists','PUT']
+    // #swagger.summary = 'Updates a playlist status: changes the description'
+    /* #swagger.parameters['obj'] = {
+        in: 'body',
+        description: 'Playlist data.',
+        schema: {
+            $name: 'The name of the playlist',
+            $new_description: 'The new description',
+        }
+    }*/
+    perform(changePlaylistDescription,req,res)
 })
 
 app.put('/playlist/follow/:name',mongoSanitize,(req,res)=>{

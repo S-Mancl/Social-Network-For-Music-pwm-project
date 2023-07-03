@@ -295,7 +295,7 @@ Mentre per le playlist:
 }
 \end{lstlisting}
 E per i gruppi:
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=JavaScript]
 async function deleteGroup(req,res){
     ...
     let a = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.params.name)})
