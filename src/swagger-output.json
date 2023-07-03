@@ -56,10 +56,8 @@
     "/coffee": {
       "get": {
         "tags": [
-          "EasterEgg",
-          "Meme"
+          "Test"
         ],
-        "summary": "I had to...",
         "description": "",
         "parameters": [],
         "responses": {
@@ -95,30 +93,6 @@
             "description": "OK"
           }
         }
-      }
-    },
-    "/register": {
-      "post": {
-        "tags": [
-          "User",
-          "POST"
-        ],
-        "summary": "Creates a new user",
-        "description": "",
-        "parameters": [],
-        "responses": {}
-      }
-    },
-    "/login": {
-      "post": {
-        "tags": [
-          "User",
-          "POST"
-        ],
-        "summary": "Logs in",
-        "description": "",
-        "parameters": [],
-        "responses": {}
       }
     },
     "/search": {
@@ -158,6 +132,131 @@
         "responses": {}
       }
     },
+    "/addOrRemoveFavorite": {
+      "post": {
+        "tags": [
+          "Favorites",
+          "POST"
+        ],
+        "summary": "Adds or removes favorites",
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/isStarred": {
+      "post": {
+        "tags": [
+          "Favorites",
+          "POST"
+        ],
+        "summary": "Checks if something is in the favorites",
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "User",
+          "POST"
+        ],
+        "summary": "Creates a new user",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "User data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "The@new.email"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Mario"
+                },
+                "surname": {
+                  "type": "string",
+                  "example": "Rossi"
+                },
+                "userName": {
+                  "type": "string",
+                  "example": "rossimario42"
+                },
+                "birthDate": {
+                  "type": "string",
+                  "example": "01-01-2000"
+                },
+                "favoriteGenres": {
+                  "type": "array",
+                  "example": [
+                    "classical",
+                    "broadway"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "password": {
+                  "type": "string",
+                  "example": "Asup3rs3cur3P4ssw0rd!!!"
+                }
+              },
+              "required": [
+                "email",
+                "name",
+                "surname",
+                "userName",
+                "birthDate",
+                "favoriteGenres",
+                "password"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "User",
+          "POST"
+        ],
+        "summary": "Logs in",
+        "description": "",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "User data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "my@email.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "Asup3rs3cur3P4ssw0rd!!!"
+                }
+              },
+              "required": [
+                "email",
+                "password"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
     "/logout": {
       "get": {
         "tags": [
@@ -189,25 +288,72 @@
         "responses": {}
       }
     },
-    "/addOrRemoveFavorite": {
-      "post": {
+    "/user": {
+      "put": {
         "tags": [
-          "Favorites",
-          "POST"
+          "User",
+          "PUT"
         ],
-        "summary": "Adds or removes favorites",
+        "summary": "Updates a user",
         "description": "",
-        "parameters": [],
-        "responses": {}
-      }
-    },
-    "/isStarred": {
-      "post": {
-        "tags": [
-          "Favorites",
-          "POST"
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "User data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "The@new.email"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Mario"
+                },
+                "surname": {
+                  "type": "string",
+                  "example": "Rossi"
+                },
+                "birthDate": {
+                  "type": "string",
+                  "example": "01-01-2000"
+                },
+                "favoriteGenres": {
+                  "type": "array",
+                  "example": [
+                    "classical",
+                    "broadway"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "password": {
+                  "type": "string",
+                  "example": "Asup3rs3cur3P4ssw0rd!!!"
+                }
+              },
+              "required": [
+                "email",
+                "name",
+                "surname",
+                "birthDate",
+                "favoriteGenres",
+                "password"
+              ]
+            }
+          }
         ],
-        "summary": "Checks if something is in the favorites",
+        "responses": {}
+      },
+      "delete": {
+        "tags": [
+          "User",
+          "DELETE"
+        ],
+        "summary": "Deletes an user",
         "description": "",
         "parameters": [],
         "responses": {}
@@ -427,7 +573,7 @@
         "responses": {}
       }
     },
-    "/playlist/{name}": {
+    "/playlist/info/{name}": {
       "get": {
         "tags": [
           "Playlists",
@@ -444,17 +590,38 @@
           }
         ],
         "responses": {}
-      },
-      "delete": {
+      }
+    },
+    "/playlist/search/name/{name}": {
+      "get": {
         "tags": [
           "Playlists",
-          "DELETE"
+          "GET"
         ],
-        "summary": "Delete a playlist",
+        "summary": "Gets playlist with that name as a substring of theirs",
         "description": "",
         "parameters": [
           {
             "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/search/tag/{tag}": {
+      "get": {
+        "tags": [
+          "Playlists",
+          "GET"
+        ],
+        "summary": "Gets playlist with that tag in their tags",
+        "description": "",
+        "parameters": [
+          {
+            "name": "tag",
             "in": "path",
             "required": true,
             "type": "string"
@@ -691,6 +858,25 @@
           "PUT"
         ],
         "summary": "Updates a playlist status: makes it private",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/playlist/{name}": {
+      "delete": {
+        "tags": [
+          "Playlists",
+          "DELETE"
+        ],
+        "summary": "Delete a playlist",
         "description": "",
         "parameters": [
           {

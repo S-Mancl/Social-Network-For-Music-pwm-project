@@ -1,2 +1,52 @@
+Le tecnologie utilizzate saranno divise a seconda della tipologia.
+\subsection{Data}
+Per i dati si è utilizzato, come da istruzioni ricevute, MongoDB. La struttura dati è approfondita nelle scelte progettuali, come anche l'uso delle informazioni di accesso, pertanto non vi sono altre informazioni rilevanti da specificare in questa sede.
+\subsection{Backend}
+Per il backend si è utilizzato \href{https://nodejs.org/en/about}{NodeJs}, con l'utilizzo del framework \verb|express|\cite{express}.
 
+L'utilizzo di \verb|NPM| ha consentito l'uso dei package, in particolare sono stati usati:
+\begin{itemize}
+    \item \textbf{cookie-parser}: un package che consente di parsare l'header \verb|Cookie| e popolare \verb|req.cookies| con un oggetto avente per attributi i nomi dei cookie\cite{cookie-parser}.
+    \item \textbf{cors}: un middleware per eliminare i fastidiosi problemi con i cors\cite{cors}.
+    \item \textbf{dotenv}: un package per la gestione del \verb|.env|, con un comodo comando \verb|require('path/to/file')| e di seguito \verb|.configure()|\cite{dotenv}.
+    \item \textbf{express}: il framework già citato sopra.
+    \item \textbf{express-mongo-sanitize}: un package che fornisce un middleware per la sanitizzazione di molti campi delle richieste. Si noti che l'ho usato con la configurazione \verb|allowDots: true| per evitare che l'email venisse modificata. Per il resto consente un notevole miglioramento della sicurezza con riduzione del rischio di injections\cite{express-mongo-sanitize}.
+    \item \textbf{jsonwebtoken}: il package che consente una autenticazione un po' più sicura rispetto al minimo richiesto mediante l'uso, la firma e la verifica dei \verb|JWT| tramite comodi metodi\cite{jsonwebtoken}.
+    \item \textbf{mongodb}: il package ufficiale per gestire MongoDB da NodeJS\cite{mongodb-npm}
+    \item \textbf{nodemon}: un package che consente di riavviare il server nel momento in cui rileva qualsiasi cambiamento\cite{nodemon}.
+    \item \textbf{swagger-ui-express}: un package per fornire uno swagger\cite{swagger-ui-express}
+    \item \textbf{validator}: un package molto utile per sanitizzare e validare stringhe\cite{validator}.
+    \item[*] \textbf{swagger-autogen}: utilizzato solo come \verb|devDependency|, esso è utile per generare automaticamente lo swagger\cite{swagger-autogen}. L'export di questo swagger lo trovate nell'Appendice B.
+\end{itemize}
+Ci sono poi altri packages, come \verb|crypto| o \verb|path|, che venivano già forniti in automatico.
+
+Il file \verb|package.json| risulta quindi composto come segue:
+\begin{lstlisting}
+{
+    "scripts": {
+        "start": "nodemon app.js",
+        "debug": "nodemon --inspect app.js"
+    },
+    "dependencies": {
+        "cookie-parser": "^1.4.6",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "express-mongo-sanitize": "^2.2.0",
+        "jsonwebtoken": "^9.0.0",
+        "mongodb": "^5.4.0",
+        "nodemon": "^1.14.9",
+        "swagger-ui-express": "^4.6.2",
+        "validator": "^13.9.0"
+    },
+    "devDependencies": {
+        "swagger-autogen": "^2.23.1"
+    }
+}
+\end{lstlisting}
+\subsection{Frontend}
+
+sanitizzatori
+dotenv
+altro
 \newpage

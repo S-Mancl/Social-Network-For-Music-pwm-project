@@ -97,17 +97,7 @@ function createUrlForSearch(question){
     return url
 }
 function askSpotify(res,question){
-    /*
-        Format of question
-        question = {
-            string: String,
-            type: Array(types) <- tra album, playlist,episode,track,audiobook,artist,show,
-            limit: number
-            offset: number
-        }
-    */
     question.string = validator.escape(question.string) //just to improve security
-    
     fetch(createUrlForSearch(question),{
         headers: {
             "Content-Type": "application/json",
@@ -135,13 +125,6 @@ function getInfo(details,res){
     )
 }
 async function login(res,user){
-    /*
-        Format of user
-        user = {
-            email: email,
-            password: password,
-        }
-    */
     if((typeof user.email !== 'string' &&!( user.email instanceof String)) || (typeof user.password !== 'string' &&!( user.password instanceof String))) res.status(400).json({code:1,reason: `Don't try to mess with me...`})
     else if(user.email == undefined || user.password == undefined) res.status(400).json({code:1,reason: `You are missing some fields or they are not strings...`})
     else{
@@ -238,10 +221,120 @@ async function register(res,user){
                     return
                 }
                 res.status(500).json({code:6,reason:`Generic error: ${e}`})
-        
+                pwmClient.close()
             };
         }
     }
+}
+async function updateUser(req,res){
+    var pwmClient = await new mongoClient(mongoUrl).connect() 
+    const token = req.cookies.token 
+    if(token == undefined) res.status(400).json({"reason":"Invalid login"}) 
+    else{ 
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{ 
+            if(err){ 
+                res.status(401).json(err) 
+                pwmClient.close() 
+            } 
+            else{
+                //TROVO L'UTENTE
+                let utente = await pwmClient.db("pwm_project").collection("users").findOne({"email":decoded.email})
+                //controllo la validità dei campi
+                user = req.body
+                if(user.name==undefined || user.password==undefined || user.surname == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({code:-1,reason: `You are missing some fields...`})
+                else{
+                    [`name`,`surname`,`birthDate`,`password`,`email`].forEach(key => {
+                        //console.log(user[key])
+                        user[key] = validator.escape(validator.trim(user[key]))
+                    })
+                    for (let i = 0; i < user.favoriteGenres.length; i++){
+                        user.favoriteGenres[i] = validator.escape(validator.trim(user.favoriteGenres[i]))
+                    }
+                    if(!validator.isEmail(user.email)) res.status(400).json({code:1,reason:`Are you sure ${user.email} is an email?`})
+                    else if(!validator.isStrongPassword(user.password)) res.status(400).json({code:2,reason:`${user.password} is not strong enough as a password`})
+                    else if(!validator.isDate(user.birthDate)) res.status(400).json({code:3,reason:`${user.birthDate} is not an accepted birth date`})
+                    else if(!validator.isAlpha(user.name)||!validator.isAlpha(user.surname)) res.status(400).json({code:4,reason:`${user.name} ${user.surname} is not an accepted name... It contains numbers or it's empty!`})
+                    /*else if(user.userName=="") res.status(400).json({code:7,reason:`You have selected an invalid username. Please try again`})*/
+                    else{
+                        utente.email = user.email.toLowerCase()
+                        utente.password = hash(user.password)
+                        utente.name=user.name
+                        utente.surname=user.surname
+                        utente.birthDate=user.birthDate
+                        utente.favoriteGenres=user.favoriteGenres
+                        try {
+                            await pwmClient.db("pwm_project").collection('users').updateOne({"userName":utente.userName},utente)
+                            pwmClient.close()
+                            res.status(200).clearCookie(`token`).json({code:0,"explanation":`you will now be logged out. Please re-login with your new credentials`})
+                        }
+                        catch (e) {
+                            //console.log('catch in test');
+                            if (e.code == 11000) {
+                                res.status(400).json({code:5,reason:"Already present user: please choose a different username or email"})
+                                return
+                            }
+                            res.status(500).json({code:6,reason:`Generic error: ${e}`})
+                            pwmClient.close()
+                        };
+                    }
+                }
+            }
+        })
+    }
+}
+async function deleteUser(req,res){ 
+    var pwmClient = await new mongoClient(mongoUrl).connect() 
+    const token = req.cookies.token 
+    if(token == undefined) res.status(400).json({"reason":"Invalid login"}) 
+    else{ 
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{ 
+            if(err){ 
+                res.status(401).json(err) 
+                pwmClient.close() 
+            } 
+            else{ 
+                //elimino l'utente 
+                try{
+                    let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                    //-3 elimino l'utente da ogni gruppo in cui è, ed elimino ogni gruppo che sia owned, rimuovendolo prima da ogni utente che sia in quel gruppo
+                    let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
+                    for(let group in allGroups){
+                        if(group.users.some(user.userName)){
+                            group.users.splice(group.users.indexOf(user.userName),1)
+                            await pwmClient.db("pwm_project").collection('groups').updateOne({"name":group.name},group)
+                        }
+                    }
+                    //-3 bis elimino ogni gruppo posseduto dall'utente
+                    await pwmClient.db("pwm_project").collection("groups").deleteMany({"owner":user.userName})
+                    //-2 elimino ogni playlist dell'utente da ogni lista di playlist seguite altrui
+                    allGroups = pwmClient.db("pwm_project").collection("groups").find({})
+                    let allPlaylists = pwmClient.db("pwm_project").collection("playlists").find({"owner":user.userName})
+                    let allUsers = pwmClient.db("pwm_project").collection("playlists").find({"email":{$not:decoded.email}})
+                    for(let playlist in allPlaylists){
+                        for(let utente in allUsers){
+                            if(utente.playlistsFollowed.some(playlist.name)){
+                                utente.playlistsFollowed.splice(utente.playlistsFollowed.indexOf(playlist.name),1)
+                                await pwmClient.db("pwm_project").collection("users").updateOne({"email":utente.email},utente)
+                            }
+                        }
+                        for(let group in allGroups){
+                            if(group.playlistsShared.some(playlist.name)){
+                                group.playlistsShared.splice(group.playlistsShared.indexOf(playlist.name),1)
+                                await pwmClient.db("pwm_project").collection("groups").updateOne({"name":group.name})
+                            }
+                        }
+                    }
+                    //-2 bis elimino ogni playlist owned dall'utente
+                    await pwmClient.db("pwm_project").collection("playlists").deleteMany({"owner":utente.userName})
+                    //-1 elimino l'account dell'utente
+                    await pwmClient.db('pwm_project').collection('users').deleteOne({"email":decoded.email})
+                    //0. forse è andato tutto liscio, e spero di non aver lasciato riferimenti pending da qualche parte
+                    res.status(200).json({"reason":"ok"}) 
+                }catch(e){res.status(400).json(e)} 
+                pwmClient.close() 
+            } 
+        }) 
+    } 
 }
 function checkLogin(req,res){
     if(req.cookies.token == undefined) res.status(401).json({})
@@ -350,6 +443,7 @@ function newPlaylist(req,userName){
         "tags":[],
         "visibility":false, //default privata
         "groups":[],
+        "totalTime":0,
         "owner":userName
     }
     if (
@@ -367,11 +461,13 @@ function isOwner(playlist,userName){
 }
 function addSong(playlist,song){
     playlist.songs.push(song)
+    playlist.totalTime+=song.duration
     return playlist
 }
 async function removeSong(playlist,song){
     var elementToRemove = await playlist.songs.find(element => element.id == song.id)
     playlist.songs.splice(indexOf(elementToRemove),1)
+    playlist.totalTime-=song.duration
     return playlist
 }
 function publish(playlist){
@@ -387,7 +483,7 @@ function changeOwner(playlist,newOwner){
     return playlist;
 }
 function canSee(playlist, groupList, user){
-    return playlist.visibility || groupList.playlistsShared.some(group => group.some(playlist.name)) || playlist.owner == user.userName
+    return playlist.visibility /*La playlist è visibile globalmente*/ || groupList.playlistsShared.some(group => {group.users==user/*Seguo un gruppo*/ && group.playlistsFollowed.some(playlist.name)/*e in quel gruppo c'è la playlist*/}) || playlist.owner == user.userName /*O la possiedo io direttamente*/
 }
 function addTag(playlist,tag){
     playlist.tags.push(validator.escape(tag))
@@ -579,7 +675,6 @@ async function removeSongFromPlaylist(req,res){
                             titolo : details.name,
                             durata : details.duration_ms,
                             cantante: details.artists[0].name,
-                            //genere: TODO: non c'è nei dati restituiti
                             anno_di_pubblicazione: details.album.releaseDate.split("-")[0]
                         }
                         if(await playlist.songs.some(element => element.id == song_id)) {
@@ -637,8 +732,8 @@ async function followPlaylist(req,res){
                 try{
                     let a = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.params.name)})
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
-                    //TO DO ottenere i gruppi di cui fa parte
-                    if(canSee(a,undefined,user)){
+                    let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
+                    if(canSee(a,allGroups,user)){
                         user.playlistsFollowed.push(a.name)
                         await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},user)
                         res.status(200).json({"reason":"ok"})
@@ -672,7 +767,6 @@ async function addSongToPlaylist(req,res){
                             titolo : details.name,
                             durata : details.duration_ms,
                             cantante: details.artists[0].name,
-                            //genere: TODO: non c'è nei dati restituiti
                             anno_di_pubblicazione: details.album.releaseDate.split("-")[0]
                         }
                         if(! await playlist.songs.some(element => element.id == song_id)){
@@ -814,8 +908,8 @@ async function getPlaylistInfos(req,res){
                 try{
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                     let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.params.name)})
-                    //TODO groups      vvvvvvvvv
-                    if(canSee(playlist,undefined,user)){
+                    let allGroups = await pwmClient.db("pwm_project").collection('groups').find({})
+                    if(canSee(playlist,allGroups,user)){
                         res.json(200).json(playlist)
                     }
                     else{
@@ -1126,14 +1220,62 @@ async function getGroupInfo(req,res){
     }
 }
 
+async function searchPlaylistsByName(req,res){
+    var pwmClient = await new mongoClient(mongoUrl).connect()
+    const token = req.cookies.token
+    if(token == undefined) res.status(400).json({"reason": `Invalid login`})
+    else{
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(401).json(err)
+                pwmClient.close()
+            }
+            else{
+                try{
+                    let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                    let all = pwmClient.db("pwm_project").collection("playlists").find({"name": { '$regex' : req.params.name, '$options' : 'i' }})
+                    let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
+                    let saw
+                    for(let a in all) if(canSee(a,allGroups,user)) saw.push(a)
+                    res.status(200).json(saw)
+                }catch(e){res.status(400).json(e)}
+                pwmClient.close()
+            }
+        })
+    }
+}
+async function searchPlaylistsByTag(req,res){
+    var pwmClient = await new mongoClient(mongoUrl).connect()
+    const token = req.cookies.token
+    if(token == undefined) res.status(400).json({"reason": `Invalid login`})
+    else{
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(401).json(err)
+                pwmClient.close()
+            }
+            else{
+                try{
+                    let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+                    let all = pwmClient.db("pwm_project").collection("playlists").find({})
+                    let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
+                    let saw
+                    for(let a in all) if(a.tags.some(req.params.tag) && canSee(a,allGroups,user)) saw.push(a)
+                    res.status(200).json(saw)
+                }catch(e){res.status(400).json(e)}
+                pwmClient.close()
+            }
+        })
+    }
+}
+
 app.use('/',express.static(__dirname + '/static'))
 app.use('/images',express.static(__dirname+'/static/resources/imgs'))
 app.use('/scripts',express.static(__dirname+'/static/resources/srcs'))
 app.use('/styles',express.static(__dirname+'/static/resources/css'))
 
 app.get('/coffee', (req, res) => {
-    // #swagger.tags = ['EasterEgg','Meme']
-    // #swagger.summary = 'I had to...'
+    // #swagger.tags = ['Test']
     res.status(418).json({"answer":"I'm not a teapot, but I cannot brew coffee..."})
 })
 
@@ -1157,20 +1299,19 @@ app.get('/types',(req,res)=>{
             .sort())
 })
 
-app.post("/register",mongoSanitize,(req, res)=>{
-    // #swagger.tags = ['User','POST']
-    // #swagger.summary = 'Creates a new user'
-    perform(register,res,req.body)
-})
-app.post("/login",mongoSanitize, (req, res)=>{
-    // #swagger.tags = ['User','POST']
-    // #swagger.summary = 'Logs in'
-    perform(login,res,req.body)
-})
-
 app.post("/search",(req,res)=>{
     // #swagger.tags = ['Data','POST']
     // #swagger.summary = 'Performs a search on Spotify'
+    /* #swagger.parameters['obj'] = { 
+         in: 'body', 
+         description: 'User data.', 
+         schema: { 
+             $string: 'the string to search for', 
+             $type: ['album','track'], 
+             $limit: 0, 
+             $offset: 18,
+         } 
+     }*/
     perform(askSpotify,res,req.body);
 })
 
@@ -1182,6 +1323,62 @@ app.get('/requireInfo/:kind/:id',(req,res)=>{
         id : req.params.id
     }
     perform(getInfo,details,res)
+})
+
+app.post('/addOrRemoveFavorite',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Favorites','POST']
+    // #swagger.summary = 'Adds or removes favorites'
+    perform(addOrRemoveFavorite,req,res)
+})
+
+app.post('/isStarred',mongoSanitize,(req,res) =>{
+    // #swagger.tags = ['Favorites','POST']
+    // #swagger.summary = 'Checks if something is in the favorites'
+    perform(isStarred,req,res)
+})
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+app.post('/register',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['User','POST'] 
+     // #swagger.summary = 'Creates a new user'
+    /* #swagger.parameters['obj'] = { 
+         in: 'body', 
+         description: 'User data.', 
+         schema: { 
+             $email: 'The@new.email', 
+             $name: 'Mario', 
+             $surname: 'Rossi', 
+             $userName: 'rossimario42',
+             $birthDate: '01-01-2000',
+             $favoriteGenres: ['classical','broadway'],
+             $password: 'Asup3rs3cur3P4ssw0rd!!!',
+         } 
+     }*/
+     perform(register,res,req.body)
+})
+
+app.post("/login",mongoSanitize, (req, res)=>{
+    // #swagger.tags = ['User','POST']
+    // #swagger.summary = 'Logs in'
+    /* #swagger.parameters['obj'] = { 
+         in: 'body', 
+         description: 'User data.', 
+         schema: { 
+             $email: 'my@email.com', 
+             $password: 'Asup3rs3cur3P4ssw0rd!!!',
+         } 
+     }*/
+
+    
+    /*
+        Format of user
+        user = {
+            email: email,
+            password: password,
+        }
+    */
+    perform(login,res,req.body)
 })
 
 app.get(`/logout`,mongoSanitize,(req,res)=>{
@@ -1197,16 +1394,28 @@ app.get(`/checkLogin`,mongoSanitize,(req,res)=>{
     perform(checkLogin,req,res)
 })
 
-app.post('/addOrRemoveFavorite',mongoSanitize,(req,res)=>{
-    // #swagger.tags = ['Favorites','POST']
-    // #swagger.summary = 'Adds or removes favorites'
-    perform(addOrRemoveFavorite,req,res)
+app.put('/user',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['User','PUT'] 
+     // #swagger.summary = 'Updates a user's data'
+    /* #swagger.parameters['obj'] = { 
+         in: 'body', 
+         description: 'User data.', 
+         schema: { 
+             $email: 'The@new.email', 
+             $name: 'Mario', 
+             $surname: 'Rossi', 
+             $birthDate: '01-01-2000',
+             $favoriteGenres: ['classical','broadway'],
+             $password: 'Asup3rs3cur3P4ssw0rd!!!',
+         } 
+     }*/
+     perform(updateUser,req,res)
 })
 
-app.post('/isStarred',mongoSanitize,(req,res) =>{
-    // #swagger.tags = ['Favorites','POST']
-    // #swagger.summary = 'Checks if something is in the favorites'
-    perform(isStarred,req,res)
+app.delete('/user', mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['User','DELETE'] 
+    // #swagger.summary = 'Deletes an user'
+    perform(deleteUser,req,res)
 })
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1293,10 +1502,23 @@ app.delete('/group/:name',mongoSanitize,(req,res)=>{
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-app.get('/playlist/:name',mongoSanitize,(req,res)=>{
+app.get('/playlist/info/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','GET']
     // #swagger.summary = 'Gets infos about a playlist'
     perform(getPlaylistInfos,req,res)
+})
+
+app.get('/playlist/search/name/:name',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Playlists','GET']
+    // #swagger.summary = 'Gets playlist with that name as a substring of theirs'
+    perform(searchPlaylistsByName,req,res)
+})
+
+app.get('/playlist/search/tag/:tag',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Playlists','GET']
+    // #swagger.summary = 'Gets playlist with that tag in their tags'
+    perform(searchPlaylistsByTag,req,res)
+
 })
 
 app.post('/playlist',mongoSanitize,(req,res)=>{
@@ -1403,6 +1625,8 @@ app.get("*", (req, res) => {
     // #swagger.tags = ['Everything else','GET']
     res.status(404).sendFile(path.join(__dirname, '/static/not_found.html'));
 })
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 app.listen(process.env.PORT, "0.0.0.0", () => {
     console.log(`Server started. Port ${process.env.PORT}. http://localhost:${process.env.PORT}/index.html`)
