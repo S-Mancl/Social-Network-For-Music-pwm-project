@@ -1,12 +1,122 @@
 Di seguito saranno spiegate alcune scelte implementative relative a varie sezioni, iniziando da quelle riguardanti la struttura dati nel database.
 \subsection{Struttura dati nel database}
-TODO TO DO
+Il database prevede tre collezioni, ciascuna costituita da documenti con una data struttura:
+\begin{figure}[h]
+    \begin{minipage}{.30\textwidth}
+        \textbf{Users}:
+
+        \begin{lstlisting}[language=JavaScript]
+{
+    "_id": {...},
+    "name": "First Name",
+    "surname": "Surname",
+    "userName": "userName", UNIQUE
+    "email": "a@b.c", UNIQUE
+    "birthDate": "2003-10-01",
+    "favoriteGenres": [],
+    "password": "...",
+    "favorites": {
+        "album": [],
+        "artist": [],
+        "audiobook": [],
+        "episode": [],
+        "show": [],
+        "track": []
+    },
+    "playlistsFollowed": [],
+    "playlistsOwned": [],
+    "groupsFollowed": [],
+    "groupsOwned": []
+}
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{.30\textwidth}
+        \textbf{Playlists}:
+
+        \begin{lstlisting}[language=JavaScript]
+{
+    "_id":{...},
+    "name": "myList", UNIQUE
+    "description": "this is a playlist about old finnish songs",
+    "tags":[
+        "finnish",
+        "old",
+        "42"
+    ],
+    "visibility": true,
+    "owner": "userName"
+}
+
+
+
+
+
+
+
+
+.
+        \end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{.30\textwidth}
+        \textbf{Groups}:
+
+        \begin{lstlisting}[language=JavaScript]
+{
+    "_id":{...},
+    "name":"myGroup", UNIQUE
+    "decription":"This is a group for lovers of classical music. Join this group to gain access to more than 15 playlists!",
+    "playlistsShared":[
+        "classicalMusic",
+        "musicaClassica",
+        ...
+    ],
+    "owner":"userName",
+    "users":[
+        "userName",
+        "user42",
+        "lambda",
+        "SophosIoun",
+        ...
+    ]
+}
+
+        \end{lstlisting}
+    \end{minipage}
+\end{figure}
+\begin{figure}[h]
+    \begin{minipage}{.30\textwidth}
+        Dove \verb|playlistsFollowed|, \verb|playlistsOwned|, \verb|groupsFollowed|, \verb|groupsOwned| referenziano gruppi o playlist nelle altre collezioni.
+    \end{minipage}
+    \hfill
+    \begin{minipage}{.30\textwidth}
+        Dove \verb|owner| referenzia \verb|userName|, che è lo \verb|userName| di uno \verb|user|. Si noti che una playlist non sa da quali utenti è seguita o in quali gruppi sia inserita.
+    \end{minipage}
+    \hfill
+    \begin{minipage}{.30\textwidth}
+        Dove \verb|owner| e \verb|users| referenziano \verb|userName| nella collezione \verb|users|, mentre \verb|playlistsShared| è un array di referenze ai nomi delle \verb|playlists| condivise con quel gruppo.
+    \end{minipage}
+\end{figure}
+In tutti e tre i casi i campi indicati come \verb|UNIQUE| permettono di fare riferimento da altri. Laddove l'\verb|email| è solo usata per la login, tutti e tre i campi \verb|name| (\verb|user.userName|, \verb|playlist.name| e \verb|group.name|) hanno lo scopo di essere i riferimenti per documenti nelle altre collezioni.
+
+\idea{So bene che alcune informazioni sono duplicate (in quanto sarebbe possibile avere le informazioni complete anche senza riportare sia gli users nei gruppi che i gruppi negli users, ad esempio) tuttavia queste informazioni sono presenti in entrambi i casi per una questione di facilità di uso delle informazioni e per ridurre il numero di chiamate al backend o al database necessarie per svolgere ogni operazione, al modico prezzo di un po' di spazio aggiuntivo occupato.}
+Si noti poi che \verb|playlists.songs| è un array di oggetti costituiti come segue:
+\begin{lstlisting}[language=JavaScript]
+{
+    "titolo":"15 secondi di muratori al lavoro",
+    "durata":15000,
+    "cantante":"Me medesimo",
+    "anno_di_pubblicazione":"2023",
+}
+\end{lstlisting}
+Mentre ogni preferito è salvato come un oggetto contenente titolo e id, tutto questo nell'apposito array.
 \subsection{Backend}
 \subsubsection{Accesso alle informazioni riservate}
 Alcune informazioni non dovevano diventare pubbliche, ossia venire direttamente a contatto (per esempio venendovi inserite) con il frontend.
 
 A questo scopo ho optato per l'utilizzo di un file \verb|.env|, prontamente inserito nel \verb|.gitignore| e che sarà consegnato a fianco della repo, contenente queste informazioni secondo il seguente formato:
-\begin{lstlisting}
+\begin{lstlisting}[language=JavaScript]
 MONGONAME=XXXXXXXXXXXX
 MONGOPASSWORD=XXXXXXXXXXXX
 PORT=3000
@@ -22,7 +132,7 @@ Per accedervi viene usato il package \verb|DotEnv|, di cui parlo più approfondi
 Voglio realizzare una autenticazione lievemente più sicura di quella richiesta. Per ottenere questo scopo utilizzo i JWT (con un apposito package di cui parlerà nella sezione \verb|tecnologie|), firmati con una chiave presente nel file \verb|.env|, e li salvo nei cookie in modo che vengano passati in automatico ad ogni richiesta.
 
 Si avrà quindi il logout nella forma di un \verb|res.clearCookie('token')| e un controllo sull'identità dell'utente mediante un codice come quello che segue:
-\begin{lstlisting}
+\begin{lstlisting}[language=JavaScript]
 async function nomeMetodo(req,res){
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
@@ -44,7 +154,7 @@ async function nomeMetodo(req,res){
 \alert{Questo sistema è sempre vulnerabile ad un possibile \say{furto} dei cookie: qualora questi venissero rubati è possibile per un utente inserirsi al posto di un altro, cambiare email e password e rendere impossibile all'utente originario l'accesso. Questo è un problema che non ho risolto in quanto ho ritenuto fuori dalle finalità di questo progetto, tuttavia sono consapevole del problema}
 \subsubsection{Token Object e perform function}
 La richiesta (per quasi ogni informazione) di un token valido che scade ogni ora per operare con Spotify mi ha fatto optare per la creazione di un oggetto \verb|Token|, come nel seguente brano di codice:
-\begin{lstlisting}
+\begin{lstlisting}[language=JavaScript]
 var token = {
     value: "none",
     expiration: 42,
@@ -87,12 +197,127 @@ Vi è poi \verb|regenAndThen| che consiste in un applicatore: esso riceve tre pa
     \item Chiama la funzione con i parametri passati
 \end{enumerate}
 \paragraph{perform} Il token object risulta di gran lunga più pratico nel momento in cui è utilizzato insieme alla funzione \verb|perform|, definita come segue:
-\begin{lstlisting}
+\begin{lstlisting}[language=JavaScript]
 function perform(questo,paramA,paramB){
     if(token.hasExpired()) token.regenAndThen(questo,paramA,paramB)
     else questo(paramA,paramB)
 }
 \end{lstlisting}
 Questa funzione è ancora una volta un applicatore, in particolare nei confronti del parametro-funzione \verb|questo|. Esso verifica se il token è scaduto sfruttando gli appositi metodi dell'oggetto \verb|token|. In caso sia scaduto chiama l'applicatore \verb|regenAndThen|, altrimenti esegue direttamente, così da non rigenerare il token ad ogni chiamata, ma solo quando necessario.
+\subsubsection{Eliminazione di documenti e integrità delle referenze}
+\idea{Non voglio dovermi ritrovare con dati inconsistenti o con riferimenti pendenti all'interno del database, perciò preferisco realizzare del codice molto inefficiente piuttosto che poi dover interpretare dati incompleti, parziali o superflui}
+Ci sono tre richieste di tipo \verb|delete| che si possono fare all'API. Queste richieste, visibili anche nello swagger di cui all'Appendice B, sono \verb|app.delete('/playlist/:name')|, \verb|app.delete('/group/:name')| e \verb|app.delete('/user')|.
 
+Quando avviene una chiamata a questi endpoint sarebbe facile risolverla con un banale \verb|deleteOne|. Questo, però, genererebbe problemi: dato che i documenti si referenziano tra loro creare dei riferimenti pending sarebbe impossibile.
+
+Per eliminare quelli ho optato per una strategia divisa in più fasi, cercando sempre di assicurarmi che lo svolgimento erroneo di una fase non potesse compromettere quelle successive, ma piuttosto le fermasse. Questo perché è meglio, a mio giudizio, eliminare dei riferimenti senza riuscire a eliminare l'oggetto in questione piuttosto che eliminare l'oggetto lasciando dei riferimenti pending.
+
+Le soluzioni sono le seguenti: iniziamo dagli utenti.
+\begin{lstlisting}[language=JavaScript]
+async function deleteUser(req,res){ 
+    ...
+    let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
+    //-3 elimino l'utente da ogni gruppo in cui e', ed elimino ogni gruppo che sia owned, rimuovendolo prima da ogni utente che sia in quel gruppo
+    let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
+    for(let group in allGroups){
+        if(group.users.some(user.userName)){
+            group.users.splice(group.users.indexOf(user.userName),1)
+            await pwmClient.db("pwm_project").collection('groups').updateOne({"name":group.name},group)
+        }
+    }
+    //-3 bis elimino ogni gruppo posseduto dall'utente
+    await pwmClient.db("pwm_project").collection("groups").deleteMany({"owner":user.userName})
+    //-2 elimino ogni playlist dell'utente da ogni lista di playlist seguite altrui
+    allGroups = pwmClient.db("pwm_project").collection("groups").find({})
+    let allPlaylists = pwmClient.db("pwm_project").collection("playlists").find({"owner":user.userName})
+    let allUsers = pwmClient.db("pwm_project").collection("playlists").find({"email":{$not:decoded.email}})
+    for(let playlist in allPlaylists){
+        for(let utente in allUsers){
+            if(utente.playlistsFollowed.some(playlist.name)){
+                utente.playlistsFollowed.splice(utente.playlistsFollowed.indexOf(playlist.name),1)
+                await pwmClient.db("pwm_project").collection("users")
+                    .updateOne({"email":utente.email},utente)
+            }
+        }
+        for(let group in allGroups){
+            if(group.playlistsShared.some(playlist.name)){
+                group.playlistsShared.splice(group.playlistsShared.indexOf(playlist.name),1)
+                await pwmClient.db("pwm_project").collection("groups").updateOne({"name":group.name})
+            }
+        }
+    }
+    //-2 bis elimino ogni playlist owned dall'utente
+    await pwmClient.db("pwm_project").collection("playlists").deleteMany({"owner":utente.userName})
+    //-1 elimino l'account dell'utente
+    await pwmClient.db('pwm_project').collection('users').deleteOne({"email":decoded.email})
+    //0. forse e' andato tutto liscio, e spero di non aver lasciato riferimenti pending da qualche parte
+    res.status(200).json({"reason":"ok"})
+    ...
+}
+\end{lstlisting}
+Mentre per le playlist:
+\begin{lstlisting}[language=Javascript]
+    async function deletePlaylist(req,res){
+    ...
+    let a = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.params.name)})
+    let userToUpdate = await pwmClient.db("pwm_project").collection('users').findOne({"email":decoded.email});
+    if(a != null && a != undefined && isOwner(a,userToUpdate.userName)){
+        //-3. per ogni utente, diverso dall'owner, elimino la playlist da quelle seguite, laddove presente.
+        let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$not: decoded.email}})
+        for(let user in allUsers){
+            if(user.playlistsFollowed.some(a.name)){
+                user.playlistsFollowed.splice(user.playlistsFollowed.indexOf(a.name),1)
+                await pwmClient.db("pwm_project").collection('users')
+                    .updateOne({"email":user.email},user)
+            }
+        }
+        //-2.5. per ogni gruppo elimino la playlist da quelle seguite, laddove presente
+        let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
+        for(let group in allGroups){
+            if(group.playlistsShared.some(a.name)){
+                group.playlistsShared.splice(group.playlistsShared.indexOf(a.name),1)
+                await pwmClient.db("pwm_project").collection('groups')
+                    .updateOne({"name":group.name},group)
+            }
+        }
+        //-2. elimino, dall'utente che la possedeva, la playlist, sia da quelle seguite che da quelle totali (aka assicuro integrita' referenziale)
+        userToUpdate.playlistsOwned.splice(await userToUpdate.playlistsOwned.indexOf(a.name),1)
+        userToUpdate.playlistsFollowed.splice(await userToUpdate.playlistsFollowed.indexOf(a.name),1)
+        await pwmClient.db("pwm_project").collection('users')
+            .updateOne({"email":decoded.email},userToUpdate);
+        //-1. elimino la playlist
+        await pwmClient.db("pwm_project").collection('playlists').deleteOne(a)
+        //se non e' esploso niente allora e' tutto okay, spero
+        res.status(200).json({"reason":"done correctly"})
+    }
+    else res.status(400).json({"reason":"Probably you haven't specified the right params"})
+    ...
+}
+\end{lstlisting}
+E per i gruppi:
+\begin{lstlisting}[language=SQL]
+async function deleteGroup(req,res){
+    ...
+    let a = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.params.name)})
+    //-3. elimino dagli utenti non owner ogni riferimento a quel gruppo
+    let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$not: decoded.email}})
+    for(let user in allUsers){
+        if(user.groupsFollowed.some(a.name)){
+            user.groupsFollowed.splice(user.groupsFollowed.indexOf(a.name),1)
+            await pwmClient.db("pwm_project").collection('users').updateOne({"email":user.email},user)
+        }
+    }
+    //-2. elimino dall'owner il gruppo, sia owned che followed
+    userToUpdate.groupsFollowed.splice(await userToUpdate.groupsFollowed.indexOf(a.name),1)
+    userToUpdate.groupsOwned.splice(await userToUpdate.groupsOwned.indexOf(a.name),1)
+    await pwmClient.db("pwm_project").collection('users')
+        .updateOne({"email":decoded.email},userToUpdate);
+    //-1 elimino il gruppo
+    await pwmClient.db("pwm_project").collection('groups').deleteOne(a)
+    //0. forse e' andato tutto liscio
+    res.status(200).json({"reason":"ok"})
+    ...
+}
+\end{lstlisting}
+\alert{Un problema simile si avrebbe anche in caso qualcuno desiderasse modificare lo username. Per risolverlo, ho reso impossibile modificare lo username, consentendo invece di modificare le credenziali usate per il login ossia solamente email e password}
 \newpage

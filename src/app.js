@@ -499,34 +499,6 @@ async function removeTag(playlist,tag){
     FINE FUNZIONI ASSORTITE per lavorare con le playlists
 */
 
-/*
-    Struttura di una playlist:
-        {
-            "nome":Stringa,
-            "canzoni":[
-                {
-                    "titolo":Stringa,
-                    "durata":numero (ms),
-                    "cantante":Stringa,
-                    "genere":Stringa,
-                    "anno_di_pubblicazione":Stringa,
-                },
-                ...
-            ],
-            "descrizione":Testo,
-            "tag":[
-                Stringa,
-                ...
-            ],
-            "public":Boolean //pubblica=>false,privata=>true,se privata => gruppi?
-            "gruppi_concessi":[
-                Stringa,
-                ...
-            ],
-            "owner":email
-        }
-*/
-
 async function makePlaylistPrivate(req,res){
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
@@ -965,23 +937,6 @@ function changeGroupOwner(group,new_owner){
 
 /*
     FINE FUNZIONI ASSORTITE per lavorare con i gruppi
-*/
-
-/*
-    Struttura di un gruppo:
-        {
-            name: description, Unique index
-            description: String
-            owner: -> users.username
-            playlistsShared:[
-                String -> playlists.name
-                ...
-            ]
-            members: [
-                String -> users.userName
-                ...
-            ]
-        }
 */
 /*
     1. Oni utente può condividere playlist con un gruppo, a patto che le possegga
@@ -1453,6 +1408,8 @@ app.put('/group/owner',mongoSanitize,(req,res)=>{
     }*/
     perform(transferGroupOwnership,req,res)
 })
+
+//TODO TO DO app.put group description
 
 app.put('/group/playlists/add',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Groups','PUT']
