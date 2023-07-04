@@ -24,8 +24,7 @@
 
     <div class="container-fluid" id="main-container">
         <div class="row" id="if-not-searching">
-            <div class="col-md-2"></div>
-            <div class="col-md-8">
+            <div class="col-md-8 mx-auto">
                 <div class="row">
                     <span>Search</span>
                 </div>
@@ -33,11 +32,11 @@
                     <form onsubmit="return false;">
                         <div class="form-group">
                           <label class="normal-text space-above" for="search">Write here anything you'd like to search:</label>
-                          <input type="text normal-text" value="Alexander Hamilton" class="form-control" id="search" placeholder="Alexander Hamilton">
+                          <input type="text normal-text" value="Alexander Hamilton" class="form-control normal-text" id="search" placeholder="Alexander Hamilton">
                         </div>
 
                         <div class="input-group mb-3 d-flex justify-content-center">
-                            <div class="form-group" id="parameters">
+                            <div class="form-group normal-text" id="parameters">
                                    
                             </div>
                         </div>
@@ -47,26 +46,19 @@
                       </form>
                 </div>
             </div>
-            <div class="col-md-2"></div>
         </div>
         <div class="row" style="display:none" id="if-searching">
             <div class="row">
                 <span>Your results!</span>
             </div>
             <div class="row results-by-kind">
-                <div class="col-1">
-
-                </div>
-                <div class="col-10" id="toFill">
-                </div>
-                <div class="col-1">
-
+                <div class="col-10 mx-auto" id="toFill">
                 </div>
             </div>
         </div>
     </div>
     
     <script src="/scripts/navbar.js"></script>
-    <script>getOptions()</script>
+    <script src="/scripts/search.js"></script>
 </body>
 </html>

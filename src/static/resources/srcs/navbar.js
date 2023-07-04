@@ -1,5 +1,5 @@
 const menuItems = [
-    { label: "Home - Playlists", link: "playlists.html", image:"music-solid" },
+    { label: "Playlists", link: "playlists.html", image:"music-solid" },
     { label: "Search", link: "search.html",image:"magnifying-glass-solid" },
     { label: "Groups", link: "groups.html",image:"user-group-solid" }
     //{ label: "", link: "" },
@@ -10,7 +10,7 @@ const dropdownItems = [
     { label: "login", link: "login.html", image:"arrow-right-to-bracket-solid", needsLogged:false },
     { label: "logout", link: "logout.html", image:"arrow-right-from-bracket-solid",needsLogged:true },
     { label: "my favorites", link: "profile.html#favorites", image:"heart-solid",needsLogged:true},
-    { label: "my playlists", link: "myplaylists.html", image:"compact-disc-solid",needsLogged:true },
+    { label: "my playlists", link: "profile.html#playlists", image:"compact-disc-solid",needsLogged:true },
     { label: "my profile", link: "profile.html", image:"address-card-solid",needsLogged:true },
 ]
 var menuHTML = "";

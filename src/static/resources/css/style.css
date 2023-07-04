@@ -69,7 +69,7 @@ div.progress-bar{
     margin-top: 10px;
 }
 .btn-lg{
-    margin: 5% 0% 5% 10%;
+    margin: 5% 10% 5% 10%;
     border-radius: 10%;
     width:80%;
     background-color: rgba(0,0,0,0);
@@ -148,7 +148,21 @@ ul.dropdown-menu li a:active{
 }
 @media screen and (min-width:2000px){
     .nav-image{
-        display: none;
+        display: inline;
+        width: 10%;
+    }
+    .scale-text{
+        font-size: 1vw;
+    }
+    .testo-pulsante{
+        font-size: 1vw;
+    }
+    .small-image{
+        width:100%;
+    }
+    .nav-brand-image{
+        width: 50%;
+        height: 50%;
     }
     nav .normal-text{
         margin-right:3vw;
