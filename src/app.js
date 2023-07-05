@@ -467,13 +467,13 @@ function isOwner(playlist,userName){
 }
 function addSong(playlist,song){
     playlist.songs.push(song)
-    playlist.totalTime+=song.duration
+    playlist.totalTime+=song.durata
     return playlist
 }
-async function removeSong(playlist,song){
-    var elementToRemove = await playlist.songs.find(element => element.id == song.id)
-    playlist.songs.splice(indexOf(elementToRemove),1)
-    playlist.totalTime-=song.duration
+function removeSong(playlist,song){
+    var elementToRemove = playlist.songs.find(element => element.id == song.id)
+    playlist.songs.splice(playlist.songs.indexOf(elementToRemove),1)
+    playlist.totalTime-=song.durata
     return playlist
 }
 function publish(playlist){
@@ -657,23 +657,24 @@ async function removeSongFromPlaylist(req,res){
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                     let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.body.name)})
                     if(isOwner(playlist,user.userName)){
-                        let details = await fetch(`/requireInfo/tracks/${validator.escape(req.body.song_id)}`)
+                        let details = await fetch(`http://0.0.0.0:${process.env.PORT}/requireInfo/tracks/${validator.escape(req.body.song_id)}`)
                         details = await details.json()
                         let song = {
+                            id : details.id,
                             titolo : details.name,
                             durata : details.duration_ms,
                             cantante: details.artists[0].name,
-                            anno_di_pubblicazione: details.album.releaseDate.split("-")[0],
+                            anno_di_pubblicazione: details.album.release_date.split("-")[0],
                             id : validator.escape(req.body.song_id)
                         }
-                        if(await playlist.songs.some(element => element.id == song_id)) {
-                            playlist = await removeSong(playlist,song)
-                            await pwmClient.db("pwm_project").collection('playlists').updateOne({"name":playlist.name},{$set:{"songs":playlist.songs}})
+                        if(await playlist.songs.some(element => element.id == song.id)) {
+                            playlist = removeSong(playlist,song)
+                            await pwmClient.db("pwm_project").collection('playlists').updateOne({"name":playlist.name},{$set:{"songs":playlist.songs,"totalTime":playlist.totalTime}})
                         }
                         res.status(200).json({"reason":"done"})
                     }
                     else res.status(400).json({"reason":"you are not the owner of this playlist"})
-                }catch(e){res.status(400).json({"reason":e})}
+                }catch(e){res.status(400).json({"reason":`Generic error: ${e.toString()}`})}
                 //rimuovo una canzone con tutti i dettagli dalla playlist
                 pwmClient.close()
             }
@@ -700,7 +701,7 @@ async function unfollowPlaylist(req,res){
                         await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},{$set:{"playlistsFollowed":user.playlistsFollowed}})
                         res.status(200).json({"reason":"ok"})
                     }
-                }catch(e){res.status(400).json({reason:`Generic error: ${e.toString()}`})}
+                }catch(e){res.status(400).json({"reason":`Generic error: ${e.toString()}`})}
                 pwmClient.close()
             }
         })
@@ -750,22 +751,23 @@ async function addSongToPlaylist(req,res){
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                     let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.body.name)})
                     if(isOwner(playlist,user.userName)){
-                        let details = await fetch(`/requireInfo/tracks/${validator.escape(req.body.song_id)}`)
+                        let details = await fetch(`http://0.0.0.0:${process.env.PORT}/requireInfo/tracks/${validator.escape(req.body.song_id)}`)
                         details = await details.json()
                         let song = {
+                            id: details.id,
                             titolo : details.name,
                             durata : details.duration_ms,
                             cantante: details.artists[0].name,
-                            anno_di_pubblicazione: details.album.releaseDate.split("-")[0]
+                            anno_di_pubblicazione: details.album.release_date.split("-")[0]
                         }
-                        if(! await playlist.songs.some(element => element.id == song_id)){
+                        if(! await playlist.songs.some(element => element.id == song.id)){
                             playlist = addSong(playlist,song)
-                            await pwmClient.db("pwm_project").collection('playlists').updateOne({"name":playlist.name},{$set:{"songs":playlist.songs}})
+                            await pwmClient.db("pwm_project").collection('playlists').updateOne({"name":playlist.name},{$set:{"songs":playlist.songs,"totalTime":playlist.totalTime}})
                         }
                         res.status(200).json({"reason":"done"})
                     }
                     else res.status(400).json({"reason":"you are not the owner of this playlist"})
-                }catch(e){res.status(400).json({"reason":e})}
+                }catch(e){console.log(e),res.status(400).json({"reason":`Generic error: ${e.toString()}`})}
                 //aggiungo una canzone con tutti i dettagli alla playlist
                 pwmClient.close()
             }
@@ -1371,7 +1373,6 @@ app.get('/types',(req,res)=>{
             "album",
             "episode",
             "track",
-            "audiobook",
             "artist",
             "show"
         ]

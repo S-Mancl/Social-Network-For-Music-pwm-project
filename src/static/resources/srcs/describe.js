@@ -3,19 +3,31 @@ const question = {
     kind : params.get('kind'),
     value : params.get('value')
 }
+
 fetch(`/requireInfo/${question.kind}/${question.value}`)
-    .then((a) => a.json())
-    .then((response) => {
+.then((a) => a.json())
+.then(async (response) => {
+        var promise = await fetch('/checkLogin')
         var toFill = document.getElementById('toFill')
         var fill=`
         <span>General Infos:</span>
         <div class="col-md-4 mx-md-auto">
-            <div class="row">`
+            <div class="row normal-text">`
         if(response.images!=undefined){
             fill+=`<img class="p-4 m-md-5 description-image common-border" src="${response.images[0].url}">`
         }
         else if(response.preview_url!=undefined){
-            fill+=`<span>Preview</span><audio class="common-border un-common-border" controls src="${response.preview_url}">`
+            fill+=`<span>Preview</span><audio class="common-border un-common-border normal-text" controls src="${response.preview_url}"></audio></div>`
+            if(promise.ok)fill+=`<div class="row normal-text">
+                <div class="form-floating col-lg-6">
+                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                    <option selected>Select a playlist first</option>
+                    </select>
+                </div>
+                <div class="col-lg-6 badge rounded-pill normal-text" id="the-mystic-button" onclick="addOrRemoveFromPlaylist();">
+                    <button class="btn btn-lg normal-text">Select a playlist first</button>
+                </div>
+            </div>`
         }
         fill+=`</div>
         </div>
@@ -129,13 +141,68 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         }
         toFill.innerHTML=fill;
         checkIfStarred();
-        const re = /\/.....\//
-        window.addEventListener('resize', () =>{
-            let a = document.getElementsByClassName('flag')
-            for (let i=0;i<a.length;i++){
-                let element = a[i].src
-                let code = element.split(re)[1].split(".png")[0]
-                a[i].src = `https://flagcdn.com/${window.screen.availWidth<2000?"16x12":"64x48"}/${code}.png`
+        if(response.preview_url!=undefined&&promise.ok){
+            //riempio le opzioni
+            let user = await promise.json()
+            let select = document.getElementById('floatingSelect')
+            for(let i in user.playlistsOwned){
+                select.options[select.options.length] = new Option(user.playlistsOwned[i],user.playlistsOwned[i])
             }
-        });
+            //creo l'evento
+            document.querySelector('#floatingSelect').addEventListener('change', () =>{
+                //recupero la playlist
+                let playlist = document.querySelector('#floatingSelect').value
+                //recupero l'id della canzone
+                let id = params.get('value')
+                fetch(`/playlist/info/${playlist}`).then(async a => {
+                    if(a.ok){
+                        response = await a.json()
+                        if(!response.songs.some(element => element.id == id)){
+                            //button to remove it
+                            console.log(document.getElementById('the-mystic-button').onclick)
+                            document.getElementById('the-mystic-button').innerHTML='Add it!'
+                            document.getElementById('the-mystic-button').classList.add('text-bg-success')
+                        }
+                        else{
+                            //button to add it
+                            console.log(document.getElementById('the-mystic-button').onclick)
+                            document.getElementById('the-mystic-button').innerHTML='Remove it!'
+                            document.getElementById('the-mystic-button').classList.add('text-bg-danger')
+                        }
+                    }
+                    //else alarm('alerts',false,"Somehow you made an impossible query... you're very capable, but please, don't hack me")
+                })
+            });
+        }
     })
+function addOrRemoveFromPlaylist(){
+    let playlist = document.querySelector('#floatingSelect').value
+    //recupero l'id della canzone
+    let id = params.get('value')
+    fetch(`/playlist/info/${playlist}`).then(async a => {
+        if(a.ok){
+            response = await a.json()
+            let mode
+            if(!response.songs.some(element => element.id == id)) mode = "add"
+            else mode = "remove"
+            fetch(`/playlist/songs/${mode}`, {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({"name":playlist,"song_id":id})
+            }).then(async b =>{
+                answer = await b.json()
+                if(b.ok){
+                    setTimeout(()=>{
+                        location.reload()
+                    },2000)
+                    alarm('alerts',true,answer.reason)
+                }
+                else{
+                    alarm('alerts',false,answer.reason)
+                }
+            })
+        }
+        else alarm('alerts',false,"Don't dare")})
+}
