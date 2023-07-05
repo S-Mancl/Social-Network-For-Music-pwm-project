@@ -1,4 +1,4 @@
-- [ ] adding playlists to groups
-- [ ] removing playlists from groups
+- [ ] adding playlists to groups by imitating the song->playlist system
+- [ ] removing playlists from groups by imitating the song->playlist system
 - [ ] order songs
 - [ ] delete user
