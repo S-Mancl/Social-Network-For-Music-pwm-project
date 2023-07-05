@@ -17,15 +17,15 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             fill+=`<img class="p-4 m-md-5 description-image common-border" src="${response.images[0].url}">`
         }
         else if(response.preview_url!=undefined){
-            fill+=`<span>Preview</span><audio class="common-border un-common-border normal-text" controls src="${response.preview_url}"></audio></div>`
+            fill+=`<span>Preview</span><audio class="${window.screen.availWidth<2000?"common-border un-common-border normal-text":""}" controls src="${response.preview_url}"></audio></div>`
             if(promise.ok)fill+=`<div class="row normal-text">
                 <div class="form-floating col-lg-6">
-                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-                    <option selected>Select a playlist first</option>
+                    <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
+                    <option selected>Select a playlist</option>
                     </select>
                 </div>
-                <div class="col-lg-6 badge rounded-pill normal-text" id="the-mystic-button" onclick="addOrRemoveFromPlaylist();">
-                    <button class="btn btn-lg normal-text">Select a playlist first</button>
+                <div class="col-lg-6 badge rounded-pill normal-text text-bg-warning" id="the-mystic-button" onclick="addOrRemoveFromPlaylist();">
+                    Select a playlist
                 </div>
             </div>`
         }
@@ -63,9 +63,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         </div>`
         }
         if(promise.ok)fill+=` <div class="row" onclick="starUnstar('${response.type}','${response.id}','${response.name.split("\"")[0].split("(")[0]}')">
-                    <div class="col-sm-5 col-4"></div>
-                    <div class="col-sm-2 col-4" id="isStarred"></div>
-                    <div class="col-sm-5 col-4"></div>
+                    <div class="col-sm-2 mx-auto col-4" id="isStarred"></div>
                 </div>
             `
         fill+=`</div>`
@@ -123,7 +121,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             fill+=`</div></div>`
         }
         if(response.album!=undefined){
-            fill+=`
+            fill+=`</div>
         <div class="row">
             <span>Album:</span>
         </div>
@@ -149,6 +147,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
                 let code = element.split(re)[1].split(".png")[0]
                 a[i].src = `https://flagcdn.com/${window.screen.availWidth<2000?"16x12":"64x48"}/${code}.png`
             }
+            document.getElementsByTagName('audio')[0].classList=`"${window.screen.availWidth<2000?"common-border un-common-border normal-text":""}`//TO DO TODO FIX THIS LINE NOT WORKING
         });
         if(response.preview_url!=undefined&&promise.ok){
             //riempio le opzioni
@@ -168,18 +167,23 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
                         response = await a.json()
                         if(!response.songs.some(element => element.id == id)){
                             //button to remove it
-                            console.log(document.getElementById('the-mystic-button').onclick)
                             document.getElementById('the-mystic-button').innerHTML='Add it!'
                             document.getElementById('the-mystic-button').classList.add('text-bg-success')
+                            document.getElementById('the-mystic-button').classList.remove('text-bg-warning')
                         }
                         else{
                             //button to add it
-                            console.log(document.getElementById('the-mystic-button').onclick)
                             document.getElementById('the-mystic-button').innerHTML='Remove it!'
                             document.getElementById('the-mystic-button').classList.add('text-bg-danger')
+                            document.getElementById('the-mystic-button').classList.remove('text-bg-warning')
                         }
                     }
-                    //else alarm('alerts',false,"Somehow you made an impossible query... you're very capable, but please, don't hack me")
+                    else{
+                        document.getElementById('the-mystic-button').innerHTML='Select a playlist'
+                        document.getElementById('the-mystic-button').classList.remove('text-bg-success')
+                        document.getElementById('the-mystic-button').classList.remove('text-bg-danger')
+                        document.getElementById('the-mystic-button').classList.add('text-bg-warning')
+                    }
                 })
             });
         }

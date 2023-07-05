@@ -1218,6 +1218,8 @@ async function leaveGroup(req,res){
                         // devo modificare il gruppo in modo che non contenga lo username
                         group.users.splice(group.users.indexOf(user.userName),1)
                         await pwmClient.db("pwm_project").collection("groups").updateOne({"name":group.name},{$set:{"users":group.users}})
+                        // devo eliminare ogni playlist che era presente da quell'user
+                        // TO DO TODO
                         res.status(200).json({"reason":"ok"})
                     }
                     else res.status(400).json({"reason":"bad data or not in this group"})

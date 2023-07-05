@@ -45,8 +45,37 @@ span{
     color:#98B9F2;
 }
 @media screen and (min-width:2000px) {
+    select option{
+        font-size: large;
+        width:15vw !important;
+    }
+    .card,.card-img-top{
+        border-radius:10%;
+    }
+    .testo-pulsante{
+        border-radius: 10%;
+    }
+    .common-border{
+        border-radius: 0%;
+        border: 5px solid #918EF4;
+        transition: 0.6s ease;
+        padding:0%;
+    }
+    .common-border:hover{
+        border-radius: 0%;
+        transition: 0.6s ease;
+    }
+    .un-common-border{
+        padding:0%;
+    }
+    .un-common-border:hover{
+        padding:0%;
+    }
     .normal-text{
         font-size:1.5vw;
+    }
+    audio{
+        height: 5vh;
     }
     span{
         font-size: 3vw;
@@ -147,6 +176,14 @@ ul.dropdown-menu li a:active{
     height:10%
 }
 @media screen and (min-width:2000px){
+    .btn-lg.btn-strange{
+        margin: 1%;
+        border-radius: 10%;
+        width:80%;
+        background-color: rgba(0,0,0,0);
+        border:3px solid #918EF4;
+        transition: 0.6s ease;
+    }
     .nav-image{
         display: inline;
         width: 10%;
