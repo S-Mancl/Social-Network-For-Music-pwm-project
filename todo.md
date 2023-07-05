@@ -1,4 +1,4 @@
-- [ ] adding songs to playlists
-- [ ] removing songs from playlists
 - [ ] adding playlists to groups
 - [ ] removing playlists from groups
+- [ ] order songs
+- [ ] delete user

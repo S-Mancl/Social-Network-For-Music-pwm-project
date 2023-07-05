@@ -219,31 +219,41 @@ async function deleteUser(req,res){
     ...
     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
     //-3 elimino l'utente da ogni gruppo in cui e', ed elimino ogni gruppo che sia owned, rimuovendolo prima da ogni utente che sia in quel gruppo
-    let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
-    for(let group in allGroups){
-        if(group.users.some(user.userName)){
+    let allGroups = await pwmClient.db("pwm_project").collection("groups").find({}).toArray()
+    for(let index in allGroups){
+        let group = allGroups[index]
+        if(group.users.some(element => element == user.userName)){
             group.users.splice(group.users.indexOf(user.userName),1)
-            await pwmClient.db("pwm_project").collection('groups').updateOne({"name":group.name},group)
+            await pwmClient.db("pwm_project").collection('groups')
+                .updateOne({"name":group.name},
+                {$set:{"users":group.users}})
         }
     }
     //-3 bis elimino ogni gruppo posseduto dall'utente
     await pwmClient.db("pwm_project").collection("groups").deleteMany({"owner":user.userName})
     //-2 elimino ogni playlist dell'utente da ogni lista di playlist seguite altrui
-    allGroups = pwmClient.db("pwm_project").collection("groups").find({})
-    let allPlaylists = pwmClient.db("pwm_project").collection("playlists").find({"owner":user.userName})
-    let allUsers = pwmClient.db("pwm_project").collection("playlists").find({"email":{$not:decoded.email}})
-    for(let playlist in allPlaylists){
-        for(let utente in allUsers){
-            if(utente.playlistsFollowed.some(playlist.name)){
+    allGroups = await pwmClient.db("pwm_project").collection("groups").find({}).toArray()
+    let allPlaylists = pwmClient.db("pwm_project").collection("playlists").find({"owner":user.userName}).toArray()
+    let allUsers = pwmClient.db("pwm_project").collection("playlists")
+        .find({"email":{$ne:decoded.email}}).toArray()
+    for(let index1 in allPlaylists){
+        let playlist = allPlaylists[index1]
+        for(let index2 in allUsers){
+            let utente = allUsers[index2]
+            if(utente.playlistsFollowed.some(element => element == playlist.name)){
                 utente.playlistsFollowed.splice(utente.playlistsFollowed.indexOf(playlist.name),1)
                 await pwmClient.db("pwm_project").collection("users")
-                    .updateOne({"email":utente.email},utente)
+                    .updateOne({"email":utente.email},
+                    {$set:{"playlistsFollowed":utente.playlistsFollowed}})
             }
         }
-        for(let group in allGroups){
-            if(group.playlistsShared.some(playlist.name)){
+        for(let index in allGroups){
+            let group = allGroups[index]
+            if(group.playlistsShared.some(element => element == playlist.name)){
                 group.playlistsShared.splice(group.playlistsShared.indexOf(playlist.name),1)
-                await pwmClient.db("pwm_project").collection("groups").updateOne({"name":group.name})
+                await pwmClient.db("pwm_project").collection("groups")
+                    .updateOne({"name":group.name},
+                    {$set:{"playlistsShared":group.playlistsShared}})
             }
         }
     }
@@ -252,40 +262,50 @@ async function deleteUser(req,res){
     //-1 elimino l'account dell'utente
     await pwmClient.db('pwm_project').collection('users').deleteOne({"email":decoded.email})
     //0. forse e' andato tutto liscio, e spero di non aver lasciato riferimenti pending da qualche parte
-    res.status(200).json({"reason":"ok"})
+    res.status(200).json({"reason":"ok"}) 
     ...
 }
 \end{lstlisting}
 Mentre per le playlist:
 \begin{lstlisting}[language=Javascript]
-    async function deletePlaylist(req,res){
+async function deletePlaylist(req,res){
     ...
     let a = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.params.name)})
     let userToUpdate = await pwmClient.db("pwm_project").collection('users').findOne({"email":decoded.email});
     if(a != null && a != undefined && isOwner(a,userToUpdate.userName)){
         //-3. per ogni utente, diverso dall'owner, elimino la playlist da quelle seguite, laddove presente.
-        let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$not: decoded.email}})
-        for(let user in allUsers){
-            if(user.playlistsFollowed.some(a.name)){
-                user.playlistsFollowed.splice(user.playlistsFollowed.indexOf(a.name),1)
-                await pwmClient.db("pwm_project").collection('users')
-                    .updateOne({"email":user.email},user)
+        let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$ne: decoded.email}}).toArray()
+        try{
+            for(let index in allUsers){
+                let user = allUsers[index]
+                if(user.playlistsFollowed.some(element => element == a.name)){
+                    user.playlistsFollowed.splice(user.playlistsFollowed.indexOf(a.name),1)
+                    await pwmClient.db("pwm_project").collection('users')
+                        .updateOne({"email":user.email},
+                        {$set:{"playlistsFollowed":user.playlistsFollowed}})
+                }
             }
-        }
+        }catch(e){}
         //-2.5. per ogni gruppo elimino la playlist da quelle seguite, laddove presente
-        let allGroups = pwmClient.db("pwm_project").collection("groups").find({})
-        for(let group in allGroups){
-            if(group.playlistsShared.some(a.name)){
-                group.playlistsShared.splice(group.playlistsShared.indexOf(a.name),1)
-                await pwmClient.db("pwm_project").collection('groups')
-                    .updateOne({"name":group.name},group)
+        let allGroups = await pwmClient.db("pwm_project").collection("groups").find({}).toArray()
+        try{
+            for(let index in allGroups){
+                let group = allGroups[index]
+                if(group.playlistsShared.some(element => element == a.name)){
+                    group.playlistsShared.splice(group.playlistsShared.indexOf(a.name),1)
+                    await pwmClient.db("pwm_project").collection('groups')
+                        .updateOne({"name":group.name},
+                        {$set:{"playlistsShared":group.playlistsShared}})
+                }
             }
-        }
+        }catch(e){}
         //-2. elimino, dall'utente che la possedeva, la playlist, sia da quelle seguite che da quelle totali (aka assicuro integrita' referenziale)
         userToUpdate.playlistsOwned.splice(await userToUpdate.playlistsOwned.indexOf(a.name),1)
         userToUpdate.playlistsFollowed.splice(await userToUpdate.playlistsFollowed.indexOf(a.name),1)
         await pwmClient.db("pwm_project").collection('users')
-            .updateOne({"email":decoded.email},userToUpdate);
+            .updateOne({"email":decoded.email},
+            {$set:{"playlistsFollowed":userToUpdate.playlistsFollowed,
+            "playlistsOwned":userToUpdate.playlistsOwned}});
         //-1. elimino la playlist
         await pwmClient.db("pwm_project").collection('playlists').deleteOne(a)
         //se non e' esploso niente allora e' tutto okay, spero
@@ -297,22 +317,28 @@ Mentre per le playlist:
 \end{lstlisting}
 E per i gruppi:
 \begin{lstlisting}[language=JavaScript]
-async function deleteGroup(req,res){
+    async function deleteGroup(req,res){
     ...
+    //elimino un gruppo
     let a = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.params.name)})
     //-3. elimino dagli utenti non owner ogni riferimento a quel gruppo
-    let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$not: decoded.email}})
-    for(let user in allUsers){
-        if(user.groupsFollowed.some(a.name)){
+    let allUsers = await pwmClient.db("pwm_project").collection("users").find({"email":{$ne: decoded.email}}).toArray()
+    for(let index in allUsers){
+        let user = allUsers[index]
+        if(user.groupsFollowed.some(element => element == a.name)){
             user.groupsFollowed.splice(user.groupsFollowed.indexOf(a.name),1)
-            await pwmClient.db("pwm_project").collection('users').updateOne({"email":user.email},user)
+            await pwmClient.db("pwm_project").collection('users')
+                .updateOne({"email":user.email},
+                {$set:{"groupsFollowed":user.groupsFollowed}})
         }
     }
     //-2. elimino dall'owner il gruppo, sia owned che followed
+    let userToUpdate = await pwmClient.db("pwm_project").collection("users").findOne({"email":decoded.email})
     userToUpdate.groupsFollowed.splice(await userToUpdate.groupsFollowed.indexOf(a.name),1)
     userToUpdate.groupsOwned.splice(await userToUpdate.groupsOwned.indexOf(a.name),1)
     await pwmClient.db("pwm_project").collection('users')
-        .updateOne({"email":decoded.email},userToUpdate);
+        .updateOne({"email":decoded.email},
+        {$set:{"groupsFollowed":userToUpdate.groupsFollowed,"groupsOwned":userToUpdate.groupsOwned}});
     //-1 elimino il gruppo
     await pwmClient.db("pwm_project").collection('groups').deleteOne(a)
     //0. forse e' andato tutto liscio
@@ -334,9 +360,17 @@ In tre diverse componenti del Javascript frontend ho avuto necessità di creare 
 
 Ho pertanto optato per la creazione dell'evento sotto, in grado di recuperare le informazioni sullo stato di cui occorre recuperare la bandiera (mediante una apposita regular expression) e aumentare o ridurre la dimensione in base alle necessità.
 \begin{lstlisting}[language=JavaScript]
-
+window.addEventListener('resize', () =>{
+    const re = /\/.....\//
+    let a = document.getElementsByClassName('flag')
+    for (let i=0;i<a.length;i++){
+        let element = a[i].src
+        let code = element.split(re)[1].split(".png")[0]
+        a[i].src = `https://flagcdn.com/${window.screen.availWidth<2000?"16x12":"64x48"}/${code}.png`
+    }
+});
 \end{lstlisting}
-\paragraph{Selezione dei gruppi} Mediante la proprietà \verb|oninput| di un \verb|input| di tipo \verb|text| sono in grado di filtrare dinamicamente i gruppi in modo che i titoli contengano come sottostringa il testo inserito. Si può notare questa cosa in azione nella pagina \verb|groups.html|
+\paragraph{Selezione dei gruppi} Mediante la proprietà \verb|oninput| di un \verb|input| di tipo \verb|text| sono in grado di filtrare dinamicamente i gruppi in modo che i titoli contengano come sottostringa il testo inserito. Si può notare questa cosa in azione nella pagina \verb|groups.html|.
 \begin{lstlisting}[language=JavaScript]
 function changing(){
     let query = document.getElementById('search').value.toLowerCase()
