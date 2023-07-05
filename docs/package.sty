@@ -258,3 +258,16 @@
 \newlist{choices}{enumerate}{1}
 \setlist[choices]{label*=(\Alph*)}
 \newcommand{\choice}{\item}
+
+\newcommand{\invisiblesection}[1]{
+    \addcontentsline{toc}{section}{#1}
+    \section*{#1}
+}
+\newcommand{\invisiblesubsection}[1]{
+    \addcontentsline{toc}{subsection}{#1}
+    \subsection*{#1}
+}
+\newcommand{\invisiblesubsubsection}[1]{
+    \addcontentsline{toc}{subsubsection}{#1}
+    \subsubsection*{#1}
+}

@@ -62,7 +62,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             <div class="normal-text"><strong>Duration: </strong>${duration(response.duration_ms)}</div>
         </div>`
         }
-        fill+=` <div class="row" onclick="starUnstar('${response.type}','${response.id}','${response.name.split("\"")[0].split("(")[0]}')">
+        if(promise.ok)fill+=` <div class="row" onclick="starUnstar('${response.type}','${response.id}','${response.name.split("\"")[0].split("(")[0]}')">
                     <div class="col-sm-5 col-4"></div>
                     <div class="col-sm-2 col-4" id="isStarred"></div>
                     <div class="col-sm-5 col-4"></div>
@@ -140,7 +140,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         `
         }
         toFill.innerHTML=fill;
-        checkIfStarred();
+        if(promise.ok)checkIfStarred();
         if(response.preview_url!=undefined&&promise.ok){
             //riempio le opzioni
             let user = await promise.json()

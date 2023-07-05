@@ -1,5 +1,5 @@
 Di seguito saranno spiegate alcune scelte implementative relative a varie sezioni, iniziando da quelle riguardanti la struttura dati nel database.
-\subsection{Struttura dati nel database}
+\invisiblesubsection{Struttura dati nel database}
 Il database prevede tre collezioni, ciascuna costituita da documenti con una data struttura:
 
 \begin{figure}[h]
@@ -112,8 +112,8 @@ Si noti poi che \verb|playlists.songs| è un array di oggetti costituiti come se
 }
 \end{lstlisting}
 Mentre ogni preferito è salvato come un oggetto contenente titolo e id, tutto questo nell'apposito array.
-\subsection{Backend}
-\subsubsection{Accesso alle informazioni riservate}
+\invisiblesubsection{Backend}
+\invisiblesubsubsection{Accesso alle informazioni riservate}
 Alcune informazioni non dovevano diventare pubbliche, ossia venire direttamente a contatto (per esempio venendovi inserite) con il frontend.
 
 A questo scopo ho optato per l'utilizzo di un file \verb|.env|, prontamente inserito nel \verb|.gitignore| e che sarà consegnato a fianco della repo, contenente queste informazioni secondo il seguente formato:
@@ -128,7 +128,7 @@ SECRET=XXXXXXXXXXXX
 Dove \verb|SECRET| è la chiave per firmare i \verb|JWT|, \verb|MONGONAME| e \verb|MONGOPASSWORD| sono relativi all'utilizzo di MongoDB, \verb|CLIENT_ID| e \verb|CLIENT_SECRET| servono per Spotify e \verb|PORT| può essere usato per cambiare il numero della porta su cui viene esposto il servizio.
 
 Per accedervi viene usato il package \verb|DotEnv|, di cui parlo più approfonditamente nella sezione \verb|tecnologie|.
-\subsubsection{JWT nei cookies anziché dati dell'utente nel local storage}
+\invisiblesubsubsection{JWT nei cookies anziché dati dell'utente nel local storage}
 \idea{L'utilizzo dei JWT nei cookies permette di eseguire più facilmente e in modo più sicuro i controlli se l'utente è loggato o meno}
 Voglio realizzare una autenticazione lievemente più sicura di quella richiesta. Per ottenere questo scopo utilizzo i JWT (con un apposito package di cui parlerà nella sezione \verb|tecnologie|), firmati con una chiave presente nel file \verb|.env|, e li salvo nei cookie in modo che vengano passati in automatico ad ogni richiesta.
 
@@ -153,7 +153,7 @@ async function nomeMetodo(req,res){
 }
 \end{lstlisting}
 \alert{Questo sistema è sempre vulnerabile ad un possibile \say{furto} dei cookie: qualora questi venissero rubati è possibile per un utente inserirsi al posto di un altro, cambiare email e password e rendere impossibile all'utente originario l'accesso. Questo è un problema che non ho risolto in quanto ho ritenuto fuori dalle finalità di questo progetto, tuttavia sono consapevole del problema}
-\subsubsection{Token Object e perform function}
+\invisiblesubsubsection{Token Object e perform function}
 La richiesta (per quasi ogni informazione) di un token valido che scade ogni ora per operare con Spotify mi ha fatto optare per la creazione di un oggetto \verb|Token|, come nel seguente brano di codice:
 \begin{lstlisting}[language=JavaScript]
 var token = {
@@ -205,7 +205,7 @@ function perform(questo,paramA,paramB){
 }
 \end{lstlisting}
 Questa funzione è ancora una volta un applicatore, in particolare nei confronti del parametro-funzione \verb|questo|. Esso verifica se il token è scaduto sfruttando gli appositi metodi dell'oggetto \verb|token|. In caso sia scaduto chiama l'applicatore \verb|regenAndThen|, altrimenti esegue direttamente, così da non rigenerare il token ad ogni chiamata, ma solo quando necessario.
-\subsubsection{Eliminazione di documenti e integrità delle referenze}
+\invisiblesubsubsection{Eliminazione di documenti e integrità delle referenze}
 \idea{Non voglio dovermi ritrovare con dati inconsistenti o con riferimenti pendenti all'interno del database, perciò preferisco realizzare del codice molto inefficiente piuttosto che poi dover interpretare dati incompleti, parziali o superflui}
 Ci sono tre richieste di tipo \verb|delete| che si possono fare all'API. Queste richieste, visibili anche nello swagger di cui all'Appendice B, sono \verb|app.delete('/playlist/:name')|, \verb|app.delete('/group/:name')| e \verb|app.delete('/user')|.
 
@@ -321,5 +321,55 @@ async function deleteGroup(req,res){
 }
 \end{lstlisting}
 \alert{Un problema simile si avrebbe anche in caso qualcuno desiderasse modificare lo username. Per risolverlo, ho reso impossibile modificare lo username, consentendo invece di modificare le credenziali usate per il login ossia solamente email e password}
-\subsection{Frontend}
+\invisiblesubsection{Frontend}
+Le scelte implementative effettuate riguardanti il frontend sono molteplici e molto ampie, pertanto verranno trattate separatamente. In questa sede saranno riportate solo le scelte che ritengo significative, per evitare di riportare nozioni a mio giudizio inutili.
+\invisiblesubsubsection{Redirect e rischio di loop}
+In svariate situazioni un redirect avrebbe potuto essere una ottima idea. Quando ad esempio qualcuno, senza essere loggato (magari usando un vecchio link o avendo salvato nei \verb|bookmarks| l'indirizzo) cerca di accedere al proprio profilo, egli viene reindirizzato alla login, e successivamente al proprio profilo.
+
+Una scelta simile, pensavo inizialmente, si potrebbe applicare anche nel caso di playlist per le quali non ci fosse la possibilità, causa permessi mancanti, di visualizzarle. Alla fine ho optato invece per non farlo perché il rischio era che un utente, loggato, non avesse accesso alla playlist in quanto privata, venisse quindi reindirizzato alla login. Constatando che è già loggato, la pagina di login reindirizzerebbe verso la pagina richiesta inizialmente, pur non essendo di fatto cambiate le credenziali, e pertanto la pagina delle playlist avrebbe nuovamente rediretto alla login, generando un ciclo.
+\alert{Si noti che anche nel caso peggiore il ciclo non avrebbe potuto durare più di un'ora causa scadenza dei token JWT. Il tempo sarebbe comunque stato decisamente eccessivo.}
+\invisiblesubsubsection{Eventi}
+In tre diverse componenti del Javascript frontend ho avuto necessità di creare degli eventi.
+\paragraph{Responsiveness} La pagina che mostra le informazioni ottenute da Spotify deve essere responsive. Questo normalmente, usando le classi di Bootstrap, si risolverebbe senza bisogno di particolari menzioni. In questo caso, tuttavia, il mio appoggiarmi a \href{https://flagcdn.com/}{https://flagcdn.com/} rende necessaria una operazione diversa: le flag vengono richieste con una dimensione fissa, pertanto all'aumentare dello schermo oltre i 2k rischiano di diventare microscopiche.
+
+Ho pertanto optato per la creazione dell'evento sotto, in grado di recuperare le informazioni sullo stato di cui occorre recuperare la bandiera (mediante una apposita regular expression) e aumentare o ridurre la dimensione in base alle necessità.
+\begin{lstlisting}[language=JavaScript]
+
+\end{lstlisting}
+\paragraph{Selezione dei gruppi} Mediante la proprietà \verb|oninput| di un \verb|input| di tipo \verb|text| sono in grado di filtrare dinamicamente i gruppi in modo che i titoli contengano come sottostringa il testo inserito. Si può notare questa cosa in azione nella pagina \verb|groups.html|
+\begin{lstlisting}[language=JavaScript]
+function changing(){
+    let query = document.getElementById('search').value.toLowerCase()
+    for(let i =0;i<groupList.length;i++){
+        let card = document.getElementById('card-groups-followed-'+i)
+        if(!card.getElementsByClassName(`card-title`)[0].innerHTML.toLowerCase().includes(query)) card.classList.add('d-none')
+        else card.classList.remove('d-none')
+
+    }
+}
+\end{lstlisting}
+\paragraph{Cambio della voce selezionata in un select} Per verificare che una canzone appartenga o meno ad una playlist, e quindi se essa possa o meno essere aggiunta o rimossa, ho creato un evento, come segue:
+\begin{lstlisting}[language=JavaScript]
+document.querySelector('#floatingSelect').addEventListener('change', () =>{
+    let playlist = document.querySelector('#floatingSelect').value
+    let id = params.get('value')
+    fetch(`/playlist/info/${playlist}`).then(async a => {
+        if(a.ok){
+            response = await a.json()
+            if(!response.songs.some(element => element.id == id)){
+                //button to remove it
+                console.log(document.getElementById('the-mystic-button').onclick)
+                document.getElementById('the-mystic-button').innerHTML='Add it!'
+                document.getElementById('the-mystic-button').classList.add('text-bg-success')
+            }
+            else{
+                //button to add it
+                console.log(document.getElementById('the-mystic-button').onclick)
+                document.getElementById('the-mystic-button').innerHTML='Remove it!'
+                document.getElementById('the-mystic-button').classList.add('text-bg-danger')
+            }
+        }
+    })
+});
+\end{lstlisting}
 \newpage
