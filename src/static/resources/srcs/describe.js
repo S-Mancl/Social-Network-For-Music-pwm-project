@@ -141,6 +141,15 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         }
         toFill.innerHTML=fill;
         if(promise.ok)checkIfStarred();
+        window.addEventListener('resize', () =>{
+            const re = /\/.....\//
+            let a = document.getElementsByClassName('flag')
+            for (let i=0;i<a.length;i++){
+                let element = a[i].src
+                let code = element.split(re)[1].split(".png")[0]
+                a[i].src = `https://flagcdn.com/${window.screen.availWidth<2000?"16x12":"64x48"}/${code}.png`
+            }
+        });
         if(response.preview_url!=undefined&&promise.ok){
             //riempio le opzioni
             let user = await promise.json()
