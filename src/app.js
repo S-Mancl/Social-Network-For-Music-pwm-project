@@ -30,14 +30,14 @@ var token = {
         .then((response) => response.json())
         .then((tokenResponse) => {
             this.expiration = new Date().getTime(); //ms since doesn't matter
-            //console.log(tokenResponse.access_token)
+            
             this.value=tokenResponse.access_token
-            //console.log(this.value)
+            
             func_to_apply(paramA,paramB)
         })                   
     },
     hasExpired : function(){
-        //console.log("dateDelta: "+(new Date().getTime()-this.expiration)/1000/60)
+        
         if(((new Date().getTime()-this.expiration)/1000/60)>=59){
             return true;
         }
@@ -53,6 +53,7 @@ const baseUrls = {
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
+const { Timestamp } = require('mongodb');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 function hash(input) {
@@ -65,7 +66,7 @@ function perform(questo,paramA,paramB){
     else questo(paramA,paramB)
 }
 function getGenres(req,res){
-    //console.log(token.value)
+    
     fetch(baseUrls.genres,{
         headers: {
             "Content-Type": "application/json",
@@ -88,11 +89,11 @@ function createUrlForSearch(question){
     question.type.forEach(element => {
         url += element
         url += ","
-        //console.log(url)
+        
     });
     url = url.slice(0,-1)
     url += "&limit="+question.limit+"&offset="+question.offset
-    //console.log(url)
+    
     return url
 }
 function askSpotify(res,question){
@@ -143,7 +144,7 @@ async function login(res,user){
             var loggedUser = await pwmClient.db("pwm_project")
                 .collection('users')
                 .findOne(filter);
-            //console.log(loggedUser)
+            
             if(loggedUser == null) res.status(401).json({code:3,reason:`This user does not exist or its password is not the one you inserted.`})
             else{
                 //JWT and cookie
@@ -181,7 +182,7 @@ async function register(res,user){
     if(user.name==undefined || user.password==undefined || user.surname == undefined || user.userName == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({code:-1,reason: `You are missing some fields...`})
     else{
         [`name`,`surname`,`userName`,`birthDate`,`password`,`email`].forEach(key => {
-            //console.log(user[key])
+            
             user[key] = validator.escape(validator.trim(user[key]))
         })
         for (let i = 0; i < user.favoriteGenres.length; i++){
@@ -216,7 +217,7 @@ async function register(res,user){
                 pwmClient.close()
             }
             catch (e) {
-                //console.log('catch in test');
+                
                 if (e.code == 11000) {
                     res.status(400).json({code:5,reason:"Already present user: please choose a different username or email"})
                     return
@@ -245,7 +246,7 @@ async function updateUser(req,res){
                 if(user.name==undefined || user.password==undefined || user.surname == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({code:-1,reason: `You are missing some fields...`})
                 else{
                     [`name`,`surname`,`birthDate`,`password`,`email`].forEach(key => {
-                        //console.log(user[key])
+                        
                         user[key] = validator.escape(validator.trim(user[key]))
                     })
                     for (let i = 0; i < user.favoriteGenres.length; i++){
@@ -269,7 +270,7 @@ async function updateUser(req,res){
                             res.status(200).clearCookie(`token`).json({code:0,"explanation":`you will now be logged out. Please re-login with your new credentials`})
                         }
                         catch (e) {
-                            //console.log('catch in test');
+                            
                             if (e.code == 11000) {
                                 res.status(400).json({code:5,reason:"Already present user: please choose a different username or email"})
                                 return
@@ -352,7 +353,7 @@ function checkLogin(req,res){
                 res.status(401).json(err)
             }
             else{
-                //console.log(decoded)
+                
                 var pwmClient = await new mongoClient(mongoUrl).connect()
             var filter = {"email": decoded.email}
             var loggedUser = await pwmClient.db("pwm_project")
@@ -362,7 +363,7 @@ function checkLogin(req,res){
             else{
                 delete loggedUser._id
                 delete loggedUser.password
-                console.log(loggedUser)
+                log("Logged: "+JSON.stringify(loggedUser))
                 res.status(200).json(loggedUser)
             }        
             pwmClient.close()
@@ -371,7 +372,7 @@ function checkLogin(req,res){
     }
 }
 async function addOrRemoveFavorite(req,res){
-    //console.log(req.body.id,req.body.name,req.body.category)
+    
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
     if(token == undefined) res.status(401).json({"reason": `Invalid login`})
@@ -388,11 +389,11 @@ async function addOrRemoveFavorite(req,res){
                             .findOne(filter);
                 //così ho trovato l'utente loggato
                 //ora devo ricavarne i campi da modificare
-                //console.log(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id))
+                
                 if(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id)){
                     loggedUser.favorites[req.body.category].splice(loggedUser.favorites[req.body.category].indexOf({"name":req.body.name,"id":req.body.id}),1)
                     res.status(200).json({"removed":true})
-                    //console.log(JSON.stringify(loggedUser.favorites[req.body.category]))
+                    
                 }//se non è già presente allora lo devo invece aggiungere
                 else {
                     loggedUser.favorites[req.body.category].push({"name":req.body.name,"id":req.body.id})
@@ -411,7 +412,7 @@ async function addOrRemoveFavorite(req,res){
     }
 }
 async function isStarred(req,res){
-    //console.log(req.body.category)
+    
     //connect to DB, evaluate if present, else... etc
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
@@ -427,10 +428,10 @@ async function isStarred(req,res){
                 var loggedUser = await pwmClient.db("pwm_project")
                             .collection('users')
                             .findOne(filter);
-                //console.log(loggedUser.favorites[req.body.category])                            
+                
                 if(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id)){
                     res.status(200).json({"favorite":true})
-                    //console.log(JSON.stringify(loggedUser.favorites[req.body.category]))
+                    
                 }//se non è già presente allora lo devo invece aggiungere
                 else res.status(200).json({"favorite":false})
                 pwmClient.close()
@@ -527,13 +528,13 @@ async function makePlaylistPrivate(req,res){
                     //-3. per ogni utente, diverso dall'owner, elimino la playlist da quelle seguite, laddove presente.
                     let allUsers = await pwmClient.db("pwm_project").collection("users").find({"email":{$ne: decoded.email}}).toArray()
                     try{for(let index in allUsers){
-                        //console.log(allUsers)
+                        
                         let user=allUsers[index]
                         if(user.playlistsFollowed.some(element => element == a.name)){
                             user.playlistsFollowed.splice(user.playlistsFollowed.indexOf(a.name),1)
                             await pwmClient.db("pwm_project").collection('users').updateOne({"email":user.email},{$set:{"playlistsFollowed":user.playlistsFollowed}})
                         }
-                    }}catch(e){console.log(e)}
+                    }}catch(e){log(e.toString())}
                     //-2.5. per ogni gruppo elimino la playlist da quelle seguite, laddove presente
                     let allGroups = await pwmClient.db("pwm_project").collection("groups").find({}).toArray()
                     try{for(let index in allGroups){
@@ -600,7 +601,7 @@ async function removeTagFromPlaylist(req,res){
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                     let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.body.name)})
                     if(isOwner(playlist,user.userName)&&validator.escape(req.body.tag)!=null&&validator.escape(req.body.tag)!=undefined){
-                        removeTag(playlist,validator.escape(req.body.tag))
+                        removeTag(playlist,validator.escape(req.body.tag.toLowerCase()))
                         await pwmClient.db('pwm_project').collection('playlists').updateOne({"name":playlist.name},{$set:{"tags":playlist.tags}})
                         res.status(200).json({"reason":"ok"})
                     }
@@ -628,7 +629,7 @@ async function addTagToPlaylist(req,res){
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                     let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(req.body.name)})
                     if(isOwner(playlist,user.userName)&&validator.escape(req.body.tag)!=null&&validator.escape(req.body.tag)!=undefined){
-                        addTag(playlist,validator.escape(req.body.tag))
+                        addTag(playlist,validator.escape(req.body.tag.toLowerCase()))
                         await pwmClient.db('pwm_project').collection('playlists').updateOne({"name":playlist.name},{$set:{"tags":playlist.tags}})
                         res.status(200).json({"reason":"ok"})
                     }
@@ -849,7 +850,7 @@ async function createPlaylist(req,res){
                         await pwmClient.db("pwm_project").collection('playlists').insertOne(playlistToAdd)
                         userToUpdate.playlistsOwned.push(playlistToAdd.name)
                         userToUpdate.playlistsFollowed.push(playlistToAdd.name)
-                        console.log(await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},{$set:{"playlistsOwned":userToUpdate.playlistsOwned,"playlistsFollowed":userToUpdate.playlistsFollowed}}))
+                        await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},{$set:{"playlistsOwned":userToUpdate.playlistsOwned,"playlistsFollowed":userToUpdate.playlistsFollowed}})
                         res.status(200).json({"reason":"inserted correctly"})
                     }
                     else res.status(400).json({"reason":"Probably you haven't specified the right params"})
@@ -962,15 +963,15 @@ async function getPlaylistInfos(req,res){
 */
 function newGroup(req,userName){
     var a = {
-        "name":validator.escape(req.body.newGroup.nome),
-        "description":validator.escape(req.body.newGroup.descrizione),
+        "name":validator.escape(req.body.nome),
+        "description":validator.escape(req.body.descrizione),
         "playlistsShared":[],
         "owner":userName,
-        "users":[]
+        "users":[userName]
     }
     if (
-        validator.escape(req.body.newGroup.nome)!=undefined&&validator.escape(req.body.newGroup.nome)!=null&&
-        validator.escape(req.body.newGroup.descrizione)!=undefined&&validator.escape(req.body.newGroup.descrizione)!=null
+        validator.escape(req.body.nome)!=undefined&&validator.escape(req.body.nome)!=null&&
+        validator.escape(req.body.descrizione)!=undefined&&validator.escape(req.body.descrizione)!=null
         )
         return a
     return null;
@@ -1035,7 +1036,7 @@ async function createGroup(req,res){
     }
 }
 async function deleteGroup(req,res){
-    //console.log(req.params.name)
+    
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
     if(token == undefined) res.status(401).json({"reason": `Invalid login`})
@@ -1050,15 +1051,16 @@ async function deleteGroup(req,res){
                 try{
                     let a = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.params.name)})
                     //-3. elimino dagli utenti non owner ogni riferimento a quel gruppo
-                    let allUsers = pwmClient.db("pwm_project").collection("users").find({"email":{$ne: decoded.email}}).toArray()
+                    let allUsers = await pwmClient.db("pwm_project").collection("users").find({"email":{$ne: decoded.email}}).toArray()
                     for(let index in allUsers){
-                        let user = allusers[index]
+                        let user = allUsers[index]
                         if(user.groupsFollowed.some(element => element == a.name)){
                             user.groupsFollowed.splice(user.groupsFollowed.indexOf(a.name),1)
                             await pwmClient.db("pwm_project").collection('users').updateOne({"email":user.email},{$set:{"groupsFollowed":user.groupsFollowed}})
                         }
                     }
                     //-2. elimino dall'owner il gruppo, sia owned che followed
+                    let userToUpdate = await pwmClient.db("pwm_project").collection("users").findOne({"email":decoded.email})
                     userToUpdate.groupsFollowed.splice(await userToUpdate.groupsFollowed.indexOf(a.name),1)
                     userToUpdate.groupsOwned.splice(await userToUpdate.groupsOwned.indexOf(a.name),1)
                     await pwmClient.db("pwm_project").collection('users').updateOne({"email":decoded.email},{$set:{"groupsFollowed":userToUpdate.groupsFollowed,"groupsOwned":userToUpdate.groupsOwned}});
@@ -1090,6 +1092,15 @@ async function transferGroupOwnership(req,res){
                     let new_owner = await pwmClient.db("pwm_project").collection('users').findOne({"userName": validator.escape(req.body.new_owner)})
                     if(isGroupOwner(group,user.userName) && new_owner!=null && new_owner!=undefined){
                         changeGroupOwner(group,new_owner)
+                        //aggiorno il gruppo
+                        await pwmClient.db("pwm_project").collection("groups").updateOne({"name":group.name},{$set:{"owner":group.owner}})
+                        //aggiorno il nuovo utente aggiungendolo negli owned
+                        new_owner.groupsOwned.push(group.name)
+                        if(!new_owner.groupsFollowed.some(element => element == group.name)) new_owner.groupsFollowed.push(group.name)
+                        await pwmClient.db("pwm_project").collection("users").updateOne({"userName":new_owner.userName},{$set:{"groupsOwned":new_owner.groupsOwned,"groupsFollowed":new_owner.groupsFollowed}})
+                        //aggiorno il vecchio utente togliendolo dagli owned
+                        user.groupsOwned.splice(user.groupsOwned.indexOf(group.name),1)
+                        await pwmClient.db("pwm_project").collection("users").updateOne({"userName":user.userName},{$set:{"groupsOwned":user.groupsOwned}})
                         res.status(200).json({"reason":"ok"})
                     }
                     else res.status(400).json({"reason":"you do not own this group, or some other data you inserted is not valid. Stop trying to hack me, please"})
@@ -1172,7 +1183,7 @@ async function joinGroup(req,res){
                         await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},{$set:{"groupsFollowed":user.groupsFollowed}})
                         // devo modificare il gruppo in modo che contenga lo username
                         group.users.push(user.userName)
-                        await pwmClient.db("pwm_project").collection("users").updateOne({"name":group.name},{$set:{"users":group.users}})
+                        await pwmClient.db("pwm_project").collection("groups").updateOne({"name":group.name},{$set:{"users":group.users}})
                         res.status(200).json({"reason":"ok"})
                     }
                     else res.status(400).json({"reason":"bad data or already in this group"})
@@ -1199,11 +1210,12 @@ async function leaveGroup(req,res){
                     let group = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.params.name)})
                     if(user!=null && group!=null && group.users.some(element => element == user.userName)){
                         // devo modificare lo user in modo che non contenga il nome del gruppo
+                        let userToUpdate = await pwmClient.db("pwm_project").collection('users').findOne({"email":decoded.email})
                         user.groupsFollowed.splice(user.groupsFollowed.indexOf(group.name),1)
                         await pwmClient.db("pwm_project").collection("users").updateOne({"email":decoded.email},{$set:{"groupsFollowed":userToUpdate.groupsFollowed}})
                         // devo modificare il gruppo in modo che non contenga lo username
                         group.users.splice(group.users.indexOf(user.userName),1)
-                        await pwmClient.db("pwm_project").collection("users").updateOne({"name":group.name},{$set:{"users":group.users}})
+                        await pwmClient.db("pwm_project").collection("groups").updateOne({"name":group.name},{$set:{"users":group.users}})
                         res.status(200).json({"reason":"ok"})
                     }
                     else res.status(400).json({"reason":"bad data or not in this group"})
@@ -1228,6 +1240,8 @@ async function getGroupInfo(req,res){
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email":decoded.email})
                     let group = await pwmClient.db("pwm_project").collection('groups').findOne({"name": validator.escape(req.params.name)})
                     if(user!=null && group!=null){
+                        group.doIOwnIt = (group.owner==user.userName)
+                        group.following = group.users.some(element => element == user.userName)
                         res.status(200).json(group)
                     }
                     else res.status(400).json({"reason":"bad data"})
@@ -1278,7 +1292,7 @@ async function searchPlaylistsByName(req,res){
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                     let all = await pwmClient.db("pwm_project").collection("playlists").find({"name": { '$regex' : req.params.name, '$options' : 'i' }}).toArray()
                     let allGroups = await pwmClient.db("pwm_project").collection("groups").find({}).toArray()
-                    let saw
+                    let saw = []
                     for(let a in all) if(canSee(all[a],allGroups,user)) saw.push(all[a])
                     res.status(200).json(saw)
                 }catch(e){res.status(400).json({reason:`Generic error: ${e.toString()}`})}
@@ -1302,8 +1316,8 @@ async function searchPlaylistsByTag(req,res){
                     let user = await pwmClient.db("pwm_project").collection('users').findOne({"email": decoded.email})
                     let all = await pwmClient.db("pwm_project").collection("playlists").find({}).toArray()
                     let allGroups = await pwmClient.db("pwm_project").collection("groups").find({}).toArray()
-                    let saw
-                    for(let a in all) if(all[a].tags.some(element => element == req.params.tag) && canSee(all[a],allGroups,user)) saw.push(all[a])
+                    let saw = []
+                    for(let a in all) if(all[a].tags.some(element => element == req.params.tag.toLowerCase()) && canSee(all[a],allGroups,user)) saw.push(all[a])
                     res.status(200).json(saw)
                 }catch(e){res.status(400).json({reason:`Generic error: ${e.toString()}`})}
                 pwmClient.close()
@@ -1731,7 +1745,18 @@ app.get("*", (req, res) => {
 })
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+function datetime(){
+    var currentdate = new Date();
+    var datetime =    currentdate.getDate() + "-"
+    + (currentdate.getMonth()+1)  + "-" 
+                    + currentdate.getFullYear() + " @ "  
+                    + currentdate.getHours() + ":"  
+                    + currentdate.getMinutes() + ":" 
+                    + currentdate.getSeconds();
+    return datetime
+}
+function log(message){console.log(`${datetime()}. ${message}`)}
 
 app.listen(process.env.PORT, "0.0.0.0", () => {
-    console.log(`Server started. Port ${process.env.PORT}. http://localhost:${process.env.PORT}/index.html`)
+    log(`Server started. Port ${process.env.PORT}. http://localhost:${process.env.PORT}/index.html`)
 })

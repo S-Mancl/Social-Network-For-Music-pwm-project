@@ -182,14 +182,6 @@ ul.dropdown-menu li a:active{
     border-radius: 5%;
     transition: 0.6s ease;
 }
-.adapt-size{
-    width:10vw;
-}
-@media screen and (max-width:576px) {
-    .adapt-size{
-        width:70vw;
-    }
-}
 @media screen and (min-width:576px) and (max-width:768px) {
     .adapt-size{
         width:55vw;

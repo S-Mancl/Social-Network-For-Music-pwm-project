@@ -9,9 +9,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         var toFill = document.getElementById('toFill')
         var fill=`
         <span>General Infos:</span>
-        <div class="col-md-1">
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-4 mx-md-auto">
             <div class="row">`
         if(response.images!=undefined){
             fill+=`<img class="p-4 m-md-5 description-image common-border" src="${response.images[0].url}">`
@@ -20,8 +18,6 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             fill+=`<span>Preview</span><audio class="common-border un-common-border" controls src="${response.preview_url}">`
         }
         fill+=`</div>
-        </div>
-        <div class="col-md-1">
         </div>
         <div class="col-md-6">
             <div class="row">
@@ -81,21 +77,18 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             <span>Tracks:</span>
         </div>
         <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
-        <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
+        <div class="col-8 mx-auto">
+        <div class="row g-4 mt-4 p-4 justify-content-center">
         `
             response.tracks.items.forEach(element => {
-                //console.log({name:element.name,id:element.id})
-                fill+=`
-                    <div class="card normal-text adapt-size m-1">
+                fill+=`<div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
+                    <div class="card h-100 w-100 normal-text adapt-size m-1">
                         <div class="card-body"><h5 class="card-title normal-text">${element.name}</h5><p class="card-text"></p></div>
                         <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=tracks&amp;value=${element.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
-                    </div>
+                    </div></div>
                 `
             });
-            fill+=`</div></div>
-            <div class="col-2"></div>`
+            fill+=`</div></div>`
         }
         if(response.artists!=undefined){
             fill+=`
@@ -103,21 +96,19 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             <span>Artists:</span>
         </div>
         <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
+        <div class="col-8 mx-auto">
         <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
         `
             response.artists.forEach(element => {
                 //console.log({name:element.name,id:element.id})
-                fill+=`
-                    <div class="card normal-text adapt-size m-md-2 m-lg-3">
+                fill+=`<div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
+                    <div class="card h-100 w-100 normal-text adapt-size m-md-2 m-lg-3">
                         <div class="card-body"><h5 class="card-title normal-text">${element.name}</h5><p class="card-text"></p></div>
                         <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=artists&amp;value=${element.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
-                    </div>
+                    </div></div>
                 `
             });
-            fill+=`</div></div>
-            <div class="col-2"></div>`
+            fill+=`</div></div>`
         }
         if(response.album!=undefined){
             fill+=`
@@ -125,16 +116,15 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             <span>Album:</span>
         </div>
         <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
+        <div class="col-8 mx-auto">
         <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
-            <div class="card normal-text adapt-size m-1">
+        <div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
+            <div class="card h-100 w-100 normal-text adapt-size m-1">
                 <img class="card-img-top" alt="..." src="${response.album.images[0].url}">
                 <div class="card-body"><h5 class="card-title normal-text">${response.album.name}</h5><p class="card-text"></p></div>
                 <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=albums&amp;value=${response.album.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
-            </div>
+            </div></div>
         </div></div>
-            <div class="col-2"></div>
         `
         }
         toFill.innerHTML=fill;

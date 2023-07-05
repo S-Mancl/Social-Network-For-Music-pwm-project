@@ -30,7 +30,7 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
                 <span class="badge rounded-pill text-bg-${colorSharing(response.visibility)} normal-text mt-3 p-4">${dataSharing(response.visibility)}</span></div>
                 </div>`
         fill+=`<div class="row">`
-        response.tags.forEach(element => fill+= `<div class="col-2 mt-3">
+        response.tags.forEach(element => fill+= `<div class="col-4 mt-3">
                 <span class="badge rounded-pill text-bg-primary normal-text p-2" onclick='location.href="/playlists.html?tag=${element}"'>${element}</span></div>
                 `)
         fill+=`</div></div>`
@@ -39,17 +39,16 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
             <span>Songs:</span>
         </div>
         <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
+        <div class="col-8 mx-auto">
         <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
         `
         response.songs.forEach(element => {
-            fill+=`
-                <div class="card normal-text adapt-size m-md-2 m-lg-3">
+            fill+=`<div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
+                <div class="card h-100 w-100 normal-text adapt-size m-md-2 m-lg-3">
                     <div class="card-body"><h5 class="card-title normal-text">${element.titolo}</h5><p class="card-text"></p>
                     </div><small class="text-body-secondary">${duration(element.durata)} - ${element.cantante}</small>
                     <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=tracks&ampvalue=${element.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
-                </div>x                `
+                </div></div>                `
         });
         if(response.doIOwnIt) {
             fill+=`<div class="row">
@@ -99,13 +98,11 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
             </div>`
 
         }
-        fill+=`</div></div>
-        <div class="col-2"></div>`
+        fill+=`</div></div>`
         toFill.innerHTML=fill;
     }
     else{
         if(a.status==401){
-            console.log(document.cookie,document.cookie.includes('token'))
             setTimeout(()=>{
                 window.location.href=`/playlists.html`
             },2000)
@@ -254,10 +251,6 @@ function followOrNot(value){
             }
         })
     }
-}
-
-function colorSharing(visibility){
-    return visibility?`success`:`danger`
 }
 function dataSharing(visibility){
     return visibility?`public`:`private`

@@ -1,1 +1,6 @@
-- [ ] fix search.html search bar not scaling correctly
+- [ ] adding songs to playlists
+- [ ] removing songs from playlists
+- [ ] adding playlists to groups
+- [ ] removing playlists from groups
+- [ ] filter groups
+- [ ] 

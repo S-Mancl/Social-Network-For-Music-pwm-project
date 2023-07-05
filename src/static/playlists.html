@@ -43,15 +43,15 @@
                     <form onsubmit="return false;">
                         <div class="form-group">
                           <label class="normal-text space-above" for="search">Write here the title or a tag of the playlist you'd like to search for:</label>
-                          <input type="text normal-text" value="" class="form-control" id="search" placeholder="Name of the playlist">
+                          <input type="text" value="" class="form-control normal-text" id="search" placeholder="Name or tag of the playlist">
                         </div>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="btn btn-lg normal-text" id="buttonLeft1" onClick="getPlaylists()">Search by name</div>
+                                    <div class="btn btn-lg normal-text" id="buttonLeft1" onClick="redirectToSearch(true)">Search by name</div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="btn btn-lg normal-text" id="buttonRight1" onClick="getPlaylistsByTag()">Search by tag</div>
+                                    <div class="btn btn-lg normal-text" id="buttonRight1" onClick="redirectToSearch(false)">Search by tag</div>
                                 </div>
                             </div>
                         </div>
@@ -65,13 +65,7 @@
                 <span>Your results!</span>
             </div>
             <div class="row results-by-kind">
-                <div class="col-1">
-
-                </div>
-                <div class="col-10" id="toFill">
-                </div>
-                <div class="col-1">
-
+                <div class="col-10 mx-auto" id="toFill">
                 </div>
             </div>
         </div>
