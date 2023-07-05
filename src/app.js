@@ -1251,6 +1251,28 @@ async function getGroupInfo(req,res){
         })
     }
 }
+
+async function getGroupList(req,res){
+    var pwmClient = await new mongoClient(mongoUrl).connect()
+    const token = req.cookies.token
+    if(token == undefined) res.status(401).json({"reason": `Invalid login`})
+    else{
+        jwt.verify(token,process.env.SECRET, async (err,decoded) =>{
+            if(err){
+                res.status(401).json(err)
+                pwmClient.close()
+            }
+            else{
+                try{
+                    let group = await pwmClient.db("pwm_project").collection('groups').find({}).toArray()
+                    res.status(200).json(group)
+                }catch(e){res.status(400).json({reason:`Generic error: ${e.toString()}`})}
+                pwmClient.close()
+            }
+        })
+    }
+}
+
 async function changeGroupDescription(req,res){
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
@@ -1498,6 +1520,12 @@ app.get('/group/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Groups','GET']
     // #swagger.summary = 'Gets infos about a group'
     perform(getGroupInfo,req,res)
+})
+
+app.get('/grouplist',mongoSanitize,(req,res)=>{
+    // #swagger.tags = ['Groups','GET']
+    // #swagger.summary = 'Get a list of all groups'
+    perform(getGroupList,req,res)
 })
 
 app.post('/group',mongoSanitize,(req,res)=>{

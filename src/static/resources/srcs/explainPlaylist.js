@@ -40,16 +40,8 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
         </div>
         <div class="row">
         <div class="col-8 mx-auto">
-        <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
+        <div class="row g-4 mt-4 p-4 d-flex justify-content-center" id="fill-this-with-songs"></div>
         `
-        response.songs.forEach(element => {
-            fill+=`<div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
-                <div class="card h-100 w-100 normal-text adapt-size m-md-2 m-lg-3">
-                    <div class="card-body"><h5 class="card-title normal-text">${element.titolo}</h5><p class="card-text"></p>
-                    </div><small class="text-body-secondary">${duration(element.durata)} - ${element.cantante}</small>
-                    <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=tracks&ampvalue=${element.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
-                </div></div>                `
-        });
         if(response.doIOwnIt) {
             fill+=`<div class="row">
                     <div class="col-md-6">
@@ -100,6 +92,40 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
         }
         fill+=`</div></div>`
         toFill.innerHTML=fill;
+
+        let toFill = document.getElementById('fill-this-with-songs')
+
+        var key = "playlist"
+        toFill.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+        var card = document.getElementById("card-"+key)
+        var clone = card.cloneNode(true)
+        clone.id = "card-"+key+"-nope"
+        clone.getElementsByClassName('card-title')[0].innerHTML = "Sorry, we found nothing!"
+        clone.getElementsByClassName('card-text')[0].innerHTML = "Search and find new songs!"
+        clone.getElementsByClassName('btn')[0].href = "/search.html"
+        clone.getElementsByClassName('testo-pulsante')[0].innerHTML = "Search!"
+        clone.classList.remove('d-block')
+        clone.classList.add('d-none')
+        card.after(clone)
+        if(response.songs.length==0){
+            document.getElementById("anche-questo-"+key).classList.add('d-none')
+        }
+        for(let i = 0;i<response.songs.length;i++){
+            try{
+                var card = document.getElementById("card-"+key)
+                var clone = card.cloneNode(true)
+                clone.id = "card-"+key+"-"+i
+                clone.getElementsByClassName('card-title')[0].innerHTML = response.songs[i].name
+                clone.getElementsByClassName('text-body-secondary')[0].innerHTML = response.songs[i].author+" - "+duration(response.songs[i].duration)
+                clone.getElementsByClassName('btn')[0].href = "/describe.html?kind=tracks&id=" + response.songs[i].id
+                clone.classList.remove('d-none')
+                clone.classList.add('d-block')
+                card.after(clone)
+            }
+            catch(e){
+                console.log(e)
+            };
+        }
     }
     else{
         if(a.status==401){

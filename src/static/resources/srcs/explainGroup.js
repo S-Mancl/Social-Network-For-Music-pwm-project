@@ -33,16 +33,9 @@ fetch(`/group/${name}`).then(async (a) =>{
         </div>
         <div class="row">
         <div class="col-2"></div>
-        <div class="col-8">
-        <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
+        <div class="col-8" id="fill-this-with-playlists"></div>
         `
-        response.playlistsShared.forEach(element => {
-            fill+=`<div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
-                <div class="card h-100 w-100 normal-text adapt-size m-md-2 m-lg-3">
-                    <div class="card-body"><h5 class="card-title normal-text">${element}</h5><p class="card-text"></p>
-                    <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/explainPlaylist?name=${element}" class="btn btn-secondary testo-pulsante">View more</a></div>
-                </div></div>                `
-        });
+        
         if(response.doIOwnIt) {
             fill+=`<div class="row">
                     <div class="col-md-6">
@@ -85,6 +78,38 @@ fetch(`/group/${name}`).then(async (a) =>{
         fill+=`</div></div>
         <div class="col-2"></div>`
         toFill.innerHTML=fill;
+        let questo = document.getElementById('fill-this-with-playlists')
+
+        var key = "playlist"
+        questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+        var card = document.getElementById("card-"+key)
+        var clone = card.cloneNode(true)
+        clone.id = "card-"+key+"-nope"
+        clone.getElementsByClassName('card-title')[0].innerHTML = "Sorry, we found nothing!"
+        clone.getElementsByClassName('card-text')[0].innerHTML = "Search and find new playlists!"
+        clone.getElementsByClassName('btn')[0].href = "/playlists.html"
+        clone.getElementsByClassName('testo-pulsante')[0].innerHTML = "Search!"
+        clone.classList.remove('d-block')
+        clone.classList.add('d-none')
+        card.after(clone)
+        if(response.playlistsShared.length==0){
+            document.getElementById("anche-questo-"+key).classList.add('d-none')
+        }
+        for(let i = 0;i<response.playlistsShared.length;i++){
+            try{
+                var card = document.getElementById("card-"+key)
+                var clone = card.cloneNode(true)
+                clone.id = "card-"+key+"-"+i
+                clone.getElementsByClassName('card-title')[0].innerHTML = response.playlistsShared[i]
+                clone.getElementsByClassName('btn')[0].href = "/explainPlaylists.html?name=" + response.playlistsShared[i]
+                clone.classList.remove('d-none')
+                clone.classList.add('d-block')
+                card.after(clone)
+            }
+            catch(e){
+                console.log(e)
+            };
+        }
     }
     else{
         if(a.status==401){

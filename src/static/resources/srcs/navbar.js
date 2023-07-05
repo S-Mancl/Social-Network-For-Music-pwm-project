@@ -11,6 +11,7 @@ const dropdownItems = [
     { label: "logout", link: "logout.html", image:"arrow-right-from-bracket-solid",needsLogged:true },
     { label: "my favorites", link: "profile.html#favorites", image:"heart-solid",needsLogged:true},
     { label: "my playlists", link: "profile.html#playlists", image:"compact-disc-solid",needsLogged:true },
+    { label: "my groups", link: "profile.html#groups", image:"user-group-solid",needsLogged:true },
     { label: "my profile", link: "profile.html", image:"address-card-solid",needsLogged:true },
 ]
 var menuHTML = "";
