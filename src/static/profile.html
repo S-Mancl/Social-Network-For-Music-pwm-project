@@ -29,8 +29,44 @@
         <div class="row d-flex justify-content-center" id="toFill">
 
         </div>
-        <div class="row">
-            <div onclick="editData()" class="btn btn-lg normal-text">Edit your data!</div>
+        <div class="row d-flex justify-content-center d-none" id="change-data">
+            <div class="col-md-6 mx-auto">
+            <!---->
+                <div class="input-group mb-3">
+                    <input id="name" type="text" class="form-control normal-text" placeholder="Name" aria-label="Name"
+                        aria-describedby="basic-addon1">
+                    <input id="surname" type="text" class="form-control normal-text" placeholder="Surname" aria-label="Surname"
+                        aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <input id="userName" type="text" class="form-control normal-text" placeholder="Username (will be visible to others)" aria-label="Name" disabled readonly
+                        aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <input id="email" type="email" class="form-control normal-text" placeholder="your@email.address" aria-label="Email"
+                        -describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <input id="pass1" type="password" class="form-control normal-text" placeholder="Password" aria-label="Username"
+                        aria-describedby="basic-addon1">
+                    <input id="pass2" type="password" class="form-control normal-text" placeholder="Repeat password" aria-label="Username"
+                        aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text normal-text" id="basic-addon1">Insert your birth date</span>
+                    <input id="birthDate" type="date" class="form-control normal-text"
+                        placeholder="Date of birth" aria-label="Nome" aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3 d-flex justify-content-center">
+                    <span>Select your favorite genres</span>
+                </div>
+                <div class="input-group mb-3 d-flex justify-content-center">
+                    <div class="form-group normal-text" id="genres">
+                        
+                    </div>
+                </div>
+            <!---->
+            </div>
         </div>
         <div class="row">
             <span id="favorites">Your favorites!</span>
@@ -69,6 +105,12 @@
         </div>
         <div class="row my-4">
             <div class="col-8 border border-danger mx-auto">
+                <div class="row">
+                    <span class="text-danger"><strong>DANGER ZONE</strong></span>
+                </div>
+                <div class="row">
+                    <div class="badge rounded-pill text-bg-danger normal-text mt-3 p-4 mb-3" id="delete" onclick="setupedit()">EDIT MY ACCOUNT</div>
+                </div>
                 <div class="row">
                     <span class="text-danger"><strong>SUPER DANGER ZONE</strong></span>
                 </div>

@@ -257,14 +257,15 @@ async function updateUser(req,res){
                     else if(!validator.isAlpha(user.name)||!validator.isAlpha(user.surname)) res.status(400).json({code:4,reason:`${user.name} ${user.surname} is not an accepted name... It contains numbers or it's empty!`})
                     /*else if(user.userName=="") res.status(400).json({code:7,reason:`You have selected an invalid username. Please try again`})*/
                     else{
-                        utente.email = user.email.toLowerCase()
-                        utente.password = hash(user.password)
-                        utente.name=user.name
-                        utente.surname=user.surname
-                        utente.birthDate=user.birthDate
-                        utente.favoriteGenres=user.favoriteGenres
                         try {
-                            await pwmClient.db("pwm_project").collection('users').updateOne({"userName":utente.userName},{$set:{"email":utente.email,"password":utente.password,"name":utente.name,"surname":utente.surname,"birthDate":utente.birthDate,"favoriteGenres":user.favoriteGenres}})
+                            await pwmClient.db("pwm_project").collection('users').updateOne({"userName":utente.userName},
+                                {$set:{
+                                    "email":user.email.toLowerCase(),
+                                    "password":hash(user.password),
+                                    "name":user.name,
+                                    "surname":user.surname,
+                                    "birthDate":user.birthDate,
+                                    "favoriteGenres":user.favoriteGenres}})
                             pwmClient.close()
                             res.status(200).clearCookie(`token`).json({code:0,"explanation":`you will now be logged out. Please re-login with your new credentials`})
                         }
@@ -330,15 +331,15 @@ async function deleteUser(req,res){
                         }
                     }
                     //-2 bis elimino ogni playlist owned dall'utente
-                    await pwmClient.db("pwm_project").collection("playlists").deleteMany({"owner":utente.userName})
+                    await pwmClient.db("pwm_project").collection("playlists").deleteMany({"owner":user.userName})
                     //-1 elimino l'account dell'utente
                     await pwmClient.db('pwm_project').collection('users').deleteOne({"email":decoded.email})
                     //0. forse è andato tutto liscio, e spero di non aver lasciato riferimenti pending da qualche parte
+                    pwmClient.close()
                     res.status(200).json({"reason":"ok"}) 
                 }catch(e){log(e.name+": "+e.message+"\n\t"+e.stack.split(/\n/)[1]+"\n------------------------------------------------------------------------------------------------");
-                    res.status(400).json({reason:`Generic error: ${e.toString()}`})
+                    res.status(400).json({reason:`Generic error: ${e.toString()}`});pwmClient.close()
                 }
-                pwmClient.close() 
             } 
         }) 
     } 
@@ -1075,7 +1076,6 @@ async function createGroup(req,res){
     }
 }
 async function deleteGroup(req,res){
-    
     var pwmClient = await new mongoClient(mongoUrl).connect()
     const token = req.cookies.token
     if(token == undefined) res.status(401).json({"reason": `Invalid login`})
@@ -1566,7 +1566,7 @@ app.put('/user',mongoSanitize,(req,res)=>{
          } 
      }*/
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/user`)
-     perform(updateUser,req,res)
+    perform(updateUser,req,res)
 })
 
 app.delete('/user', mongoSanitize,(req,res)=>{

@@ -485,6 +485,18 @@
         "responses": {}
       }
     },
+    "/grouplist": {
+      "get": {
+        "tags": [
+          "Groups",
+          "GET"
+        ],
+        "summary": "Get a list of all groups",
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
     "/group": {
       "post": {
         "tags": [
@@ -790,6 +802,64 @@
         "responses": {}
       }
     },
+    "/playlist/sort/{name}": {
+      "put": {
+        "tags": [
+          "Playlists",
+          "PUT"
+        ],
+        "summary": "Updates a playlist status: adds a song",
+        "description": "",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Playlist data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "order": {
+                  "type": "array",
+                  "example": [
+                    "7m9XR7FquXLP1FewdAcNS9",
+                    "6oF8ueLn5hIl4PRp17sxW6",
+                    "6p7jXaTJdpzGWnOJoK2jYr",
+                    "3lXyAQ0kekAvY5LodpWmUs",
+                    "27MB0qHaYAZiTlwg25js1Y",
+                    "7EqpEBPOohgk7NnKvBGFWo",
+                    "1CzeuSrm71wHP9qsjg7p3F",
+                    "3dP0pLbg9OfVwssDjp9aT0",
+                    "54Sc7mZQ1RM03STpk4SfaA",
+                    "2yBMVrq96wb9OHbMdBs0lF",
+                    "3nJYcY9yvKP8Oi2Ml8brXt",
+                    "6OG1S805gIrH5nAQbEOPY3",
+                    "2G9lekfCh83S0lt2yfffBz",
+                    "71X7bPDljJHrmEGYCe7kQ8",
+                    "0NJWhm3hUwIZSy5s0TGJ8q",
+                    "4cxvludVmQxryrnx1m9FqL",
+                    "6dr7ekfhlbquvsVY8D7gyk",
+                    "4TTV7EcfroSLWzXRY6gLv6"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "order"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
     "/playlist/songs/add": {
       "put": {
         "tags": [
@@ -976,7 +1046,30 @@
         ],
         "summary": "Updates a playlist status: adds a tag",
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Playlist data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "The name of the playlist"
+                },
+                "tag": {
+                  "type": "string",
+                  "example": "The new tag"
+                }
+              },
+              "required": [
+                "name",
+                "tag"
+              ]
+            }
+          }
+        ],
         "responses": {}
       }
     },
@@ -988,7 +1081,30 @@
         ],
         "summary": "Updates a playlist status: removes a tag",
         "description": "",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Playlist data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "The name of the playlist"
+                },
+                "tag": {
+                  "type": "string",
+                  "example": "The old tag"
+                }
+              },
+              "required": [
+                "name",
+                "tag"
+              ]
+            }
+          }
+        ],
         "responses": {}
       }
     },
