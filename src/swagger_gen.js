@@ -5,6 +5,7 @@ const doc = {
   info: {
     title: 'Social Network for Music: Backend',
     description: 'The backend for SNM project',
+  
   },
   host: 'localhost:3000',
   schemes: ['http'],

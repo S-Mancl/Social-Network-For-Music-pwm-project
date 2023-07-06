@@ -76,7 +76,11 @@
         "summary": "Gets a list of genres",
         "description": "",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The result of the query is sent back"
+          }
+        }
       }
     },
     "/types": {
@@ -90,7 +94,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "The known types are sent back"
           }
         }
       }
@@ -143,7 +147,11 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The result is sent back"
+          }
+        }
       }
     },
     "/requireInfo/{kind}/{id}": {
@@ -168,7 +176,11 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The result is sent back"
+          }
+        }
       }
     },
     "/addOrRemoveFavorite": {
@@ -208,7 +220,14 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The query was executed correctly"
+          },
+          "401": {
+            "description": "The user was not logged in"
+          }
+        }
       }
     },
     "/isStarred": {
@@ -243,7 +262,14 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "A boolean value is sent back to indicate if the element is starred or not"
+          },
+          "401": {
+            "description": "The user was not logged in"
+          }
+        }
       }
     },
     "/register": {
@@ -309,7 +335,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user has been inseted into the database"
+          },
+          "400": {
+            "description": "The user was already registered, or at least his email or username were"
+          },
+          "500": {
+            "description": "The database refused the insertion, more details are provided in the response"
+          }
+        }
       }
     },
     "/login": {
@@ -344,7 +380,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user has correctly logged in"
+          },
+          "400": {
+            "description": "The email was not an email"
+          },
+          "401": {
+            "description": "A user with such credentials does not exist"
+          }
+        }
       }
     },
     "/logout": {
@@ -358,10 +404,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "The logout was successful"
           },
           "400": {
-            "description": "Bad Request"
+            "description": "The logout failed - probably the user was not logged in"
           }
         }
       }
@@ -375,7 +421,14 @@
         "summary": "Checks if the user is logged in",
         "description": "",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user is logged in"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/user": {
@@ -436,7 +489,20 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user successfully updates his data"
+          },
+          "400": {
+            "description": "A user with such an email is already present. The email needs to be unique."
+          },
+          "401": {
+            "description": "The user is not logged in"
+          },
+          "500": {
+            "description": "The database refused the operation. More details are available in the response"
+          }
+        }
       },
       "delete": {
         "tags": [
@@ -446,7 +512,17 @@
         "summary": "Deletes an user",
         "description": "",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user was successfully deleted"
+          },
+          "400": {
+            "description": "There was an error. More details in the response"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/group/{name}": {
@@ -465,7 +541,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The response contains the data requested"
+          },
+          "400": {
+            "description": "Invalid data was providen"
+          },
+          "401": {
+            "description": "The user was not logged in"
+          }
+        }
       },
       "delete": {
         "tags": [
@@ -482,7 +568,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The group was deleted"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/grouplist": {
@@ -494,7 +590,17 @@
         "summary": "Get a list of all groups",
         "description": "",
         "parameters": [],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The response contains the requested data"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/group": {
@@ -529,7 +635,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "A new group was created"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/group/owner": {
@@ -564,7 +680,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The owner was changed, according to the request"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/group/description": {
@@ -599,7 +725,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The description was changed, according to the request"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/group/playlists/add": {
@@ -634,7 +770,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The playlist was added, according to the request"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/group/playlists/remove": {
@@ -669,7 +815,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The playlist was removed, according to the request"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/group/join/{name}": {
@@ -688,7 +844,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user joined the group, according to the request"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/group/leave/{name}": {
@@ -707,7 +873,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user left the group, according to the request"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/info/{name}": {
@@ -726,7 +902,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The response contains the requested informations"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/search/name/{name}": {
@@ -745,7 +931,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The response contains the requested informations"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/search/tag/{tag}": {
@@ -764,7 +960,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The response contains the requested informations"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist": {
@@ -799,7 +1005,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "A playlist was created successfully"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/sort/{name}": {
@@ -857,7 +1073,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The order of the songs was changed successfully"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/songs/add": {
@@ -892,7 +1118,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The song was added successfully"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/songs/remove": {
@@ -927,7 +1163,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The song was removed successfully"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/owner": {
@@ -962,7 +1208,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The owner changed, as requested"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/description": {
@@ -997,7 +1253,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The playlist changed, as requested"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/follow/{name}": {
@@ -1016,7 +1282,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user is now following the playlist"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/unfollow/{name}": {
@@ -1035,7 +1311,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The user has ceased following the playlist"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/tags/add": {
@@ -1070,7 +1356,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "A tag was added to the playlist successfully"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/tags/remove": {
@@ -1105,7 +1401,17 @@
             }
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "A tag was removed from the playlist successfully"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/publish/{name}": {
@@ -1124,7 +1430,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The playlist is now public"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/private/{name}": {
@@ -1143,7 +1459,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The playlist is now private"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     },
     "/playlist/{name}": {
@@ -1162,7 +1488,17 @@
             "type": "string"
           }
         ],
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "The playlist was successfully deleted"
+          },
+          "400": {
+            "description": "Something failed. Refer to the response for more details"
+          },
+          "401": {
+            "description": "The user is not logged in"
+          }
+        }
       }
     }
   }

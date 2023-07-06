@@ -162,21 +162,6 @@ async function login(res,user){
     }
 }
 async function register(res,user){
-    /*
-        Format of user
-        user = {
-            name: String,
-            surname: String,
-            userName: String,
-            email: String
-            birthDate: Date
-            favoriteGenres: Array(genres) <- tra /genres
-            password: String
-            favorites: object of arrays of types
-            playlistsFollowed: array of strings (names)
-            playlistsOwned: array of strings (names)
-        }
-    */
 
     if(user.name==undefined || user.password==undefined || user.surname == undefined || user.userName == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({code:-1,reason: `You are missing some fields...`})
     else{
@@ -230,7 +215,7 @@ async function register(res,user){
 async function updateUser(req,res){
     var pwmClient = await new mongoClient(mongoUrl).connect() 
     const token = req.cookies.token 
-    if(token == undefined) res.status(400).json({"reason":"Invalid login"}) 
+    if(token == undefined) res.status(401).json({"reason":"Invalid login"}) 
     else{ 
         jwt.verify(token,process.env.SECRET, async (err,decoded) =>{ 
             if(err){ 
@@ -287,7 +272,7 @@ async function updateUser(req,res){
 async function deleteUser(req,res){ 
     var pwmClient = await new mongoClient(mongoUrl).connect() 
     const token = req.cookies.token 
-    if(token == undefined) res.status(400).json({"reason":"Invalid login"}) 
+    if(token == undefined) res.status(401).json({"reason":"Invalid login"}) 
     else{ 
         jwt.verify(token,process.env.SECRET, async (err,decoded) =>{ 
             if(err){ 
@@ -1421,12 +1406,14 @@ app.get('/coffee', (req, res) => {//ne ho bisogno per verificare se il server è
 app.get('/genres',(req,res)=>{
     // #swagger.tags = ['General','GET']
     // #swagger.summary = 'Gets a list of genres'
+    // #swagger.responses[200] = {description:'The result of the query is sent back'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/genres`)
     perform(getGenres,req,res);
 })
 app.get('/types',(req,res)=>{
     // #swagger.tags = ['General','GET']
     // #swagger.summary = 'Gets a list of types'
+    // #swagger.responses[200] = {description:'The known types are sent back'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/types`)
     res.status(200).json(
         [
@@ -1452,6 +1439,7 @@ app.post("/search",(req,res)=>{
              $offset: 18,
          } 
      }*/
+    // #swagger.responses[200] = {description:'The result is sent back'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[32mPOST\x1b[0m\t/search`)
     perform(askSpotify,res,req.body);
 })
@@ -1459,6 +1447,7 @@ app.post("/search",(req,res)=>{
 app.get('/requireInfo/:kind/:id',(req,res)=>{
     // #swagger.tags = ['Data','GET']
     // #swagger.summary = 'Gets infos about a specific item'
+    // #swagger.responses[200] = {description:'The result is sent back'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/requireInfo/${req.params.kind}/${req.params.id}`)
     const details = {
         kind: req.params.kind,
@@ -1479,6 +1468,8 @@ app.post('/addOrRemoveFavorite',mongoSanitize,(req,res)=>{
              $name: 'Hamilton (Original Broadway Cast Recording)',
          } 
      }*/
+    // #swagger.responses[401] = {description:'The user was not logged in'}
+    // #swagger.responses[200] = {description:'The query was executed correctly'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[32mPOST\x1b[0m\t/addOrRemoveFavorite`)
     perform(addOrRemoveFavorite,req,res)
 })
@@ -1494,6 +1485,8 @@ app.post('/isStarred',mongoSanitize,(req,res) =>{
              $id: '1kCHru7uhxBUdzkm4gzRQc',
          } 
      }*/
+    // #swagger.responses[401] = {description:'The user was not logged in'}
+    // #swagger.responses[200] = {description:'A boolean value is sent back to indicate if the element is starred or not'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[32mPOST\x1b[0m\t/isStarred`)
     perform(isStarred,req,res)
 })
@@ -1516,8 +1509,11 @@ app.post('/register',mongoSanitize,(req,res)=>{
              $password: 'Asup3rs3cur3P4ssw0rd!!!',
          } 
      }*/
+    // #swagger.responses[200] = {description:'The user has been inseted into the database'}
+    // #swagger.responses[400] = {description:'The user was already registered, or at least his email or username were'}
+    // #swagger.responses[500] = {description:'The database refused the insertion, more details are provided in the response'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[32mPOST\x1b[0m\t/register`)
-     perform(register,res,req.body)
+    perform(register,res,req.body)
 })
 
 app.post("/login",mongoSanitize, (req, res)=>{
@@ -1531,6 +1527,9 @@ app.post("/login",mongoSanitize, (req, res)=>{
              $password: 'Asup3rs3cur3P4ssw0rd!!!',
          } 
      }*/
+    // #swagger.responses[200] = {description:'The user has correctly logged in'}
+    // #swagger.responses[400] = {description:'The email was not an email'}
+    // #swagger.responses[401] = {description:'A user with such credentials does not exist'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[32mPOST\x1b[0m\t/login`)
     perform(login,res,req.body)
 })
@@ -1538,6 +1537,8 @@ app.post("/login",mongoSanitize, (req, res)=>{
 app.get(`/logout`,mongoSanitize,(req,res)=>{
     // #swagger.tags = ['User','GET']
     // #swagger.summary = 'Performs logout'
+    // #swagger.responses[200] = {description:'The logout was successful'}
+    // #swagger.responses[400] = {description:'The logout failed - probably the user was not logged in'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/logout`)
     try{res.status(200).clearCookie(`token`).json({success:true});}
     catch(e){log(e.name+": "+e.message+"\n\t"+e.stack.split(/\n/)[1]+"\n------------------------------------------------------------------------------------------------");res.status(400).json({success:false})}
@@ -1546,6 +1547,8 @@ app.get(`/logout`,mongoSanitize,(req,res)=>{
 app.get(`/checkLogin`,mongoSanitize,(req,res)=>{
     // #swagger.tags = ['User','GET']
     // #swagger.summary = 'Checks if the user is logged in'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The user is logged in'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/checkLogin`)
     perform(checkLogin,req,res)
 })
@@ -1565,6 +1568,10 @@ app.put('/user',mongoSanitize,(req,res)=>{
              $password: 'Asup3rs3cur3P4ssw0rd!!!',
          } 
      }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The user successfully updates his data'}
+    // #swagger.responses[400] = {description:'A user with such an email is already present. The email needs to be unique.'}
+    // #swagger.responses[500] = {description:'The database refused the operation. More details are available in the response'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/user`)
     perform(updateUser,req,res)
 })
@@ -1572,6 +1579,9 @@ app.put('/user',mongoSanitize,(req,res)=>{
 app.delete('/user', mongoSanitize,(req,res)=>{
     // #swagger.tags = ['User','DELETE'] 
     // #swagger.summary = 'Deletes an user'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[400] = {description:'There was an error. More details in the response'}
+    // #swagger.responses[200] = {description:'The user was successfully deleted'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[35mDELETE\x1b[0m\t/user`)
     perform(deleteUser,req,res)
 })
@@ -1581,6 +1591,9 @@ app.delete('/user', mongoSanitize,(req,res)=>{
 app.get('/group/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Groups','GET']
     // #swagger.summary = 'Gets infos about a group'
+    // #swagger.responses[401] = {description:'The user was not logged in'}
+    // #swagger.responses[400] = {description:'Invalid data was providen'}
+    // #swagger.responses[200] = {description:'The response contains the data requested'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/group/${req.params.name}`)
     perform(getGroupInfo,req,res)
 })
@@ -1588,6 +1601,9 @@ app.get('/group/:name',mongoSanitize,(req,res)=>{
 app.get('/grouplist',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Groups','GET']
     // #swagger.summary = 'Get a list of all groups'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The response contains the requested data'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/grouplist`)
     perform(getGroupList,req,res)
 })
@@ -1603,6 +1619,9 @@ app.post('/group',mongoSanitize,(req,res)=>{
             $descrizione: 'The description of your new group',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'A new group was created'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[32mPOST\x1b[0m\t/group`)
     perform(createGroup,req,res)
 })
@@ -1618,6 +1637,9 @@ app.put('/group/owner',mongoSanitize,(req,res)=>{
             $new_owner: 'The username of the new owner',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The owner was changed, according to the request'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/group/owner`)
     perform(transferGroupOwnership,req,res)
 })
@@ -1633,6 +1655,9 @@ app.put('/group/description',mongoSanitize,(req,res)=>{
             $new_description: 'The new description',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The description was changed, according to the request'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/group/description`)
     perform(changeGroupDescription,req,res)
 })
@@ -1648,6 +1673,9 @@ app.put('/group/playlists/add',mongoSanitize,(req,res)=>{
             $playlist_name: 'The name of the playlist to add',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The playlist was added, according to the request'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/group/playlists/add`)
     perform(addPlaylistToGroup,req,res)
 })
@@ -1663,6 +1691,9 @@ app.put('/group/playlists/remove',mongoSanitize,(req,res)=>{
             $playlist_name: 'The name of the playlist to remove',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The playlist was removed, according to the request'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/group/playlists/remove`)
     perform(removePlaylistFromGroup,req,res)
 })
@@ -1670,6 +1701,9 @@ app.put('/group/playlists/remove',mongoSanitize,(req,res)=>{
 app.put('/group/join/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Groups','PUT']
     // #swagger.summary = 'Updates a group status: joins a group'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The user joined the group, according to the request'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/group/join/${req.params.name}`)
     perform(joinGroup,req,res)
 })
@@ -1677,6 +1711,9 @@ app.put('/group/join/:name',mongoSanitize,(req,res)=>{
 app.put('/group/leave/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Groups','PUT']
     // #swagger.summary = 'Updates a group status: leaves a group'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The user left the group, according to the request'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/group/leave/${req.params.name}`)
     perform(leaveGroup,req,res)
 })
@@ -1684,6 +1721,9 @@ app.put('/group/leave/:name',mongoSanitize,(req,res)=>{
 app.delete('/group/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Groups','DELETE']
     // #swagger.summary = 'Delete a group'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The group was deleted'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[35mDELETE\x1b[0m\t/group/${req.params.name}`)
     perform(deleteGroup,req,res)
 })
@@ -1693,6 +1733,9 @@ app.delete('/group/:name',mongoSanitize,(req,res)=>{
 app.get('/playlist/info/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','GET']
     // #swagger.summary = 'Gets infos about a playlist'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The response contains the requested informations'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/playlist/info/${req.params.name}`)
     perform(getPlaylistInfos,req,res)
 })
@@ -1700,6 +1743,9 @@ app.get('/playlist/info/:name',mongoSanitize,(req,res)=>{
 app.get('/playlist/search/name/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','GET']
     // #swagger.summary = 'Gets playlist with that name as a substring of theirs'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The response contains the requested informations'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/playlist/search/name/${req.params.name}`)
     perform(searchPlaylistsByName,req,res)
 })
@@ -1707,6 +1753,9 @@ app.get('/playlist/search/name/:name',mongoSanitize,(req,res)=>{
 app.get('/playlist/search/tag/:tag',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','GET']
     // #swagger.summary = 'Gets playlist with that tag in their tags'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The response contains the requested informations'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t/playlist/search/tag/${req.params.tag}`)
     perform(searchPlaylistsByTag,req,res)
 
@@ -1723,6 +1772,9 @@ app.post('/playlist',mongoSanitize,(req,res)=>{
             $descrizione: 'The description of your new playlist',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'A playlist was created successfully'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[32mPOST\x1b[0m\t/playlist`)
     perform(createPlaylist,req,res)
 })
@@ -1756,6 +1808,9 @@ app.put('/playlist/sort/:name',mongoSanitize,(req,res)=>{
             ]
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The order of the songs was changed successfully'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/sort/${req.params.name}`)
     perform(sortPlaylist,req,res)
 })
@@ -1771,6 +1826,9 @@ app.put('/playlist/songs/add',mongoSanitize,(req,res)=>{
             $song_id: 'The id of the song to add',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The song was added successfully'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/songs/add`)
     perform(addSongToPlaylist,req,res)
 })
@@ -1786,6 +1844,9 @@ app.put('/playlist/songs/remove',mongoSanitize,(req,res)=>{
             $song_id: 'The id of the song to add',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The song was removed successfully'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/songs/remove`)
     perform(removeSongFromPlaylist,req,res)
 })
@@ -1801,6 +1862,9 @@ app.put('/playlist/owner',mongoSanitize,(req,res)=>{
             $new_owner: 'The username of the new owner',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The owner changed, as requested'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/owner`)
     perform(transferPlaylistOwnership,req,res)
 })
@@ -1816,6 +1880,9 @@ app.put('/playlist/description',mongoSanitize,(req,res)=>{
             $new_description: 'The new description',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The playlist changed, as requested'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/description`)
     perform(changePlaylistDescription,req,res)
 })
@@ -1823,6 +1890,9 @@ app.put('/playlist/description',mongoSanitize,(req,res)=>{
 app.put('/playlist/follow/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','PUT']
     // #swagger.summary = 'Updates a playlist status: start following'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The user is now following the playlist'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/follow/${req.params.name}`)
     perform(followPlaylist,req,res)
 })
@@ -1830,6 +1900,9 @@ app.put('/playlist/follow/:name',mongoSanitize,(req,res)=>{
 app.put('/playlist/unfollow/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','PUT']
     // #swagger.summary = 'Updates a playlist status: stop following'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The user has ceased following the playlist'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/unfollow/${req.params.name}`)
     perform(unfollowPlaylist,req,res)
 })
@@ -1845,6 +1918,9 @@ app.put('/playlist/tags/add',mongoSanitize,(req,res)=>{
             $tag: 'The new tag',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'A tag was added to the playlist successfully'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/tags/add`)
     perform(addTagToPlaylist,req,res)
 })
@@ -1860,6 +1936,9 @@ app.put('/playlist/tags/remove',mongoSanitize,(req,res)=>{
             $tag: 'The old tag',
         }
     }*/
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'A tag was removed from the playlist successfully'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/tags/remove`)
     perform(removeTagFromPlaylist,req,res)
 })
@@ -1867,6 +1946,9 @@ app.put('/playlist/tags/remove',mongoSanitize,(req,res)=>{
 app.put('/playlist/publish/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','PUT']
     // #swagger.summary = 'Updates a playlist status: publishes it'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The playlist is now public'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/publish/${req.params.name}`)
     perform(publishPlaylist,req,res)
 })
@@ -1874,6 +1956,9 @@ app.put('/playlist/publish/:name',mongoSanitize,(req,res)=>{
 app.put('/playlist/private/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','PUT']
     // #swagger.summary = 'Updates a playlist status: makes it private'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The playlist is now private'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[33mPUT\x1b[0m\t/playlist/private/${req.params.name}`)
     perform(makePlaylistPrivate,req,res)
 })
@@ -1881,6 +1966,9 @@ app.put('/playlist/private/:name',mongoSanitize,(req,res)=>{
 app.delete('/playlist/:name',mongoSanitize,(req,res)=>{
     // #swagger.tags = ['Playlists','DELETE']
     // #swagger.summary = 'Delete a playlist'
+    // #swagger.responses[401] = {description:'The user is not logged in'}
+    // #swagger.responses[200] = {description:'The playlist was successfully deleted'}
+    // #swagger.responses[400] = {description:'Something failed. Refer to the response for more details'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[35mDELETE\x1b[0m\t/playlist/${req.params.name}`)
     perform(deletePlaylist,req,res)
 })
@@ -1889,6 +1977,7 @@ app.delete('/playlist/:name',mongoSanitize,(req,res)=>{
 
 app.get("*", (req, res) => {
     // #swagger.tags = ['Everything else','GET']
+    // #swagger.responses[404] = {description:'The requested resource was not found'}
     log(`\t\x1b[36m${req.ip}\x1b[0m\t\x1b[34mGET\x1b[0m\t* invoked`)
     res.status(404).sendFile(path.join(__dirname, '/static/not_found.html'));
 })
