@@ -101,7 +101,7 @@ fetch(`/group/${name}`).then(async (a) =>{
                 var clone = card.cloneNode(true)
                 clone.id = "card-"+key+"-"+i
                 clone.getElementsByClassName('card-title')[0].innerHTML = response.playlistsShared[i]
-                clone.getElementsByClassName('btn')[0].href = "/explainPlaylists.html?name=" + response.playlistsShared[i]
+                clone.getElementsByClassName('btn')[0].href = "/explainPlaylist.html?name=" + response.playlistsShared[i]
                 clone.classList.remove('d-none')
                 clone.classList.add('d-block')
                 card.after(clone)

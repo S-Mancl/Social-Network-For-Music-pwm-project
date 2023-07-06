@@ -132,7 +132,7 @@ fetch(`/checkLogin`)
                     }
 
                     var key = "groups-owned"
-                    document.getElementById('groupsOwned').innerHTML+=`<div class="row" id="${key}"><div class="normal-text text-start-${key}">We found the following <strong>owned playlists</strong></div></div><div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+                    document.getElementById('groupsOwned').innerHTML+=`<div class="row" id="${key}"><div class="normal-text text-start-${key}">We found the following <strong>owned groups</strong></div></div><div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
                     var card = document.getElementById("card-"+key)
                     var clone = card.cloneNode(true)
                     clone.id = "card-"+key+"-nope"
@@ -164,7 +164,7 @@ fetch(`/checkLogin`)
                     }
 
                     var key = "groups-followed"
-                    document.getElementById('groupsFollowed').innerHTML+=`<div class="row" id="${key}"><div class="normal-text text-start-${key}">We found the following <strong>owned playlists</strong></div></div><div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+                    document.getElementById('groupsFollowed').innerHTML+=`<div class="row" id="${key}"><div class="normal-text text-start-${key}">We found the following <strong>groups followed</strong></div></div><div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
                     var card = document.getElementById("card-"+key)
                     var clone = card.cloneNode(true)
                     clone.id = "card-"+key+"-nope"
@@ -198,3 +198,31 @@ fetch(`/checkLogin`)
                 })
         }
     })
+function deleteMyAccount(){
+    document.getElementById("sure").classList.remove('d-none')
+    location.href="#sure"
+}
+function check(){
+    //console.log(document.getElementById("sure2").value)
+    if(document.getElementById("sure2").value=="I AM ABSOLUTELY SURE ABOUT WHAT I AM DOING"){
+        document.getElementById("sure2").setAttribute('disabled','')
+        document.getElementById("confirm").classList.remove('d-none')
+        location.href="#confirm"
+    }
+}
+function letsdothisthing(){
+    console.log("You did something no one imagined")
+    fetch(`/user`, {
+        method: 'DELETE',
+    }).then(async a=>{
+        if(a.ok){
+            alarm('alerts',false,'We are very sorry to see you go...')
+            setTimeout(()=>{
+                window.location.href="/"
+            },2000)
+        }
+        else{
+            alarm('alerts',false,"Something hasn't worked as expected, sorry")
+        }
+    })
+}

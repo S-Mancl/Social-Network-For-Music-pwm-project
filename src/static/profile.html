@@ -67,6 +67,25 @@
         <div class="row">
             <div onclick="javascript:window.location.href='/groups.html'" class="btn btn-lg normal-text">Browse the public groups!</div>
         </div>
+        <div class="row my-4">
+            <div class="col-8 border border-danger mx-auto">
+                <div class="row">
+                    <span class="text-danger"><strong>SUPER DANGER ZONE</strong></span>
+                </div>
+                <div class="row">
+                    <div class="badge rounded-pill text-bg-danger normal-text mt-3 p-4 mb-3" id="delete" onclick="deleteMyAccount()">DELETE MY ACCOUNT</div>
+                </div>
+                <div class="row d-none" id="sure">
+                    <div class="form-group">
+                        <input type="text" value="" class="form-control normal-text mb-4" id="sure2" oninput="check()" placeholder="Type here this sentence: I AM ABSOLUTELY SURE ABOUT WHAT I AM DOING">
+                      </div>
+                </div>
+                <div class="row d-none" id="confirm">
+                    <div class="badge rounded-pill text-bg-danger normal-text mt-3 p-4 mb-3" id="confirmbutton" onclick="letsdothisthing()">I CONFIRM</div>
+                </div>
+            </div>
+        </div>
+        <div id="alerts"></div>
     </div>
     
     <script src="/scripts/navbar.js"></script>

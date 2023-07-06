@@ -4,24 +4,37 @@ const name=params.get('name')
 fetch(`/playlist/info/${name}`).then(async (a) =>{
     response = await a.json()
     if(a.ok){
-        console.log(response)
+        var promise = await fetch('/checkLogin')
         var toFill = document.getElementById('toFill')
-        //console.log(toFill)
-        var fill=`
+                var fill=`
         <span>General Infos:</span>
-        <div class="col-md-1">
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-4 mx-auto">
             <div class="row">`
-        fill+=`<span>${response.name}</span><br><div class="normal-text">${response.description}</div>`
-        fill+=`</div>
-        </div>
-        <div class="col-md-1">
-        </div>
-        <div class="col-md-6">
+        fill+=`<span>${response.name}</span><br><div class="normal-text">${response.description}</div></div>`
+        if(promise.ok)fill+=`<div class="row normal-text">
+               <div class="form-floating col-lg-6">
+                   <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
+                   <option selected>Select a group</option>
+                   </select>
+               </div>
+               <div class="col-lg-6 badge rounded-pill normal-text text-bg-warning" id="the-mystic-button" onclick="addOrRemoveFromGroup();">
+                   Select a group
+               </div>
+           </div>`
+           else fill+=`<div class="row normal-text">
+               <div class="form-floating col-lg-6">
+                   <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
+                   <option selected>View the gtoups</option>
+                   </select>
+               </div>
+               <div class="col-lg-6 badge rounded-pill normal-text text-bg-warning" id="the-mystic-button" onclick="alarm('alerts',false,'Please login or register')">
+                   by logging in
+               </div>
+           </div>`
+        fill+=`</div>`
+        fill+=`<div class="col-md-6">
             <div class="row">
-                <div class="normal-text"><strong>Owner: </strong>${response.owner}</div>
-            </div>`
+                <div class="normal-text"><strong>Owner: </strong>${response.owner}</div></div>`
         fill+=`<div class="row">
                     <div class="normal-text"><strong>Duration: </strong>${duration(response.totalTime)}</div>
                 </div>`
@@ -39,8 +52,8 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
             <span>Songs:</span>
         </div>
         <div class="row">
-        <div class="col-8 mx-auto">
-        <div class="row g-4 mt-4 p-4 d-flex justify-content-center" id="fill-this-with-songs"></div>
+        <div class="col-md-8 mx-auto">
+        <div class="row g-4 mt-4 p-md-4 d-flex justify-content-center" id="fill-this-with-songs"></div>
         `
         if(response.doIOwnIt) {
             fill+=`<div class="row">
@@ -76,10 +89,12 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
                 <textarea class="form-control normal-text" id="owner" aria-label="With textarea">UserName of the new Owner</textarea>
                 <span class="input-group-text normal-text text-danger" onclick="changePlaylistOwnership()">CLICK HERE<br>CANNOT BE REVERSED</span>
             </div>
+            <div class="row">
+                <div class="badge rounded-pill text-bg-danger normal-text mt-3 p-4" id="" onclick="window.location.href='/sort.html?name=${response.name}'">Change the order of the songs!</div></div>
             <div class="row"><span class="text-danger"><strong>SUPER DANGER ZONE</strong></span></div>
                 <div class="row">
-                <div class="badge rounded-pill text-bg-danger normal-text mt-3 p-4" id="delete" onclick="deletePlaylist()">DELETE THIS PLAYLIST</div></div>
-            </div>`
+                <div class="badge rounded-pill text-bg-danger normal-text mt-3 mb-3 p-4" id="delete" onclick="deletePlaylist()">DELETE THIS PLAYLIST</div></div>
+            </div></div>`
         }
         else{
             fill+=`<div class="row border border-success mt-4">
@@ -93,10 +108,49 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
         fill+=`</div></div>`
         toFill.innerHTML=fill;
 
+        if(promise.ok){
+            //riempio le opzioni
+            let user = await promise.json()
+            let select = document.getElementById('floatingSelect')
+            for(let i in user.playlistsOwned){
+                select.options[select.options.length] = new Option(user.groupsFollowed[i],user.groupsFollowed[i])
+            }
+            //creo l'evento
+            document.querySelector('#floatingSelect').addEventListener('change', () =>{
+                //recupero la playlist
+                let group = document.querySelector('#floatingSelect').value
+                //recupero l'id della canzone
+                let name = params.get('name')
+                fetch(`/group/${group}`).then(async a => {
+                    if(a.ok){
+                        response = await a.json()
+                        if(!response.playlistsShared.some(playlist => playlist == name)){
+                            //button to add it
+                            document.getElementById('the-mystic-button').innerHTML='Add it!'
+                            document.getElementById('the-mystic-button').classList.add('text-bg-success')
+                            document.getElementById('the-mystic-button').classList.remove('text-bg-warning')
+                        }
+                        else{
+                            //button to remove it
+                            document.getElementById('the-mystic-button').innerHTML='Remove it!'
+                            document.getElementById('the-mystic-button').classList.add('text-bg-danger')
+                            document.getElementById('the-mystic-button').classList.remove('text-bg-warning')
+                        }
+                    }
+                    else{
+                        document.getElementById('the-mystic-button').innerHTML='Select a group'
+                        document.getElementById('the-mystic-button').classList.remove('text-bg-success')
+                        document.getElementById('the-mystic-button').classList.remove('text-bg-danger')
+                        document.getElementById('the-mystic-button').classList.add('text-bg-warning')
+                    }
+                })
+            });
+        }
+
         let thisOne = document.getElementById('fill-this-with-songs')
 
         var key = "playlist"
-        thisOne.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+        thisOne.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 w-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
         var card = document.getElementById("card-"+key)
         var clone = card.cloneNode(true)
         clone.id = "card-"+key+"-nope"
@@ -120,7 +174,7 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
                 clone.getElementsByClassName('btn')[0].href = "/describe.html?kind=tracks&value=" + response.songs[i].id
                 clone.classList.remove('d-none')
                 clone.classList.add('d-block')
-                card.after(clone)
+                card.before(clone)
             }
             catch(e){
                 console.log(e)
@@ -169,8 +223,7 @@ function removeTag(){
         tag: document.getElementById('tag').value,
         name : params.get('name')
     }
-    //console.log(tag)
-    fetch(`/playlist/tags/remove`, {
+        fetch(`/playlist/tags/remove`, {
         method: 'PUT',
         headers: {
             "Content-Type": "application/json"
@@ -326,8 +379,7 @@ function changeDescription(){
         //recuperare descrizione testo
         new_description : document.getElementById('new-description').value
     }
-    //console.log(question)
-    //fare la PUT ed eventualmente ricarica la pagina
+        //fare la PUT ed eventualmente ricarica la pagina
     fetch(`/playlist/description`, {
             method: 'PUT',
             headers: {
@@ -347,4 +399,37 @@ function changeDescription(){
                 alarm('alerts',false,response.reason)
             }
         })
+}
+
+function addOrRemoveFromGroup(){
+    let group = document.querySelector('#floatingSelect').value
+    //recupero il nome della playlist
+    let name = params.get('name')
+    fetch(`/group/${group}`).then(async a => {
+        if(a.ok){
+            response = await a.json()
+            let mode
+            if(!response.playlistsShared.some(playlist => playlist == name)) mode = "add"
+            else mode = "remove"
+            fetch(`/group/playlists/${mode}`, {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({"group_name":group,"playlist_name":name})
+            }).then(async b =>{
+                answer = await b.json()
+                if(b.ok){
+                    setTimeout(()=>{
+                        location.reload()
+                    },2000)
+                    alarm('alerts',true,answer.reason)
+                }
+                else{
+                    alarm('alerts',false,answer.reason)
+                }
+            })
+        }
+        else alarm('alerts',false,"Don't dare")
+    })
 }

@@ -17,7 +17,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             fill+=`<img class="p-4 m-md-5 description-image common-border" src="${response.images[0].url}">`
         }
         else if(response.preview_url!=undefined){
-            fill+=`<span>Preview</span><audio class="${window.screen.availWidth<2000?"common-border un-common-border normal-text":""}" controls src="${response.preview_url}"></audio></div>`
+            fill+=`<span>Preview</span><audio controls class="mb-2" src="${response.preview_url}"></audio></div>`
             if(promise.ok)fill+=`<div class="row normal-text">
                 <div class="form-floating col-lg-6">
                     <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
@@ -26,6 +26,16 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
                 </div>
                 <div class="col-lg-6 badge rounded-pill normal-text text-bg-warning" id="the-mystic-button" onclick="addOrRemoveFromPlaylist();">
                     Select a playlist
+                </div>
+            </div>`
+            else fill+=`<div class="row normal-text">
+                <div class="form-floating col-lg-6">
+                    <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
+                    <option selected>View the playlists</option>
+                    </select>
+                </div>
+                <div class="col-lg-6 badge rounded-pill normal-text text-bg-warning" id="the-mystic-button" onclick="alarm('alerts',false,'Please login or register')">
+                    by logging in
                 </div>
             </div>`
         }
@@ -46,7 +56,6 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
                         <div class="normal-text"><strong>Total tracks: </strong>${response.total_tracks}</div>
                     </div>`
         }
-        //
         if(response.track_number!=undefined){
             fill+=` <div class="row">
                         <div class="normal-text"><strong>Track number: </strong>${response.track_number}</div>
@@ -87,19 +96,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             <span>Tracks:</span>
         </div>
         <div class="row">
-        <div class="col-8 mx-auto">
-        <div class="row g-4 mt-4 p-4 justify-content-center">
-        `
-            response.tracks.items.forEach(element => {
-                fill+=`<div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
-                    <div class="card h-100 w-100 normal-text adapt-size m-1">
-                        <div class="card-body"><h5 class="card-title normal-text">${element.name}</h5><p class="card-text"></p></div>
-                        <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=tracks&amp;value=${element.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
-                    </div></div>
-                `
-            });
-            fill+=`</div></div>`
-        }
+        <div class="col-8 mx-auto" id="fill-this-with-tracks"></div></div>`}
         if(response.artists!=undefined){
             fill+=`
         <div class="row">
@@ -107,18 +104,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         </div>
         <div class="row">
         <div class="col-8 mx-auto">
-        <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
-        `
-            response.artists.forEach(element => {
-                //console.log({name:element.name,id:element.id})
-                fill+=`<div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
-                    <div class="card h-100 w-100 normal-text adapt-size m-md-2 m-lg-3">
-                        <div class="card-body"><h5 class="card-title normal-text">${element.name}</h5><p class="card-text"></p></div>
-                        <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=artists&amp;value=${element.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
-                    </div></div>
-                `
-            });
-            fill+=`</div></div>`
+        <div class="row g-4 mt-4 p-4 d-flex justify-content-center" id="fill-this-with-artists"></div></div></div>`
         }
         if(response.album!=undefined){
             fill+=`</div>
@@ -132,12 +118,70 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             <div class="card h-100 w-100 normal-text adapt-size m-1">
                 <img class="card-img-top" alt="..." src="${response.album.images[0].url}">
                 <div class="card-body"><h5 class="card-title normal-text">${response.album.name}</h5><p class="card-text"></p></div>
-                <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=albums&amp;value=${response.album.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
+                <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=albums&value=${response.album.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
             </div></div>
         </div></div>
         `
         }
         toFill.innerHTML=fill;
+        if(response.total_tracks!=undefined){
+            let questo = document.getElementById('fill-this-with-tracks')
+            var key = "track"
+            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+            var card = document.getElementById("card-"+key)
+            var clone = card.cloneNode(true)
+            clone.id = "card-"+key+"-nope"
+            clone.classList.remove('d-block')
+            clone.classList.add('d-none')
+            card.after(clone)
+            if(response.tracks.items.length==0){
+                document.getElementById("anche-questo-"+key).classList.add('d-none')
+            }
+            for(let i = 0;i<response.tracks.items.length;i++){
+                try{
+                    var card = document.getElementById("card-"+key)
+                    var clone = card.cloneNode(true)
+                    clone.id = "card-"+key+"-"+i
+                    clone.getElementsByClassName('card-title')[0].innerHTML = response.tracks.items[i].name
+                    clone.getElementsByClassName('btn')[0].href = `/describe.html?kind=tracks&value=${response.tracks.items[i].id}`
+                    clone.classList.remove('d-none')
+                    clone.classList.add('d-block')
+                    card.before(clone)
+                }
+                catch(e){
+                    console.log(e)
+                };
+        }
+        }
+        if(response.artists!=undefined){
+            let questo = document.getElementById('fill-this-with-artists')
+            var key = "artists"
+            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+            var card = document.getElementById("card-"+key)
+            var clone = card.cloneNode(true)
+            clone.id = "card-"+key+"-nope"
+            clone.classList.remove('d-block')
+            clone.classList.add('d-none')
+            card.after(clone)
+            if(response.artists.length==0){
+                document.getElementById("anche-questo-"+key).classList.add('d-none')
+            }
+            for(let i = 0;i<response.artists.length;i++){
+                try{
+                    var card = document.getElementById("card-"+key)
+                    var clone = card.cloneNode(true)
+                    clone.id = "card-"+key+"-"+i
+                    clone.getElementsByClassName('card-title')[0].innerHTML = response.artists[i].name
+                    clone.getElementsByClassName('btn')[0].href = `/describe.html?kind=artists&value=${response.artists[i].id}`
+                    clone.classList.remove('d-none')
+                    clone.classList.add('d-block')
+                    card.before(clone)
+                }
+                catch(e){
+                    console.log(e)
+                };
+        }
+        }
         if(promise.ok)checkIfStarred();
         window.addEventListener('resize', () =>{
             const re = /\/.....\//
@@ -147,7 +191,6 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
                 let code = element.split(re)[1].split(".png")[0]
                 a[i].src = `https://flagcdn.com/${window.screen.availWidth<2000?"16x12":"64x48"}/${code}.png`
             }
-            document.getElementsByTagName('audio')[0].classList=`"${window.screen.availWidth<2000?"common-border un-common-border normal-text":""}`//TO DO TODO FIX THIS LINE NOT WORKING
         });
         if(response.preview_url!=undefined&&promise.ok){
             //riempio le opzioni
@@ -166,13 +209,13 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
                     if(a.ok){
                         response = await a.json()
                         if(!response.songs.some(element => element.id == id)){
-                            //button to remove it
+                            //button to add it
                             document.getElementById('the-mystic-button').innerHTML='Add it!'
                             document.getElementById('the-mystic-button').classList.add('text-bg-success')
                             document.getElementById('the-mystic-button').classList.remove('text-bg-warning')
                         }
                         else{
-                            //button to add it
+                            //button to remove it
                             document.getElementById('the-mystic-button').innerHTML='Remove it!'
                             document.getElementById('the-mystic-button').classList.add('text-bg-danger')
                             document.getElementById('the-mystic-button').classList.remove('text-bg-warning')

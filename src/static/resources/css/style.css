@@ -1,5 +1,10 @@
 body{
     background-color: #141B41;
+    overflow:auto;
+}
+a{
+    color:white;
+    text-decoration:none;
 }
 nav{
     background-color: #141B41;
@@ -195,7 +200,7 @@ ul.dropdown-menu li a:active{
         font-size: 1vw;
     }
     .small-image{
-        width:100%;
+        width:30%;
     }
     .nav-brand-image{
         width: 50%;
