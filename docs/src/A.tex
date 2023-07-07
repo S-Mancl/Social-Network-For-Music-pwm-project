@@ -207,7 +207,7 @@ function perform(questo,paramA,paramB){
 Questa funzione è ancora una volta un applicatore, in particolare nei confronti del parametro-funzione \verb|questo|. Esso verifica se il token è scaduto sfruttando gli appositi metodi dell'oggetto \verb|token|. In caso sia scaduto chiama l'applicatore \verb|regenAndThen|, altrimenti esegue direttamente, così da non rigenerare il token ad ogni chiamata, ma solo quando necessario.
 \invisiblesubsubsection{Eliminazione di documenti e integrità delle referenze}
 \idea{Non voglio dovermi ritrovare con dati inconsistenti o con riferimenti pendenti all'interno del database, perciò preferisco realizzare del codice molto inefficiente piuttosto che poi dover interpretare dati incompleti, parziali o superflui}
-Ci sono tre richieste di tipo \verb|delete| che si possono fare all'API. Queste richieste, visibili anche nello swagger di cui all'Appendice B, sono \verb|app.delete('/playlist/:name')|, \verb|app.delete('/group/:name')| e \verb|app.delete('/user')|.
+Ci sono tre richieste di tipo \verb|delete| che si possono fare all'API. Queste richieste, visibili anche nello swagger di cui all'Appendice C, sono \verb|app.delete('/playlist/:name')|, \verb|app.delete('/group/:name')| e \verb|app.delete('/user')|.
 
 Quando avviene una chiamata a questi endpoint sarebbe facile risolverla con un banale \verb|deleteOne|. Questo, però, genererebbe problemi: dato che i documenti si referenziano tra loro creare dei riferimenti pending sarebbe impossibile.
 

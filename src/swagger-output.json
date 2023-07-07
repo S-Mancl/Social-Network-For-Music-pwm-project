@@ -62,7 +62,19 @@
         "parameters": [],
         "responses": {
           "418": {
-            "description": "I'm a teapot"
+            "description": "I'm a teapot",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "answer": {
+                  "type": "string",
+                  "example": "I'm not a teapot, but I cannot brew coffee..."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -78,7 +90,31 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The result of the query is sent back"
+            "description": "The result of the query is sent back",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "number",
+                  "example": 200
+                },
+                "results": {
+                  "type": "array",
+                  "example": [
+                    "acoustic",
+                    "afrobeat",
+                    "alt-rock",
+                    "alternative"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -94,7 +130,23 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The known types are sent back"
+            "description": "The known types are sent back",
+            "schema": {
+              "type": "array",
+              "example": [
+                "album",
+                "artist",
+                "episode",
+                "show",
+                "track"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -131,11 +183,11 @@
                 },
                 "limit": {
                   "type": "number",
-                  "example": 0
+                  "example": 18
                 },
                 "offset": {
                   "type": "number",
-                  "example": 18
+                  "example": 0
                 }
               },
               "required": [
@@ -222,10 +274,34 @@
         ],
         "responses": {
           "200": {
-            "description": "The query was executed correctly"
+            "description": "The query was executed correctly",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "removed": {
+                  "type": "boolean",
+                  "example": true
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user was not logged in"
+            "description": "The user was not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -264,10 +340,34 @@
         ],
         "responses": {
           "200": {
-            "description": "A boolean value is sent back to indicate if the element is starred or not"
+            "description": "A boolean value is sent back to indicate if the element is starred or not",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "favorite": {
+                  "type": "boolean",
+                  "example": true
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user was not logged in"
+            "description": "The user was not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -340,10 +440,42 @@
             "description": "The user has been inseted into the database"
           },
           "400": {
-            "description": "The user was already registered, or at least his email or username were"
+            "description": "The user was already registered, or at least his email or username were, or some other invalid data was inserted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "example": -1
+                },
+                "reason": {
+                  "type": "string",
+                  "example": "You are missing some fields..."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "500": {
-            "description": "The database refused the insertion, more details are provided in the response"
+            "description": "The database refused the insertion, more details are provided in the response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "example": 6
+                },
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -382,13 +514,61 @@
         ],
         "responses": {
           "200": {
-            "description": "The user has correctly logged in"
+            "description": "The user has correctly logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "example": 4
+                },
+                "reason": {
+                  "type": "string",
+                  "example": "Logged successfully!"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "The email was not an email"
+            "description": "The email was not an email",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "example": 2
+                },
+                "reason": {
+                  "type": "string",
+                  "example": "This isn't really an email, is it?"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "A user with such credentials does not exist"
+            "description": "A user with such credentials does not exist",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "example": 3
+                },
+                "reason": {
+                  "type": "string",
+                  "example": "This user does not exist or its password is not the one you inserted."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -404,10 +584,34 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The logout was successful"
+            "description": "The logout was successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": true
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "The logout failed - probably the user was not logged in"
+            "description": "The logout failed - probably the user was not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": false
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -423,10 +627,110 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The user is logged in"
+            "description": "The user is logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Name"
+                },
+                "surname": {
+                  "type": "string",
+                  "example": "Surname"
+                },
+                "userName": {
+                  "type": "string",
+                  "example": "User Name"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "email@email.email"
+                },
+                "birthDate": {
+                  "type": "string",
+                  "example": "YYYY-MM-DD"
+                },
+                "favoriteGenres": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                },
+                "favorites": {
+                  "type": "object",
+                  "properties": {
+                    "album": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    },
+                    "artist": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    },
+                    "audiobook": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    },
+                    "episode": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    },
+                    "show": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    },
+                    "track": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    }
+                  }
+                },
+                "playlistsFollowed": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                },
+                "playlistsOwned": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                },
+                "groupsOwned": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                },
+                "groupsFollowed": {
+                  "type": "array",
+                  "example": [],
+                  "items": {}
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -491,16 +795,76 @@
         ],
         "responses": {
           "200": {
-            "description": "The user successfully updates his data"
+            "description": "The user successfully updates his data",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "example": 0
+                },
+                "explanation": {
+                  "type": "string",
+                  "example": "you will now be logged out. Please re-login with your new credentials"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "A user with such an email is already present. The email needs to be unique."
+            "description": "A user with such an email is already present. The email needs to be unique.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "example": 5
+                },
+                "reason": {
+                  "type": "string",
+                  "example": "Already present user: please choose a different username or email"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "500": {
-            "description": "The database refused the operation. More details are available in the response"
+            "description": "The database refused the operation. More details are available in the response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "number",
+                  "example": 6
+                },
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       },
@@ -514,13 +878,49 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The user was successfully deleted"
+            "description": "The user was successfully deleted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "There was an error. More details in the response"
+            "description": "There was an error. More details in the response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -543,13 +943,87 @@
         ],
         "responses": {
           "200": {
-            "description": "The response contains the data requested"
+            "description": "The response contains the data requested",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "myGroup"
+                },
+                "decription": {
+                  "type": "string",
+                  "example": "This is a group for ..."
+                },
+                "playlistsShared": {
+                  "type": "array",
+                  "example": [
+                    "classicalMusic",
+                    "musicaClassica"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "owner": {
+                  "type": "string",
+                  "example": "userName"
+                },
+                "users": {
+                  "type": "array",
+                  "example": [
+                    "userName",
+                    "user42",
+                    "lambda",
+                    "SophosIoun"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "doIOwnIt": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "following": {
+                  "type": "boolean",
+                  "example": true
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Invalid data was providen"
+            "description": "Invalid data was providen",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "bad data"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user was not logged in"
+            "description": "The user was not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       },
@@ -570,13 +1044,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The group was deleted"
+            "description": "The group was deleted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -592,13 +1102,82 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The response contains the requested data"
+            "description": "The response contains the requested data",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "myGroup"
+                  },
+                  "decription": {
+                    "type": "string",
+                    "example": "This is a group for ..."
+                  },
+                  "playlistsShared": {
+                    "type": "array",
+                    "example": [
+                      "classicalMusic",
+                      "musicaClassica"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "owner": {
+                    "type": "string",
+                    "example": "userName"
+                  },
+                  "users": {
+                    "type": "array",
+                    "example": [
+                      "userName",
+                      "user42",
+                      "lambda",
+                      "SophosIoun"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -637,13 +1216,49 @@
         ],
         "responses": {
           "200": {
-            "description": "A new group was created"
+            "description": "A new group was created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "inserted correctly"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Probably you haven't specified the right params"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -682,13 +1297,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The owner was changed, according to the request"
+            "description": "The owner was changed, according to the request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "you do not own this group, or some other data you inserted is not valid. Stop trying to hack me, please"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -727,13 +1378,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The description was changed, according to the request"
+            "description": "The description was changed, according to the request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "you do not own this group, or some other data you inserted is not valid. Stop trying to hack me, please"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -772,13 +1459,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The playlist was added, according to the request"
+            "description": "The playlist was added, according to the request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "done successfully"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "invalid data or wrong permissions"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -817,13 +1540,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The playlist was removed, according to the request"
+            "description": "The playlist was removed, according to the request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "done successfully"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "invalid data or wrong permissions"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -846,13 +1605,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The user joined the group, according to the request"
+            "description": "The user joined the group, according to the request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "bad data or already in this group"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -875,13 +1670,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The user left the group, according to the request"
+            "description": "The user left the group, according to the request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "bad data or not in this group"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -904,13 +1735,80 @@
         ],
         "responses": {
           "200": {
-            "description": "The response contains the requested informations"
+            "description": "The response contains the requested informations",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "myList"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "this is a playlist about old finnish songs"
+                },
+                "tags": {
+                  "type": "array",
+                  "example": [
+                    "finnish",
+                    "old",
+                    "42"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "visibility": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "owner": {
+                  "type": "string",
+                  "example": "userName"
+                },
+                "doIOwnIt": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "following": {
+                  "type": "boolean",
+                  "example": true
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -933,13 +1831,75 @@
         ],
         "responses": {
           "200": {
-            "description": "The response contains the requested informations"
+            "description": "The response contains the requested informations",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "myList"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "this is a playlist about old finnish songs"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "example": [
+                      "finnish",
+                      "old",
+                      "42"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "visibility": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "owner": {
+                    "type": "string",
+                    "example": "userName"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -962,13 +1922,75 @@
         ],
         "responses": {
           "200": {
-            "description": "The response contains the requested informations"
+            "description": "The response contains the requested informations",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "myList"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "this is a playlist about old finnish songs"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "example": [
+                      "finnish",
+                      "old",
+                      "42"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "visibility": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "owner": {
+                    "type": "string",
+                    "example": "userName"
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1007,13 +2029,49 @@
         ],
         "responses": {
           "200": {
-            "description": "A playlist was created successfully"
+            "description": "A playlist was created successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "inserted correctly"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Probably you haven't specified the right params"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1075,13 +2133,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The order of the songs was changed successfully"
+            "description": "The order of the songs was changed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "everything is fine"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1120,13 +2214,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The song was added successfully"
+            "description": "The song was added successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "done"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1165,13 +2295,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The song was removed successfully"
+            "description": "The song was removed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "done"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1210,13 +2376,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The owner changed, as requested"
+            "description": "The owner changed, as requested",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1255,13 +2457,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The playlist changed, as requested"
+            "description": "The playlist changed, as requested",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1284,13 +2522,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The user is now following the playlist"
+            "description": "The user is now following the playlist",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1313,13 +2587,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The user has ceased following the playlist"
+            "description": "The user has ceased following the playlist",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1361,10 +2671,34 @@
             "description": "A tag was added to the playlist successfully"
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1403,13 +2737,49 @@
         ],
         "responses": {
           "200": {
-            "description": "A tag was removed from the playlist successfully"
+            "description": "A tag was removed from the playlist successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1432,13 +2802,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The playlist is now public"
+            "description": "The playlist is now public",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1461,13 +2867,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The playlist is now private"
+            "description": "The playlist is now private",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "ok"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
@@ -1490,13 +2932,49 @@
         ],
         "responses": {
           "200": {
-            "description": "The playlist was successfully deleted"
+            "description": "The playlist was successfully deleted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "done correctly"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "400": {
-            "description": "Something failed. Refer to the response for more details"
+            "description": "Something failed. Refer to the response for more details",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Generic error: Explanation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "401": {
-            "description": "The user is not logged in"
+            "description": "The user is not logged in",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "example": "Invalid login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
