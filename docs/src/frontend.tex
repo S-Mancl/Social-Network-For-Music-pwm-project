@@ -1,27 +1,40 @@
 \subsection{Pagine e relative funzioni e visibilità}
-\subsubsection{Welcome page - \textit{index.html}}
-La pagina di accoglienza sarà una pagina con pochissime funzionalità, destinata prevalentemente a fare da \say{vetrina} del servizio offerto.
+\subsubsection{Pagine non richiedenti login}
+\paragraph{Welcome page - \textit{index.html}}
+La pagina di accoglienza sarà una pagina con pochissime funzionalità, destinata prevalentemente a fare da \say{vetrina} del servizio offerto. Da essa si potranno trovare i link a tutte le altre funzionalità.
 
-Vi saranno due pulsanti: \verb|login| e \verb|register|, e la navbar per navigare invece la parte pubblica. Se si è già loggati, nel load si verrà reindirizzati alla pagina dove sono mostrate le playlist pubbliche o a quella dove è possibile effettuare ricerche.
+Vi saranno due pulsanti: \verb|login| e \verb|register|, e la navbar per navigare invece la parte pubblica.
 
-\subsubsection{Registrazione - \textit{register.html}}
+\paragraph{Registrazione - \textit{register.html}}
 La pagina di registrazione sarà costituita da un form. Se si è loggati, si verrà reindirizzati automaticamente alla pagina di login. Altrimenti, ci si potrà registrare. Se la registrazione va a buon fine si viene reindirizzati alla pagina di login, altrimenti viene mostrato il messaggio d'errore restituito dal backend.
 
-\subsubsection{Login - \textit{login.html}}
-La pagina di login sarà costituita da un form. Se si è già loggati si viene reindirizzati alla pagina di visualizzazione dati pubblici, altrimenti ci si può loggare. In ogni caso saranno emessi appositi messaggi per segnalare lo stato.
+\paragraph{Login - \textit{login.html}}
+La pagina di login sarà costituita da un form. Se si è già loggati si viene reindirizzati alla pagina richiesta mediante un parametro, altrimenti ci si può loggare. In ogni caso saranno emessi appositi messaggi per segnalare lo stato.
 
-\subsubsection{Ricerca - \textit{search.html}}
-La pagina di ricerca consentirà di effettuare una ricerca per vari campi. Il meccanismo è ancora da studiare nei dettagli.
+\paragraph{Ricerca - \textit{search.html}}
+La pagina di ricerca consentirà di effettuare una ricerca per vari campi. Una volta cercato, verranno mostrati i primi risultati di ogni categoria. Se si desidera ottenere maggiori risultati di quella categoria, i parametri vengono ristretti mentre avviene la redirezione a una pagina apposita.
 
-\subsubsection{Playlist - \textit{playlists.html}}
-In questa pagina si potranno vedere le playlist pubbliche.
+\paragraph{Not Found - \textit{not\_found.html}}
+Questa pagina sarà quella mostrata ogniqualvolta sia stata richiesta una pagina non esistente.
 
-\subsubsection{MyPlaylists - \textit{myplaylists.html}}
-In questa pagina si potranno vedere le proprie playlist, divise tra private, pubbliche e quelle altrui che vengono seguite.
+\subsubsection{Pagine richiedenti login}
+\paragraph{Playlist - \textit{playlists.html}}
+In questa pagina si potranno cercare le playlist pubbliche o comunque condivise con sé, e crearne di nuove.
+
+\paragraph{Groups - \textit{groups.html}}
+Questa pagina consentirà la creazione, la visualizzazione e il filtraggio dei gruppi.
+
+\paragraph{Spiegazione di una playlist o di un gruppo \textit{explainPlaylist.html|explainGroup.html}}
+Come la pagina di \verb|describe|, ma per playlist o gruppi. Dovranno includere l'unirsi e l'uscire dai gruppi, l'unire o il rimuovere una playlist a un gruppo e una canzone ad una playlist.
+\paragraph{Profilo - \textit{profile.html}}
+Questa pagina includerà tutte le informazioni legate all'utente, come preferiti, dati personali, playlist seguite o possedute, gruppi in cui si è o posseduti.
+
 
 \subsection{Navbar condivisa tra tutte le pagine}
 Tutte le pagine avranno accesso a una navbar condivisa, costituita dai seguenti elementi.
 \subsubsection{Pulsante \textit{SNM}}
+Permette di tornare alla pagina \verb|index.html|.
+\subsubsection{Pulsante \textit{Playlists}}
 Consente di tornare alla pagina delle playlist pubbliche.
 \subsubsection{Pulsante \textit{Search}}
 Consente di tornare alla pagina di ricerca.
@@ -29,15 +42,11 @@ Consente di tornare alla pagina di ricerca.
 Consente di tornare alla pagina dove sono mostrati i gruppi, ed eventualmente visualizzare le informazioni su di essi.
 \subsubsection{Dropdown \textit{User}}
 Esso conterrà diverse operazioni sul profilo, tra cui le seguenti:
-\begin{center}
-    \begin{tabular}[h]{ c || c | c }
-        \textbf{Nome}&\textbf{Cosa fa}&\textbf{Condizioni di visualizzazione}\\
-        \hline
-        \textit{login}&Redirige alla pagina di login&Non essere loggati\\
-        \textit{register}&Redirige alla pagina di registrazione&Sempre visibile\\
-        \textit{profile}&Redirige alla pagina del profilo&Essere loggati\\
-        \textit{logout}&Effettua il logout e redirige alla \say{vetrina}&Essere loggati\\
-        \textit{my playlists}&Redirige alla pagina privata delle playlist personali&Essere loggati\\
-    \end{tabular}
-\end{center}
+\paragraph{Register}Visibile solo a chi non è loggato, permette di registrarsi.
+\paragraph{Login}Visibile solo a chi non è loggato, permette di loggarsi.
+\paragraph{Logout}Visibile solo a chi è loggato, permette di effettuare il logout.
+\paragraph{My Favorites}Visibile solo a chi è loggato, permette di andare al profilo, nella sezione dedicata ai preferiti.
+\paragraph{My Playlists}Visibile solo a chi è loggato, permette di andare al profilo, nella sezione dedicata alle playlists.
+\paragraph{My Groups}Visibile solo a chi è loggato, permette di andare al profilo, nella sezione dedicata ai gruppi.
+\paragraph{Profile}Visibile solo a chi è loggato, permette di andare al profilo.
 \newpage

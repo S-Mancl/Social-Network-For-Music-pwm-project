@@ -164,7 +164,7 @@ function duration(ms){
 }
 function alarm(where,good,reason){
     document.getElementById(where).innerHTML=`<div class="toast-container position-fixed bottom-0 end-0 p-3 scale-text w-100" style="z-index: 11">
-            <div id="liveToast" class="toast  scale-text" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="liveToast" class="toast ${window.screen.availWidth>2000?"w-25":""} scale-text" role="alert" data-bs-autohide="false" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header  scale-text">
                 <img src="/images/alert.png" class="rounded me-2 small-image  scale-text" alt="...">
                 <strong class="me-auto text-${colorSharing(good)}  scale-text">${returnDescription(good)[0]}</strong>
@@ -183,3 +183,15 @@ function alarm(where,good,reason){
 function returnDescription(status){
     return status?["Done correctly!","success"]:["Don't panic","failure"]
 }
+window.addEventListener('resize', () =>{
+    let a = document.getElementById('liveToast')
+    if(a!=null&&a!=undefined){
+        console.log(window.screen.availWidth)
+        if(window.screen.availWidth>2000){
+            a.classList.add('w-25')
+        }
+        else {
+            a.classList.remove('w-25')
+        }
+    }
+});
