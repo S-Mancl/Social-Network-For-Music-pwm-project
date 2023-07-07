@@ -143,40 +143,6 @@ ul.dropdown-menu li a:active{
     width:10%;
     height:10%
 }
-@media screen and (min-width:2000px){
-    .btn-lg.btn-strange{
-        margin: 1%;
-        border-radius: 10%;
-        width:80%;
-        background-color: rgba(0,0,0,0);
-        border:3px solid #918EF4;
-        transition: 0.6s ease;
-    }
-    .nav-image{
-        display: inline;
-        width: 10%;
-    }
-    .scale-text{
-        font-size: 1vw;
-    }
-    .testo-pulsante{
-        font-size: 1vw;
-    }
-    .small-image{
-        width:30%;
-    }
-    .nav-brand-image{
-        width: 50%;
-        height: 50%;
-    }
-    nav .normal-text{
-        margin-right:3vw;
-    }
-    .nav-link.dropdown-toggle.normal-text{
-        margin-right: 4vw;
-        padding-left:4vw;
-    }
-}
 .carousel-inner img{
     border-radius: 20%;
     padding:10%;
@@ -230,6 +196,38 @@ ul.dropdown-menu li a:active{
 /*Configuration for high resolution screens*/
 
 @media screen and (min-width:2000px) {
+    .btn-lg.btn-strange{
+        margin: 1%;
+        border-radius: 10%;
+        width:80%;
+        background-color: rgba(0,0,0,0);
+        border:3px solid #918EF4;
+        transition: 0.6s ease;
+    }
+    .nav-image{
+        display: inline;
+        width: 10%;
+    }
+    .scale-text{
+        font-size: 1vw;
+    }
+    .testo-pulsante{
+        font-size: 1vw;
+    }
+    .small-image{
+        width:30%;
+    }
+    .nav-brand-image{
+        width: 50%;
+        height: 50%;
+    }
+    nav .normal-text{
+        padding-right:3vw;
+    }
+    .nav-link.dropdown-toggle.normal-text{
+        margin-right: 4vw;
+        margin-left:4vw;
+    }
     select option{
         font-size: large;
         width:15vw !important;
@@ -241,13 +239,13 @@ ul.dropdown-menu li a:active{
         border-radius: 10%;
     }
     .common-border{
-        border-radius: 0%;
+        border-radius: 20%;
         border: 5px solid #918EF4;
         transition: 0.6s ease;
         padding:0%;
     }
     .common-border:hover{
-        border-radius: 0%;
+        border-radius: 5%;
         transition: 0.6s ease;
     }
     .un-common-border{
@@ -263,10 +261,13 @@ ul.dropdown-menu li a:active{
         height: 5vh;
     }
     span{
-        font-size: 3vw;
+        font-size: 2.5vw;
     }
     #liveToast,.toast-container,.toast-header{
         border-radius: 5%;
+    }
+    .form-control.normal-text{
+        border-radius: 25px;
     }
 }
 /*debug purposes only

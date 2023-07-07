@@ -77,7 +77,11 @@ function askAndRedirect(){
                         clone.getElementsByClassName('card-title')[0].innerHTML = response[key].items[i].name
                         //clone.getElementsByClassName('card-text')[0].innerHTML = popolari.results[i].overview
                         //clone.getElementsByClassName('text-body-secondary')[0].innerHTML = popolari.results[i].release_date
-                        try{clone.getElementsByClassName('card-img-top')[0].src = response[key].items[i].images[1].url}catch(e){clone.getElementsByClassName('card-img-top')[0].src = '/images/black.png'}
+                        try{clone.getElementsByClassName('card-img-top')[0].src = response[key].items[i].images[1].url}catch(e){
+                            try{
+                                clone.getElementsByClassName('card-img-top')[0].src = response[key].items[i].album.images[1].url
+                            }catch(e){clone.getElementsByClassName('card-img-top')[0].classList.add('d-none')}
+                        }
                         clone.getElementsByClassName('btn')[0].href = "/describe.html?kind="+key+"&value=" + response[key].items[i].id
                         document.getElementById("card-"+key+"-more").classList.remove('disabled')
                         clone.classList.remove('d-none')

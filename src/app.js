@@ -173,7 +173,7 @@ async function register(res,user){
             user.favoriteGenres[i] = validator.escape(validator.trim(user.favoriteGenres[i]))
         }
         if(!validator.isEmail(user.email)) res.status(400).json({code:1,reason:`Are you sure ${user.email} is an email?`})
-        else if(!validator.isStrongPassword(user.password)) res.status(400).json({code:2,reason:`${user.password} is not strong enough as a password`})
+        else if(!validator.isStrongPassword(user.password)) res.status(400).json({code:2,reason:`The password you inserted is not strong enough as a password`})
         else if(!validator.isDate(user.birthDate)) res.status(400).json({code:3,reason:`${user.birthDate} is not an accepted birth date`})
         else if(!validator.isAlpha(user.name)||!validator.isAlpha(user.surname)) res.status(400).json({code:4,reason:`${user.name} ${user.surname} is not an accepted name... It contains numbers or it's empty!`})
         else if(user.userName=="") res.status(400).json({code:7,reason:`You have selected an invalid username. Please try again`})

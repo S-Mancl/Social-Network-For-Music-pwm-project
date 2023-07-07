@@ -9,6 +9,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
 .then(async (response) => {
         var promise = await fetch('/checkLogin')
         var toFill = document.getElementById('toFill')
+        document.getElementsByTagName('title')[0].innerHTML=`SNM - ${response.name}`
         var fill=`
         <span>General Infos:</span>
         <div class="col-md-4 mx-md-auto">
@@ -17,7 +18,8 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             fill+=`<img class="p-4 m-md-5 description-image common-border" src="${response.images[0].url}">`
         }
         else if(response.preview_url!=undefined){
-            fill+=`<span>Preview</span><audio controls class="mb-2" src="${response.preview_url}"></audio></div>`
+            fill+=`<span>Preview</span><audio controls class="mb-2" src="${response.preview_url}"></audio></div>`}
+        if(response.type=="track"){
             if(promise.ok)fill+=`<div class="row normal-text">
                 <div class="form-floating col-lg-6">
                     <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
@@ -80,54 +82,59 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             var flags = ""
             response.available_markets.forEach(countryCode => {
                 var code = countryCode.toLowerCase()
-                //console.log(code)
-                flags += `<img class="p-1 flag" src='https://flagcdn.com/${window.screen.availWidth<2000?"16x12":"64x48"}/${code}.png'>`
+                flags += `<img class="p-1 flag" ${window.screen.availWidth<576?"width='6%'":""} src='https://flagcdn.com/${window.screen.availWidth<2000?"16x12":"64x48"}/${code}.png'>`
             });
             fill+=`
             <div class="row">
                 <div class="normal-text"><strong>Available on Spotify: </strong>${flags}</div>
             </div>
             `
-            //console.log('done')
         }
         if(response.total_tracks!=undefined){
             fill+=`
         <div class="row">
             <span>Tracks:</span>
         </div>
-        <div class="row">
-        <div class="col-8 mx-auto" id="fill-this-with-tracks"></div></div>`}
+        <div class="row mx-auto" id="fill-this-with-tracks"></div>`}
         if(response.artists!=undefined){
             fill+=`
         <div class="row">
             <span>Artists:</span>
         </div>
-        <div class="row">
-        <div class="col-8 mx-auto">
-        <div class="row g-4 mt-4 p-4 d-flex justify-content-center" id="fill-this-with-artists"></div></div></div>`
+        <div class="row mx-auto" id="fill-this-with-artists"></div>`
         }
         if(response.album!=undefined){
+            console.log(response.album)
             fill+=`</div>
         <div class="row">
             <span>Album:</span>
         </div>
-        <div class="row">
-        <div class="col-8 mx-auto">
-        <div class="row g-4 mt-4 p-4 d-flex justify-content-center">
-        <div class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
-            <div class="card h-100 w-100 normal-text adapt-size m-1">
-                <img class="card-img-top" alt="..." src="${response.album.images[0].url}">
-                <div class="card-body"><h5 class="card-title normal-text">${response.album.name}</h5><p class="card-text"></p></div>
-                <div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="/describe.html?kind=albums&value=${response.album.id}" class="btn btn-secondary testo-pulsante">View more</a></div>
-            </div></div>
-        </div></div>
+        <div class="row mx-auto" id="">
+        <div id="album" class="row g-4 mt-4 p-4 d-flex justify-content-center">
+            <div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
+                <div  class="card h-100 normal-text adapt-size m-1">
+                    <img class="card-img-top" alt="..." src="${response.album.images[0].url}">
+                    <div class="card-body">
+                        <h5 class="card-title normal-text">
+                            ${response.album.name}
+                        </h5>
+                        <p class="card-text">
+                        </p>
+                    </div>
+                        <div class="card-footer">
+                        <p class="card-text">
+                        <small class="text-body-secondary">
+                        </small>
+                        </p>
+                        <a href="/describe.html?kind=albums&value=${response.album.id}" class="btn btn-secondary testo-pulsante">View more</a></div></div></div></div>
+        </div>
         `
         }
         toFill.innerHTML=fill;
         if(response.total_tracks!=undefined){
             let questo = document.getElementById('fill-this-with-tracks')
             var key = "track"
-            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante">View more</a></div></div></div></div>`
             var card = document.getElementById("card-"+key)
             var clone = card.cloneNode(true)
             clone.id = "card-"+key+"-nope"
@@ -156,7 +163,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         if(response.artists!=undefined){
             let questo = document.getElementById('fill-this-with-artists')
             var key = "artists"
-            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante">View more</a></div></div></div></div>`
             var card = document.getElementById("card-"+key)
             var clone = card.cloneNode(true)
             clone.id = "card-"+key+"-nope"
