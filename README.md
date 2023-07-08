@@ -1,5 +1,7 @@
 # Social Network For Music pwm project
 A project for my CS classes at university
+## Features
+TO DO TODO
 ## How to create the docker image
 1. Create a .env file under ./src, put there the following:
     - MONGONAME
