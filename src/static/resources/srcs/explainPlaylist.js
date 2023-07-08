@@ -13,7 +13,7 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
         fill+=`<span>${response.name}</span><br><div class="normal-text">${response.description}</div></div>`
         if(promise.ok)fill+=`<div class="row normal-text">
                <div class="form-floating col-lg-6">
-                   <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
+                   <select class="form-select normal-text h-100 w-100" id="floatingSelect" aria-label="Floating label select example">
                    <option selected>Select a group</option>
                    </select>
                </div>
@@ -23,7 +23,7 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
            </div>`
            else fill+=`<div class="row normal-text">
                <div class="form-floating col-lg-6">
-                   <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
+                   <select class="form-select normal-text h-100 w-100" id="floatingSelect" aria-label="Floating label select example">
                    <option selected>View the gtoups</option>
                    </select>
                </div>
@@ -67,24 +67,26 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
         }
         else fill+=`<div class="btn btn-lg normal-text col-sm-6" id="button" onClick="location.href='/playlists.html'">Browse some other playlists!</div>`
         if(response.doIOwnIt){
-            fill+=`<div class="row border border-danger mt-4">
+            fill+=`<div class="row border border-danger mt-4 justify-content-center">
         <div class="col-8 mx-auto">
-                <div class="row"><span class="text-danger"><strong>DANGER ZONE</strong></span></div>
-                <div class="row">
+            <div class="row">
+                <span class="text-danger"><strong>DANGER ZONE</strong></span>
+            </div>
+            <div class="row">
                 <div class="badge rounded-pill text-bg-danger normal-text mt-3 p-4" id="change-visibility" onclick="makePlaylistPublicOrPrivate(${response.visibility},'${response.name}')">Make it ${dataSharing(!response.visibility)}</div></div>
             </div>
-            <div class="input-group mt-4">
+            <div class="row input-group mt-4">
                 <span class="input-group-text normal-text">Insert your new description</span>
                 <textarea class="form-control normal-text" id="new-description" aria-label="With textarea">${response.description}</textarea>
                 <span class="input-group-text normal-text text-danger" onclick="changeDescription()">Change it!</span>
             </div>
-            <div class="input-group mt-4">
+            <div class="row input-group mt-4">
                 <span class="input-group-text normal-text">Insert a tag</span>
                 <textarea class="form-control normal-text" id="tag" aria-label="With textarea">tagName</textarea>
                 <span class="input-group-text normal-text text-danger" onclick="addTag()">Add it!</span>
                 <span class="input-group-text normal-text text-danger" onclick="removeTag()">Remove it!</span>
             </div>
-            <div class="input-group mt-4">
+            <div class="row input-group mt-4">
                 <span class="input-group-text normal-text">Trasfer to</span>
                 <textarea class="form-control normal-text" id="owner" aria-label="With textarea">UserName of the new Owner</textarea>
                 <span class="input-group-text normal-text text-danger" onclick="changePlaylistOwnership()">CLICK HERE<br>CANNOT BE REVERSED</span>
@@ -97,7 +99,7 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
             </div></div>`
         }
         else{
-            fill+=`<div class="row border border-success mt-4">
+            fill+=`<div class="row mx-auto border border-success mt-4">
         <div class="col-8 mx-auto">
                 <div class="row"><span class="text-success"><strong>SAFE ZONE</strong></span></div>
                 <div class="row">
@@ -112,9 +114,12 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
             //riempio le opzioni
             let user = await promise.json()
             let select = document.getElementById('floatingSelect')
-            for(let i in user.playlistsOwned){
-                select.options[select.options.length] = new Option(user.groupsFollowed[i],user.groupsFollowed[i])
-            }
+            fetch('/groupList').then(async a =>{
+                response = await a.json()
+                for(let i=0;i<response.length;i++){
+                    select.options[select.options.length] = new Option(response[i].name,response[i].name)
+                }
+            })
             //creo l'evento
             document.querySelector('#floatingSelect').addEventListener('change', () =>{
                 //recupero la playlist
@@ -150,7 +155,7 @@ fetch(`/playlist/info/${name}`).then(async (a) =>{
         let thisOne = document.getElementById('fill-this-with-songs')
 
         var key = "playlist"
-        thisOne.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 w-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+        thisOne.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 w-100normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
         var card = document.getElementById("card-"+key)
         var clone = card.cloneNode(true)
         clone.id = "card-"+key+"-nope"

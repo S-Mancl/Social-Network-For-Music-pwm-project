@@ -22,7 +22,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         if(response.type=="track"){
             if(promise.ok)fill+=`<div class="row normal-text">
                 <div class="form-floating col-lg-6">
-                    <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
+                    <select class="form-select normal-text h-100 w-100" id="floatingSelect" aria-label="Floating label select example">
                     <option selected>Select a playlist</option>
                     </select>
                 </div>
@@ -32,7 +32,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             </div>`
             else fill+=`<div class="row normal-text">
                 <div class="form-floating col-lg-6">
-                    <select class="form-select normal-text h-100" id="floatingSelect" aria-label="Floating label select example">
+                    <select class="form-select normal-text h-100 w-100" id="floatingSelect" aria-label="Floating label select example">
                     <option selected>View the playlists</option>
                     </select>
                 </div>
@@ -73,7 +73,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
             <div class="normal-text"><strong>Duration: </strong>${duration(response.duration_ms)}</div>
         </div>`
         }
-        if(promise.ok)fill+=` <div class="row" onclick="starUnstar('${response.type}','${response.id}','${response.name.split("\"")[0].split("(")[0]}')">
+        if(promise.ok)fill+=` <div class="row" onclick="starUnstar('${response.type}','${response.id}','${response.name.split("\"")[0].split("(")[0].replace("'","").replace('"','')}')">
                     <div class="col-sm-2 mx-auto col-4" id="isStarred"></div>
                 </div>
             `
@@ -112,7 +112,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         <div class="row mx-auto" id="">
         <div id="album" class="row g-4 mt-4 p-4 d-flex justify-content-center">
             <div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2">
-                <div  class="card h-100 normal-text adapt-size m-1">
+                <div  class="card h-100 w-100 normal-text adapt-size m-1">
                     <img class="card-img-top" alt="..." src="${response.album.images[0].url}">
                     <div class="card-body">
                         <h5 class="card-title normal-text">
@@ -134,7 +134,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         if(response.total_tracks!=undefined){
             let questo = document.getElementById('fill-this-with-tracks')
             var key = "track"
-            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante">View more</a></div></div></div></div>`
+            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 w-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante">View more</a></div></div></div></div>`
             var card = document.getElementById("card-"+key)
             var clone = card.cloneNode(true)
             clone.id = "card-"+key+"-nope"
@@ -163,7 +163,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
         if(response.artists!=undefined){
             let questo = document.getElementById('fill-this-with-artists')
             var key = "artists"
-            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante">View more</a></div></div></div></div>`
+            questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 w-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante">View more</a></div></div></div></div>`
             var card = document.getElementById("card-"+key)
             var clone = card.cloneNode(true)
             clone.id = "card-"+key+"-nope"
@@ -199,7 +199,7 @@ fetch(`/requireInfo/${question.kind}/${question.value}`)
                 a[i].src = `https://flagcdn.com/${window.screen.availWidth<2000?"16x12":"64x48"}/${code}.png`
             }
         });
-        if(response.preview_url!=undefined&&promise.ok){
+        if(response.type=="track"&&promise.ok){
             //riempio le opzioni
             let user = await promise.json()
             let select = document.getElementById('floatingSelect')

@@ -196,6 +196,9 @@ ul.dropdown-menu li a:active{
 /*Configuration for high resolution screens*/
 
 @media screen and (min-width:2000px) {
+    .text-body-secondary{
+        font-size: 1vw;
+    }
     .btn-lg.btn-strange{
         margin: 1%;
         border-radius: 10%;

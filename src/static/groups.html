@@ -25,27 +25,31 @@
     <div class="container-fluid" id="main-container">
 
         <div class="row" id="">
-            <div class="col-md-9 mx-auto view-groups">
+            <div class="mx-auto view-groups">
                     <div class="row title">
-                        <span>View groups</span>
+                        <div class="col-md-9 mx-auto">
+                            <span>View groups</span>
+                        </div>
                     </div>
-                    <div class="form-group ">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="btn btn-lg normal-text mb-0" id="button" onClick="newGroup()">Create a new group!</div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="btn btn-lg normal-text mb-0" id="button" onClick="location.href='/playlists.html'">View playlists!</div>
+                    <div class="form-group">
+                        <div class="col-md-9 mx-auto">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="btn btn-lg normal-text mb-0" id="button" onClick="newGroup()">Create a new group!</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="btn btn-lg normal-text mb-0" id="button" onClick="location.href='/playlists.html'">View playlists!</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row search">
-                        <div class="form-group">
+                        <div class="form-group col-md-10 mx-auto">
                             <label class="normal-text space-above" for="search">Filter:</label>
                             <input type="text" value="" class="form-control normal-text" id="search" oninput="changing()" placeholder="Start typing the name of the group">
                           </div>
                     </div>
-                    <div class="row display" id="fillThisWithGroups">
+                    <div class="row display mx-auto" id="fillThisWithGroups">
                         <!--TODO TO DO FILL WITH GROUPS-->
                     </div>
             </div>

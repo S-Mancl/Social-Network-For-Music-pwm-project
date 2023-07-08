@@ -463,7 +463,7 @@ function removeSong(playlist,song){
 function publish(playlist){
     playlist.visibility=true;
     return playlist;
-}
+}   
 function makePrivate(playlist){
     playlist.visibility=false;
     return playlist;
@@ -474,7 +474,7 @@ function changeOwner(playlist,newOwner){
 }
 function canSee(playlist, groupList, user){
     try{
-        return playlist.visibility /*La playlist è visibile globalmente*/ || groupList.some(group => {group.users.some(element => element == user.userName)/*Seguo un gruppo*/ && group.playlistsShared.some(element => element == playlist.name)/*e in quel gruppo c'è la playlist*/}) || playlist.owner == user.userName /*O la possiedo io direttamente*/
+        return playlist.visibility /*La playlist è visibile globalmente*/ || groupList.some(group => {return group.users.includes(user.userName)/*Seguo un gruppo*/ && group.playlistsShared.includes(playlist.name)/*e in quel gruppo c'è la playlist*/}) || playlist.owner == user.userName /*O la possiedo io direttamente*/
     }
     catch(e){log(e.name+": "+e.message+"\n\t"+e.stack.split(/\n/)[1]+"\n------------------------------------------------------------------------------------------------");
         return playlist.visibility || playlist.owner == user.userName
@@ -1310,6 +1310,7 @@ async function getGroupList(req,res){
             else{
                 try{
                     let group = await pwmClient.db("pwm_project").collection('groups').find({}).toArray()
+                    console.log(group)
                     res.status(200).json(group)
                 }catch(e){log(e.name+": "+e.message+"\n\t"+e.stack.split(/\n/)[1]+"\n------------------------------------------------------------------------------------------------");res.status(400).json({reason:`Generic error: ${e.toString()}`})}
                 pwmClient.close()

@@ -9,14 +9,10 @@ fetch(`/group/${name}`).then(async (a) =>{
         //console.log(toFill)
         var fill=`
         <span>General Infos:</span>
-        <div class="col-md-1">
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-4 mx-auto">
             <div class="row">`
         fill+=`<span>${response.name}</span><br><div class="normal-text">${response.description}</div>`
         fill+=`</div>
-        </div>
-        <div class="col-md-1">
         </div>
         <div class="col-md-6">
             <div class="row">
@@ -31,9 +27,7 @@ fetch(`/group/${name}`).then(async (a) =>{
         <div class="row">
             <span>Playlists:</span>
         </div>
-        <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8" id="fill-this-with-playlists"></div>
+        <div class="row mx-auto" id="fill-this-with-playlists"></div>
         `
         
         if(response.doIOwnIt) {
@@ -48,40 +42,55 @@ fetch(`/group/${name}`).then(async (a) =>{
         }
         else fill+=`<div class="btn btn-lg normal-text col-sm-6" id="button" onClick="location.href='/groups.html'">Browse some other groups!</div>`
         if(response.doIOwnIt){
-            fill+=`<div class="row border border-danger mt-4">
-        <div class="col-8 mx-auto">
-        <div class="row"><span class="text-danger"><strong>DANGER ZONE</strong></span></div>
-            <div class="input-group mt-4">
-                <span class="input-group-text normal-text">Insert your new description</span>
-                <textarea class="form-control normal-text" id="new-description" aria-label="With textarea">${response.description}</textarea>
-                <span class="input-group-text normal-text text-danger" onclick="changeDescription()">Change it!</span>
-            </div>
-            <div class="input-group mt-4">
-                <span class="input-group-text normal-text">Trasfer to</span>
-                <textarea class="form-control normal-text" id="owner" aria-label="With textarea">UserName of the new Owner</textarea>
-                <span class="input-group-text normal-text text-danger" onclick="changeGroupOwnership()">CLICK HERE<br>CANNOT BE REVERSED</span>
-            </div>
-            <div class="row"><span class="text-danger"><strong>SUPER DANGER ZONE</strong></span></div>
+            fill+=`<div class="col-md-8 mx-auto">
+                <div class="row border border-danger mx-auto mt-4 justify-content-center">
+                <div class="col-8 mx-auto">
+                    <div class="row">
+                        <span class="text-danger"><strong>DANGER ZONE</strong></span>
+                    </div>
+                </div>
+                <div class="row input-group mt-4">
+                    <span class="input-group-text normal-text">Insert your new description</span>
+                    <textarea class="form-control normal-text" id="new-description" aria-label="With textarea">${response.description}</textarea>
+                    <span class="input-group-text normal-text text-danger" onclick="changeDescription()">Change it!</span>
+                </div>
+                <div class="row input-group mt-4">
+                    <span class="input-group-text normal-text">Trasfer to</span>
+                    <textarea class="form-control normal-text" id="owner" aria-label="With textarea">UserName of the new Owner</textarea>
+                    <span class="input-group-text normal-text text-danger" onclick="changeGroupOwnership()">CLICK HERE<br>CANNOT BE REVERSED</span>
+                </div>
                 <div class="row">
-                <div class="badge rounded-pill text-bg-danger normal-text mt-3 p-4" id="delete" onclick="deleteGroup()">DELETE THIS GROUP</div></div>
-            </div>`
+                    <span class="text-danger"><strong>SUPER DANGER ZONE</strong></span>
+                </div>
+                    <div class="row">
+                        <div class="badge rounded-pill text-bg-danger normal-text mt-3 mb-3 p-4" id="delete" onclick="deleteGroup()">DELETE THIS GROUP
+                        </div>
+                    </div>
+                </div>
+            </div></div></div>`
         }
         else{
-            fill+=`<div class="row border border-success mt-4">
-        <div class="col-8 mx-auto">
-                <div class="row"><span class="text-success"><strong>SAFE ZONE</strong></span></div>
-                <div class="row">
-                <div class="badge rounded-pill text-bg-success normal-text mt-3 p-4" id="follow-unfollow" onclick="followOrNot(${response.following})">${ifFollowing(response.following)} this group!</div></div>
+            fill+=`<div class="row mx-auto">
+                    <div class="row border border-success mt-4">
+                        <div class="col-8 mx-auto">
+                            <div class="row">
+                                <span class="text-success"><strong>SAFE ZONE</strong></span>
+                            </div>
+                            <div class="row">
+                                <div class="badge rounded-pill text-bg-success normal-text mt-3 p-4" id="follow-unfollow" onclick="followOrNot(${response.following})">${ifFollowing(response.following)} this group!
+                                </div>
+                            </div>
+                        </div>
+                </div>
             </div>`
 
         }
-        fill+=`</div></div>
-        <div class="col-2"></div>`
+        fill+=`</div></div>`
         toFill.innerHTML=fill;
         let questo = document.getElementById('fill-this-with-playlists')
 
         var key = "playlist"
-        questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
+        questo.innerHTML+=`<div id="anche-questo-${key}" class="row g-4 mt-4 p-4 d-flex justify-content-center"><div id="card-${key}" class="col-8 m-2 m-md-0 mb-md-2 col-md-6 col-lg-4 col-xxl-2 d-none"><div  class="card h-100 w-100 w-100 normal-text adapt-size m-1"><div class="card-body"><h5 class="card-title normal-text"></h5><p class="card-text"></p></div><div class="card-footer"><p class="card-text"><small class="text-body-secondary"></small></p><a href="#" class="btn btn-secondary testo-pulsante testo-pulsante">View more</a></div></div></div></div>`
         var card = document.getElementById("card-"+key)
         var clone = card.cloneNode(true)
         clone.id = "card-"+key+"-nope"
