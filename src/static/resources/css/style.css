@@ -6,6 +6,10 @@ a{
     color:white;
     text-decoration:none;
 }
+span a:hover{
+    color:white!important;
+    text-decoration: underline!important;
+}
 nav{
     background-color: #141B41;
 }

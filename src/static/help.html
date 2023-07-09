@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNM - Showcase</title>
+    <link rel="icon" type="image/x-icon" href="/images/icons8-hypercube-96.png">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg"></nav>
+
+    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="height: 10px">
+        <div class="progress-bar" style="width: 100%"></div>
+      </div>
+
+    <div class="container-fluid" id="main-container">
+        <div class="d-flex align-items-start justify-content-end">
+            <div>
+                <div class="btn btn-lg normal-text p-2 pe-3 m-0 g-0" onclick="window.open('/help.html').focus()">?</div>
+            </div>
+        </div>
+        <div class="row">
+            <strong>
+                <span>Help page!</span>
+            </strong>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                Due to the high requests, we decided to include an explanation page. Here you will be able to search for various features. Every page will have a link to this page in the upper right corner of the screen.
+            </div>
+        </div>
+
+
+
+        <!--SEARCH-->
+        <div class="row" id="search">
+            <span><a onclick="copy('search.html')">#</a> Search</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                Using this feature, you can browse through every track, album, episode, artist or even show that is available. You need to insert a string to search for and select some categories, and then press the button.
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                You will see the first five results for every category, and by pressing "Show more" you'll be able to see others, and browse through multiple pages.
+            </div>
+        </div>
+        <div class="row" id="describe">
+            <span><a onclick="copy('search.html')">#</a> Describe</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                From this page, you can view more details about your search. If you're logged, you can add it to your favorites and, if it is a track, even to a playlist! WOW!
+            </div>
+        </div>
+        <div class="row" id="playlists">
+            <span><a onclick="copy('playlists.html')">#</a> Playlists</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                With this page, you can browse public playlist, searching them by name or by tag, and you can create new playlists.
+            </div>
+        </div>
+        <div class="row" id="explainplaylists">
+            <span><a onclick="copy('playlists.html')">#</a> Explain a playlist</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                This page allows you to edit a playlist data (if you're the owner) or to follow/unfollow it. It even allows you to insert it into a group.
+            </div>
+        </div>
+        <div class="row" id="groups">
+            <span><a onclick="copy('groups.html')">#</a> Groups</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                With this page, you can browse groups, filtering them by name. You can also create a new group.
+            </div>
+        </div>
+        <div class="row" id="explaingroups">
+            <span><a onclick="copy('groups.html')">#</a> Explain a group</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                This page allows you to edit a group data (if you're the owner) or to join/leave it.
+            </div>
+        </div>
+
+        <!--USER-->
+        <div class="row" id="login">
+            <span><a onclick="copy('login.html')">#</a> Login</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                With this page, you can login into your account. If you don't have an account, consider <a href="/register.html">registering yourself for free</a>.
+            </div>
+        </div>
+        <div class="row" id="register">
+            <span><a onclick="copy('register.html')">#</a> Register</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                With this page, you can register a new account. If you already registered, you can instead <a href="/login.html">login</a>.
+            </div>
+        </div>
+        <div class="row" id="profile">
+            <span><a onclick="copy('profile.html')">#</a> My Profile</span>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mx-auto normal-text">
+                From this page, you can see and edit your personal data, your favorites, playlists, groups and other details.
+            </div>
+        </div>
+        <div class="row mb-5"></div>
+
+
+
+        <!---->
+        <div id="toFill">
+
+        </div>
+    </div>
+    
+    <script src="/scripts/navbar.js"></script>
+    <script src="/scripts/lib.js"></script>
+    <script>
+        function copy(something) {
+            navigator.clipboard.writeText(`${location.protocol}//${location.host}/${something}`);
+            alarm('toFill',true,`You copied the link <code>${location.protocol}//${location.host}/${something}</code> to your clipboard!`)
+        }
+    </script>
+</body>
+</html>
