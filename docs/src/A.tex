@@ -112,6 +112,7 @@ Si noti poi che \verb|playlists.songs| è un array di oggetti costituiti come se
 }
 \end{lstlisting}
 Mentre ogni preferito è salvato come un oggetto contenente titolo e id, tutto questo nell'apposito array.
+\idea{L'uso dei nomi anziché degli \_id permette di ridurre al minimo indispensabile le richieste al backend per informazioni parziali. Questo complica le cose (modificare i nomi allungherebbe notevolmente il codice, e pertanto rimarrà uno sviluppo futuro non svolto in questa occasione)}
 \invisiblesubsection{Backend}
 \invisiblesubsubsection{Accesso alle informazioni riservate}
 Alcune informazioni non dovevano diventare pubbliche, ossia venire direttamente a contatto (per esempio venendovi inserite) con il frontend.
@@ -352,7 +353,7 @@ Una scelta simile, pensavo inizialmente, si potrebbe applicare anche nel caso di
 \alert{Un ulteriore punto di criticità è il fatto che se un utente cambia password senza cambiare email, chiunque sia loggato mediante quella email rimane loggato, sempre per un'ora.}
 \invisiblesubsubsection{Eventi}
 In molte diverse componenti del Javascript frontend ho avuto necessità di creare degli eventi, per ragioni fondamentalmente riassumibili in tre tipi. Queste sono spiegate nei paragrafi seguenti, a partire da uno dei casi concreti e dall'esempio di codice.
-\paragraph{Responsiveness} La pagina che mostra le informazioni ottenute da Spotify deve essere responsive. Questo normalmente, usando le classi di Bootstrap, si risolverebbe senza bisogno di particolari menzioni. In questo caso, tuttavia, il mio appoggiarmi a \href{https://flagcdn.com/}{https://flagcdn.com/} rende necessaria una operazione diversa: le flag vengono richieste con una dimensione fissa, pertanto all'aumentare dello schermo oltre i 2k rischiano di diventare microscopiche.
+\paragraph{Responsiveness} La pagina che mostra le informazioni ottenute da Spotify deve essere responsive. Questo normalmente, usando le classi di Bootstrap, si risolverebbe senza bisogno di particolari menzioni. In questo caso, tuttavia, il mio appoggiarmi a \href{https://flagcdn.com/}{\underline{https://flagcdn.com/}} rende necessaria una operazione diversa: le flag vengono richieste con una dimensione fissa, pertanto all'aumentare dello schermo oltre i 2k rischiano di diventare microscopiche.
 
 Ho pertanto optato per la creazione dell'evento sotto, in grado di recuperare le informazioni sullo stato di cui occorre recuperare la bandiera (mediante una apposita regular expression) e aumentare o ridurre la dimensione in base alle necessità.
 \begin{lstlisting}[language=JavaScript]
@@ -413,5 +414,5 @@ new Sortable(document.getElementById('anche-questo-songs'),{
     });
 \end{lstlisting}
 
-Per ulteriore documentazione si consulti \href{https://github.com/SortableJS/Sortable}{la loro repo su GitHub}.
+Per ulteriore documentazione si consulti \href{https://github.com/SortableJS/Sortable}{\underline{la loro repo su GitHub}}.
 \newpage
