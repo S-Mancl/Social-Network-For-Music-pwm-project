@@ -929,7 +929,7 @@ async function sortPlaylist(req,res){
                     let playlist = await pwmClient.db("pwm_project").collection('playlists').findOne({"name": validator.escape(validator.trim(req.params.name))})
                     if(isOwner(playlist,user.userName)){
                         let new_songs = []
-                        for(let i in req.body.order){
+                        for(i=1;i<req.body.order.length;i++){
                             req.body.order[i]=validator.escape(validator.trim(req.body.order[i]))
                             for(let j=0;j<playlist.songs.length;j++){
                                 if(playlist.songs[j].id==req.body.order[i]){
