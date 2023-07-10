@@ -1425,11 +1425,11 @@
         }
       }
     },
-    "/group/playlists/add": {
-      "put": {
+    "/group/playlist": {
+      "post": {
         "tags": [
           "Groups",
-          "PUT"
+          "POST"
         ],
         "summary": "Updates a group status: adds a playlist",
         "description": "",
@@ -1504,13 +1504,11 @@
             }
           }
         }
-      }
-    },
-    "/group/playlists/remove": {
-      "put": {
+      },
+      "delete": {
         "tags": [
           "Groups",
-          "PUT"
+          "DELETE"
         ],
         "summary": "Updates a group status: removes a playlist",
         "description": "",
@@ -2180,11 +2178,11 @@
         }
       }
     },
-    "/playlist/songs/add": {
-      "put": {
+    "/playlist/song": {
+      "post": {
         "tags": [
           "Playlists",
-          "PUT"
+          "POST"
         ],
         "summary": "Updates a playlist status: adds a song",
         "description": "",
@@ -2259,13 +2257,11 @@
             }
           }
         }
-      }
-    },
-    "/playlist/songs/remove": {
-      "put": {
+      },
+      "delete": {
         "tags": [
           "Playlists",
-          "PUT"
+          "DELETE"
         ],
         "summary": "Updates a playlist status: removes a song",
         "description": "",
@@ -2634,11 +2630,11 @@
         }
       }
     },
-    "/playlist/tags/add": {
-      "put": {
+    "/playlist/tag": {
+      "post": {
         "tags": [
           "Playlists",
-          "PUT"
+          "POST"
         ],
         "summary": "Updates a playlist status: adds a tag",
         "description": "",
@@ -2701,13 +2697,11 @@
             }
           }
         }
-      }
-    },
-    "/playlist/tags/remove": {
-      "put": {
+      },
+      "delete": {
         "tags": [
           "Playlists",
-          "PUT"
+          "DELETE"
         ],
         "summary": "Updates a playlist status: removes a tag",
         "description": "",

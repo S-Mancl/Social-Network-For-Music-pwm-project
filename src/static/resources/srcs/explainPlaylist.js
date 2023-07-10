@@ -202,8 +202,8 @@ function addTag(){
         tag: document.getElementById('tag').value,
         name : params.get('name')
     }
-    fetch(`/playlist/tags/add`, {
-        method: 'PUT',
+    fetch(`/playlist/tag`, {
+        method: 'POST',
         headers: {
             "Content-Type": "application/json"
         },
@@ -228,8 +228,8 @@ function removeTag(){
         tag: document.getElementById('tag').value,
         name : params.get('name')
     }
-        fetch(`/playlist/tags/remove`, {
-        method: 'PUT',
+        fetch(`/playlist/tag`, {
+        method: 'DELETE',
         headers: {
             "Content-Type": "application/json"
         },
@@ -416,8 +416,8 @@ function addOrRemoveFromGroup(){
             let mode
             if(!response.playlistsShared.some(playlist => playlist == name)) mode = "add"
             else mode = "remove"
-            fetch(`/group/playlists/${mode}`, {
-                method: 'PUT',
+            fetch(`/group/playlist`, {
+                method: mode=="add"?'POST':'DELETE',
                 headers: {
                     "Content-Type": "application/json"
                 },

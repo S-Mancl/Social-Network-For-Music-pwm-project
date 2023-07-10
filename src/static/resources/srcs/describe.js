@@ -248,8 +248,8 @@ function addOrRemoveFromPlaylist(){
             let mode
             if(!response.songs.some(element => element.id == id)) mode = "add"
             else mode = "remove"
-            fetch(`/playlist/songs/${mode}`, {
-                method: 'PUT',
+            fetch(`/playlist/song`, {
+                method: mode=="add"?'POST':'DELETE',
                 headers: {
                     "Content-Type": "application/json"
                 },
