@@ -206,7 +206,7 @@ fetch(`/checkLogin`)
                         .then((a) => a.json())
                         .then((response) => {
                             response.results.forEach(element => {
-                                toFill.innerHTML+=`<div class="form-check"><input class="form-check-input" type="checkbox" value="${element}" id="${element}" ${userData.favoriteGenres.some(favorite => favorite == element)?"checked":""}> <label class="form-check-label normal-text" for="${element}">${element}</label></div>`
+                                toFill.innerHTML+=`<div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" value="${element}" id="${element}" ${userData.favoriteGenres.some(favorite => favorite == element)?"checked":""}> <label class="form-check-label normal-text" for="${element}">${element}</label></div>`
                             });
                         })
                 })

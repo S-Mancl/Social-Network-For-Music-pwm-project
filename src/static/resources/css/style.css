@@ -139,6 +139,9 @@ ul.dropdown-menu li a:active{
     -webkit-filter: invert(100%); /* Safari/Chrome */
     filter: invert(100%);
 }
+.help{
+    height: 5%;
+}
 .nav-brand-image{
     width: 30%;
     height: 30%;

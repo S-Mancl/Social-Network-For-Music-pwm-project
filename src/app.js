@@ -124,7 +124,7 @@ function getInfo(details,res){
     )
 }
 async function login(res,user){
-    if((typeof user.email !== 'string' &&!( user.email instanceof String)) || (typeof user.password !== 'string' &&!( user.password instanceof String))) res.status(400).json({code:1,reason: `Don't try to mess with me...`})
+    if((typeof user.userName !== 'string' &&!( user.userName instanceof String)) || (typeof user.email !== 'string' &&!( user.email instanceof String)) || (typeof user.password !== 'string' &&!( user.password instanceof String))) res.status(400).json({code:1,reason: `Don't try to mess with me...`})
     else if(user.email == undefined || user.password == undefined) res.status(400).json({code:1,reason: `You are missing some fields or they are not strings...`})
     else{
         user.email = validator.escape(validator.trim(user.email))
@@ -162,8 +162,8 @@ async function login(res,user){
     }
 }
 async function register(res,user){
-
-    if(user.name==undefined || user.password==undefined || user.surname == undefined || user.userName == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({code:-1,reason: `You are missing some fields...`})
+    if((typeof user.userName !== 'string' &&!( user.userName instanceof String)) || (typeof user.email !== 'string' &&!( user.email instanceof String)) || (typeof user.password !== 'string' &&!( user.password instanceof String))) res.status(400).json({code:1,reason: `Don't try to mess with me...`})
+    else if(user.name==undefined || user.password==undefined || user.surname == undefined || user.userName == undefined || user.birthDate == undefined || user.favoriteGenres == undefined || user.email == undefined) res.status(400).json({code:-1,reason: `You are missing some fields...`})
     else{
         [`name`,`surname`,`userName`,`birthDate`,`password`,`email`].forEach(key => {
             
@@ -413,7 +413,7 @@ async function isStarred(req,res){
                             .collection('users')
                             .findOne(filter);
                 
-                if(await loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id)){
+                if(loggedUser.favorites[req.body.category].some(element => element.id ==req.body.id)){
                     res.status(200).json({"favorite":true})
                     
                 }//se non è già presente allora lo devo invece aggiungere
@@ -1310,6 +1310,7 @@ async function getGroupList(req,res){
             }
             else{
                 try{
+                    if(await pwmClient.db('pwm_project').collection('users').findOne({"email":decoded.email})==null) throw new Error()
                     let group = await pwmClient.db("pwm_project").collection('groups').find({}).toArray()
                     console.log(group)
                     res.status(200).json(group)

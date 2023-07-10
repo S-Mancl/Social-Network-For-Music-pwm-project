@@ -5,7 +5,7 @@ fetch('/genres')
     .then((response) => {
         response.results.forEach(element => {
             //console.log(element)
-            toFill.innerHTML+=`<div class="form-check"><input class="form-check-input" type="checkbox" value="${element}" id="${element}"> <label class="form-check-label normal-text" for="${element}">${element}</label></div>`
+            toFill.innerHTML+=`<div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" value="${element}" id="${element}"> <label class="form-check-label normal-text" for="${element}">${element}</label></div>`
         });
     })
 function register(){
