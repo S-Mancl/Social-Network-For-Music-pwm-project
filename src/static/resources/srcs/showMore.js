@@ -74,7 +74,7 @@ fetch("/search", {
                         clone.getElementsByClassName('card-img-top')[0].src = response[key].items[i].album.images[1].url
                     }catch(e){clone.getElementsByClassName('card-img-top')[0].classList.add('d-none')}
                 }
-                try{clone.getElementsByClassName('text-body-secondary')[0].innerHTML=`${duration(response[key].items[i].duration_ms)}`}catch(e){console.log(e)}
+                //try{clone.getElementsByClassName('text-body-secondary')[0].innerHTML=`${duration(response[key].items[i].duration_ms)}`}catch(e){console.log(e)}
                 clone.getElementsByClassName('btn')[0].href = "/describe.html?kind="+key+"&value=" + response[key].items[i].id
                 clone.classList.remove('d-none')
                 clone.classList.add('d-block')

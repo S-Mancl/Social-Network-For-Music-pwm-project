@@ -124,7 +124,7 @@ function getInfo(details,res){
     )
 }
 async function login(res,user){
-    if((typeof user.userName !== 'string' &&!( user.userName instanceof String)) || (typeof user.email !== 'string' &&!( user.email instanceof String)) || (typeof user.password !== 'string' &&!( user.password instanceof String))) res.status(400).json({code:1,reason: `Don't try to mess with me...`})
+    if((typeof user.email !== 'string' &&!( user.email instanceof String)) || (typeof user.password !== 'string' &&!( user.password instanceof String))) res.status(400).json({code:1,reason: `Don't try to mess with me...`})
     else if(user.email == undefined || user.password == undefined) res.status(400).json({code:1,reason: `You are missing some fields or they are not strings...`})
     else{
         user.email = validator.escape(validator.trim(user.email))
