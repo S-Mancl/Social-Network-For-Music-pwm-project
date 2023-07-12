@@ -7,7 +7,7 @@ A project for my CS classes at university
 ## Screens and docs
 You can see the docs [here](./docs/relazione.pdf) and some screenshots [here](./docs/images/)
 ## How to create the docker image
-1. Create a .env file under ./src, put there the following:
+1. Create a `.env` file under `./src`, put there the following:
     - MONGONAME
     - MONGOPASSWORD
     - PORT
