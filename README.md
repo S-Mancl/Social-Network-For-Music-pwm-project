@@ -1,7 +1,9 @@
 # Social Network For Music pwm project
 A project for my CS classes at university
 ## Features
-TO DO
+* Search for songs, albums, artists & more!
+* Register and login to view your profile, to select favorites & more!
+* Create playlists and group, follow playlists, join groups
 ## Screens and docs
 You can see the docs [here](./docs/relazione.pdf) and some screenshots [here](./docs/images/)
 ## How to create the docker image
