@@ -280,6 +280,9 @@ ul.dropdown-menu li a:active{
         border-radius: 25px;
     }
 }
+.col-lg-6.badge.rounded-pill:hover{
+    font-size:larger;
+}
 /*debug purposes only
 #main-container div{
     border:1px solid magenta;
