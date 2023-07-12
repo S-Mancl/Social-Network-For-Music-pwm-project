@@ -81,10 +81,13 @@ function getGenres(req,res){
         if(searchResults.error!=undefined) answer.status = searchResults.error
         res.json(answer)
     }
-    )    
+    )
+}
+function clean(string){
+    return string.replace(/[&\/\\#,+()$~%.'":*?<>{}`]/g,"")
 }
 function createUrlForSearch(question){
-    var url = baseUrls.search+"q="+question.string+"&type="
+    var url = baseUrls.search+"q="+clean(question.string)+"&type="
     question.type.forEach(element => {
         url += element
         url += ","
@@ -482,12 +485,12 @@ function canSee(playlist, groupList, user){
     return false
 }
 function addTag(playlist,tag){
-    if(!playlist.tags.some(element => element == tag)) playlist.tags.push(tag)
+    if(!playlist.tags.some(element => element == tag)) playlist.tags.push(clean(tag))
     return playlist
 }
 async function removeTag(playlist,tag){
-    if(playlist.tags.some(element => element == tag)){
-        playlist.tags.splice(playlist.tags.indexOf(tag),1)
+    if(playlist.tags.some(element => element ==clean(tag))){
+        playlist.tags.splice(playlist.tags.indexOf(clean(tag)),1)
     }
     return playlist
 }
