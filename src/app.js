@@ -84,7 +84,7 @@ function getGenres(req,res){
     )
 }
 function clean(string){
-    return string.replace(/[&\/\\#,+()$~%.'":*?<>{}`]/g,"")
+    return string.replace(/[&\/\\#,+()$~%.'":^*?<>{}`]/g,"")
 }
 function createUrlForSearch(question){
     var url = baseUrls.search+"q="+clean(question.string)+"&type="
