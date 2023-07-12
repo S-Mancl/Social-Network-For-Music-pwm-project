@@ -84,7 +84,7 @@ function getGenres(req,res){
     )
 }
 function clean(string){
-    return string.replace(/[&\/\\#,+()$~%.'":^*?<>{}`]/g,"")
+    return encodeURIComponent(string)
 }
 function createUrlForSearch(question){
     var url = baseUrls.search+"q="+clean(question.string)+"&type="
@@ -476,8 +476,6 @@ function changeOwner(playlist,newOwner){
     return playlist;
 }
 function canSee(playlist, groupList, user){
-    console.log(playlist,user)
-    if(playlist==null) return false
     if(playlist.visibility) return true
     if(user==null) return false
     if(playlist.owner == user.userName) return true
@@ -1315,7 +1313,6 @@ async function getGroupList(req,res){
                 try{
                     if(await pwmClient.db('pwm_project').collection('users').findOne({"email":decoded.email})==null) throw new Error()
                     let group = await pwmClient.db("pwm_project").collection('groups').find({}).toArray()
-                    console.log(group)
                     res.status(200).json(group)
                 }catch(e){log(e.name+": "+e.message+"\n\t"+e.stack.split(/\n/)[1]+"\n------------------------------------------------------------------------------------------------");res.status(400).json({reason:`Generic error: ${e.toString()}`})}
                 pwmClient.close()
