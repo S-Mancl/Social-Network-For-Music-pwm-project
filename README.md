@@ -1,7 +1,7 @@
 # Social Network For Music pwm project
 A project for my CS classes at university
 
-![Screenshot](docs%2Fimages%2Fvetrina-pc.png)
+![Screenshot](docs%2Fimages%2Fvetrina-pc.png?raw=true)
 
 ## Features
 * Search for songs, albums, artists & more!
