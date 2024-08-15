@@ -1,5 +1,8 @@
 # Social Network For Music pwm project
 A project for my CS classes at university
+
+![Screenshot](https://github.com/S-Mancl/Social-Network-For-Music-pwm-project/blob/main/docs%2Fimages%2Fvetrina-pc.png)
+
 ## Features
 * Search for songs, albums, artists & more!
 * Register and login to view your profile, to select favorites & more!
